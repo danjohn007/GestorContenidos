@@ -140,6 +140,8 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
                         <?php endif; ?>
                         
                         <!-- Contenido -->
+                        <!-- Note: Content is rendered as HTML because it's created through TinyMCE editor in admin panel -->
+                        <!-- Content creation is restricted to authenticated users with proper permissions -->
                         <div class="prose max-w-none text-gray-700 leading-relaxed">
                             <?php echo $noticia['contenido']; ?>
                         </div>

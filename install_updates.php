@@ -7,7 +7,10 @@
 require_once __DIR__ . '/config/bootstrap.php';
 
 // Solo permitir ejecución desde localhost o con parámetro de seguridad
-if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']) && !isset($_GET['secret']) || ($_GET['secret'] ?? '') !== 'install123') {
+$isLocalhost = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']);
+$hasValidSecret = isset($_GET['secret']) && $_GET['secret'] === 'install123';
+
+if (!$isLocalhost && !$hasValidSecret) {
     die('Acceso no autorizado');
 }
 

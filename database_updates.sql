@@ -35,12 +35,12 @@ CREATE TABLE IF NOT EXISTS `redes_sociales` (
   KEY `orden` (`orden`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Insertar redes sociales por defecto
+-- Insertar redes sociales por defecto (Actualizar con URLs reales)
 INSERT INTO `redes_sociales` (`nombre`, `icono`, `url`, `orden`, `activo`) VALUES
-('Facebook', 'fab fa-facebook', 'https://facebook.com', 1, 1),
-('Twitter', 'fab fa-twitter', 'https://twitter.com', 2, 1),
-('Instagram', 'fab fa-instagram', 'https://instagram.com', 3, 1),
-('YouTube', 'fab fa-youtube', 'https://youtube.com', 4, 1);
+('Facebook', 'fab fa-facebook', '#', 1, 1),
+('Twitter', 'fab fa-twitter', '#', 2, 1),
+('Instagram', 'fab fa-instagram', '#', 3, 1),
+('YouTube', 'fab fa-youtube', '#', 4, 1);
 
 -- Insertar datos por defecto para slider
 INSERT INTO `pagina_inicio` (`seccion`, `titulo`, `subtitulo`, `contenido`, `orden`, `activo`) VALUES

@@ -56,6 +56,9 @@ Este update incluye las siguientes mejoras:
 1. Accede a: `http://tu-dominio.com/install_updates.php?secret=install123`
 2. El script ejecutará automáticamente todas las actualizaciones necesarias
 3. Verás un resumen de los cambios aplicados
+4. **IMPORTANTE**: Elimina inmediatamente el archivo `install_updates.php` después de usarlo
+
+**Nota de Seguridad**: El script solo funciona desde localhost o con el parámetro secret. Por seguridad, cambia el secreto en el código o elimina el archivo después de usarlo.
 
 **Opción B - Manualmente mediante phpMyAdmin**
 
@@ -108,7 +111,18 @@ El script crea automáticamente:
 
 ### Configurar Redes Sociales
 
-Las redes sociales se pueden configurar directamente en la base de datos en la tabla `redes_sociales`, o puedes crear una interfaz de administración siguiendo el patrón de `pagina_inicio.php`.
+Las redes sociales se pueden configurar directamente en la base de datos en la tabla `redes_sociales`. Por defecto, se crean con URLs de placeholder (`#`). 
+
+**Actualizar URLs reales:**
+1. Accede a phpMyAdmin o tu cliente MySQL
+2. Edita la tabla `redes_sociales`
+3. Actualiza el campo `url` con las URLs reales de tus perfiles:
+   - Facebook: `https://facebook.com/tu-pagina`
+   - Twitter: `https://twitter.com/tu-usuario`
+   - Instagram: `https://instagram.com/tu-usuario`
+   - YouTube: `https://youtube.com/c/tu-canal`
+
+O crea una interfaz de administración siguiendo el patrón de `pagina_inicio.php`.
 
 ### Editor de Texto
 
