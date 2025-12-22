@@ -133,9 +133,26 @@ Las redes sociales se crean desactivadas por defecto con URLs de placeholder.
 
 ### Editor de Texto
 
-El editor TinyMCE está configurado para usar el CDN público. Para producción, considera:
-- Obtener una API key gratuita en https://www.tiny.cloud/
-- Reemplazar en `noticia_crear.php` la línea del CDN con tu API key
+El editor TinyMCE está configurado para usar el CDN público sin API key. 
+
+**Para producción, se recomienda:**
+
+**Opción 1: Obtener API key gratuita (Recomendado)**
+1. Regístrate en https://www.tiny.cloud/auth/signup/
+2. Obtén tu API key gratuita
+3. En `noticia_crear.php`, reemplaza:
+   ```html
+   <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"></script>
+   ```
+   Con:
+   ```html
+   <script src="https://cdn.tiny.cloud/1/TU-API-KEY/tinymce/6/tinymce.min.js"></script>
+   ```
+
+**Opción 2: Versión auto-hospedada**
+1. Descarga TinyMCE desde https://www.tiny.cloud/get-tiny/self-hosted/
+2. Coloca los archivos en `public/js/tinymce/`
+3. Actualiza la ruta del script en `noticia_crear.php`
 
 ## Solución de Problemas
 
@@ -157,14 +174,31 @@ El editor TinyMCE está configurado para usar el CDN público. Para producción,
 
 ## Seguridad
 
-### Importante: Eliminar archivo de instalación
-Después de ejecutar las actualizaciones, elimina o renombra el archivo `install_updates.php` por seguridad:
+### Importante: Gestión del Script de Instalación
 
-```bash
-rm install_updates.php
-# o
-mv install_updates.php install_updates.php.bak
-```
+El archivo `install_updates.php` es una herramienta de instalación que debe ser manejada con cuidado:
+
+**Antes de usar:**
+1. Considera cambiar el secreto por defecto (`install123`) por uno más seguro en la línea 12 del archivo
+2. O usa el script solo desde localhost donde no se requiere el secreto
+
+**Después de usar:**
+1. **CRÍTICO**: Elimina inmediatamente el archivo:
+   ```bash
+   rm install_updates.php
+   ```
+2. O al menos renómbralo para evitar acceso no autorizado:
+   ```bash
+   mv install_updates.php install_updates.php.disabled
+   ```
+
+### Otras Consideraciones de Seguridad
+
+- ✅ Todo el contenido HTML se sanitiza antes de mostrarse
+- ✅ Las redes sociales se crean desactivadas por defecto
+- ✅ Los usuarios admin deben configurar URLs reales antes de activarlas
+- ✅ El contenido de noticias pasa por sanitización HTML para prevenir XSS
+- ✅ Todos los formularios usan prepared statements para prevenir SQL injection
 
 ## Compatibilidad
 
