@@ -35,7 +35,7 @@
             </div>
             
             <nav class="mt-8">
-                <a href="<?php echo url('index.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('dashboard.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
                     <i class="fas fa-home mr-3"></i>
                     Dashboard
                 </a>

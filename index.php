@@ -1,298 +1,199 @@
 <?php
 /**
- * Dashboard Principal
+ * Página Pública Principal
  */
 require_once __DIR__ . '/config/bootstrap.php';
 
-// Requerir autenticación
-requireAuth();
+// Si está autenticado, redirigir al dashboard
+if (isAuthenticated()) {
+    redirect('dashboard.php');
+}
 
-$usuarioModel = new Usuario();
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 
-// Obtener estadísticas
-$totalNoticias = $noticiaModel->count();
-$noticiasPublicadas = $noticiaModel->count('publicado');
-$noticiasBorrador = $noticiaModel->count('borrador');
-$noticiasRevision = $noticiaModel->count('revision');
+// Obtener noticias destacadas
+$noticiasDestacadas = $noticiaModel->getDestacadas(3);
 
-$totalCategorias = count($categoriaModel->getAll());
-$totalUsuarios = count($usuarioModel->getAll(1));
+// Obtener noticias recientes publicadas
+$noticiasRecientes = $noticiaModel->getAll('publicado', null, 1, 6);
 
-// Obtener noticias recientes
-$noticiasRecientes = $noticiaModel->getAll(null, null, 1, 10);
+// Obtener categorías principales
+$categorias = $categoriaModel->getParents(1);
 
-// Obtener noticias más leídas
-$noticiasMasLeidas = $noticiaModel->getMasLeidas(5);
-
-$title = 'Dashboard';
-ob_start();
 ?>
-
-<div class="space-y-6">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Noticias - Querétaro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <div class="text-sm text-gray-600">
-            <i class="fas fa-calendar-alt mr-2"></i>
-            <?php echo date('d/m/Y H:i'); ?>
-        </div>
-    </div>
-
-    <!-- Estadísticas -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Noticias -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                    <i class="fas fa-newspaper text-white text-2xl"></i>
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Portal de Noticias Querétaro</h1>
                 </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            Total Noticias
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $totalNoticias; ?>
-                        </dd>
-                    </dl>
-                </div>
+                <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Acceder
+                </a>
             </div>
+            <!-- Navigation -->
+            <nav class="border-t border-gray-200 py-3">
+                <ul class="flex space-x-6">
+                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium">Inicio</a></li>
+                    <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
+                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600"><?php echo e($cat['nombre']); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </nav>
         </div>
+    </header>
 
-        <!-- Noticias Publicadas -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                    <i class="fas fa-check-circle text-white text-2xl"></i>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            Publicadas
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $noticiasPublicadas; ?>
-                        </dd>
-                    </dl>
-                </div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Noticias Destacadas -->
+        <?php if (!empty($noticiasDestacadas)): ?>
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-star text-yellow-500 mr-2"></i>
+                Noticias Destacadas
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <?php foreach ($noticiasDestacadas as $noticia): ?>
+                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <?php if ($noticia['imagen_destacada']): ?>
+                    <img src="<?php echo e($noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
+                    <?php else: ?>
+                    <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-white text-6xl"></i>
+                    </div>
+                    <?php endif; ?>
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                <?php echo e($noticia['categoria_nombre']); ?>
+                            </span>
+                            <span class="ml-auto">
+                                <i class="fas fa-calendar mr-1"></i>
+                                <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600">
+                            <?php echo e($noticia['titulo']); ?>
+                        </h3>
+                        <?php if ($noticia['resumen']): ?>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            <?php echo e($noticia['resumen']); ?>
+                        </p>
+                        <?php endif; ?>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span>
+                                <i class="fas fa-eye mr-1"></i>
+                                <?php echo number_format($noticia['visitas']); ?> visitas
+                            </span>
+                        </div>
+                    </div>
+                </article>
+                <?php endforeach; ?>
             </div>
-        </div>
+        </section>
+        <?php endif; ?>
 
-        <!-- Borradores -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                    <i class="fas fa-edit text-white text-2xl"></i>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            Borradores
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $noticiasBorrador; ?>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-
-        <!-- En Revisión -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-orange-500 rounded-md p-3">
-                    <i class="fas fa-clock text-white text-2xl"></i>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            En Revisión
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $noticiasRevision; ?>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Estadísticas adicionales -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                    <i class="fas fa-folder text-white text-2xl"></i>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            Categorías
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $totalCategorias; ?>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                    <i class="fas fa-users text-white text-2xl"></i>
-                </div>
-                <div class="ml-5 w-0 flex-1">
-                    <dl>
-                        <dt class="text-sm font-medium text-gray-500 truncate">
-                            Usuarios Activos
-                        </dt>
-                        <dd class="text-3xl font-semibold text-gray-900">
-                            <?php echo $totalUsuarios; ?>
-                        </dd>
-                    </dl>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Noticias Recientes y Más Leídas -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Noticias Recientes -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-clock mr-2 text-blue-500"></i>
-                    Noticias Recientes
-                </h3>
+        <section>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                <i class="fas fa-clock text-blue-600 mr-2"></i>
+                Últimas Noticias
+            </h2>
+            <?php if (empty($noticiasRecientes)): ?>
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">No hay noticias disponibles en este momento</p>
             </div>
-            <div class="p-6">
-                <div class="space-y-4">
-                    <?php if (empty($noticiasRecientes)): ?>
-                        <p class="text-gray-500 text-center py-4">No hay noticias recientes</p>
+            <?php else: ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <?php foreach ($noticiasRecientes as $noticia): ?>
+                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <?php if ($noticia['imagen_destacada']): ?>
+                    <img src="<?php echo e($noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
                     <?php else: ?>
-                        <?php foreach ($noticiasRecientes as $noticia): ?>
-                        <div class="flex items-start space-x-3 pb-3 border-b border-gray-100">
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium
-                                    <?php 
-                                    echo match($noticia['estado']) {
-                                        'publicado' => 'bg-green-100 text-green-800',
-                                        'borrador' => 'bg-yellow-100 text-yellow-800',
-                                        'revision' => 'bg-orange-100 text-orange-800',
-                                        'aprobado' => 'bg-blue-100 text-blue-800',
-                                        'rechazado' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
-                                    };
-                                    ?>
-                                ">
-                                    <?php echo ucfirst($noticia['estado']); ?>
-                                </span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate">
-                                    <?php echo e($noticia['titulo']); ?>
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    <?php echo e($noticia['categoria_nombre']); ?> • 
-                                    <?php echo date('d/m/Y H:i', strtotime($noticia['fecha_creacion'])); ?>
-                                </p>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
+                    <div class="w-full h-40 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                        <i class="fas fa-newspaper text-white text-4xl"></i>
+                    </div>
                     <?php endif; ?>
-                </div>
-                
-                <?php if (!empty($noticiasRecientes)): ?>
-                <div class="mt-4 text-center">
-                    <a href="<?php echo url('noticias.php'); ?>" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        Ver todas las noticias <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- Noticias Más Leídas -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">
-                    <i class="fas fa-fire mr-2 text-red-500"></i>
-                    Noticias Más Leídas
-                </h3>
-            </div>
-            <div class="p-6">
-                <div class="space-y-4">
-                    <?php if (empty($noticiasMasLeidas)): ?>
-                        <p class="text-gray-500 text-center py-4">No hay noticias publicadas</p>
-                    <?php else: ?>
-                        <?php foreach ($noticiasMasLeidas as $index => $noticia): ?>
-                        <div class="flex items-start space-x-3 pb-3 border-b border-gray-100">
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-800 font-bold text-sm">
-                                    <?php echo $index + 1; ?>
-                                </span>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate">
-                                    <?php echo e($noticia['titulo']); ?>
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    <i class="fas fa-eye mr-1"></i>
-                                    <?php echo number_format($noticia['visitas']); ?> visitas
-                                </p>
-                            </div>
+                    <div class="p-4">
+                        <div class="flex items-center text-xs text-gray-500 mb-2">
+                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                                <?php echo e($noticia['categoria_nombre']); ?>
+                            </span>
+                            <span class="ml-auto">
+                                <i class="fas fa-calendar mr-1"></i>
+                                <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
+                            </span>
                         </div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-blue-600 line-clamp-2">
+                            <?php echo e($noticia['titulo']); ?>
+                        </h3>
+                        <?php if ($noticia['resumen']): ?>
+                        <p class="text-gray-600 text-sm line-clamp-2 mb-3">
+                            <?php echo e($noticia['resumen']); ?>
+                        </p>
+                        <?php endif; ?>
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-eye mr-1"></i>
+                            <?php echo number_format($noticia['visitas']); ?> visitas
+                        </div>
+                    </div>
+                </article>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-newspaper mr-2"></i>
+                        Portal de Noticias
+                    </h3>
+                    <p class="text-gray-400">Tu fuente de noticias de Querétaro</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categorías</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <?php foreach (array_slice($categorias, 0, 5) as $cat): ?>
+                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="hover:text-white"><?php echo e($cat['nombre']); ?></a></li>
                         <?php endforeach; ?>
-                    <?php endif; ?>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contacto</h4>
+                    <p class="text-gray-400">
+                        <i class="fas fa-phone mr-2"></i>
+                        442-123-4567
+                    </p>
+                    <p class="text-gray-400 mt-2">
+                        <i class="fas fa-envelope mr-2"></i>
+                        contacto@portalqueretaro.mx
+                    </p>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Acciones Rápidas -->
-    <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">
-                <i class="fas fa-bolt mr-2 text-yellow-500"></i>
-                Acciones Rápidas
-            </h3>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <?php if (hasPermission('noticias.crear') || hasPermission('all')): ?>
-                <a href="<?php echo url('noticia_crear.php'); ?>" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                    <i class="fas fa-plus-circle text-3xl text-blue-500 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-700">Nueva Noticia</span>
-                </a>
-                <?php endif; ?>
-                
-                <?php if (hasPermission('categorias') || hasPermission('all')): ?>
-                <a href="<?php echo url('categoria_crear.php'); ?>" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                    <i class="fas fa-folder-plus text-3xl text-green-500 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-700">Nueva Categoría</span>
-                </a>
-                <?php endif; ?>
-                
-                <?php if (hasPermission('usuarios') || hasPermission('all')): ?>
-                <a href="<?php echo url('usuario_crear.php'); ?>" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-                    <i class="fas fa-user-plus text-3xl text-purple-500 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-700">Nuevo Usuario</span>
-                </a>
-                <?php endif; ?>
-                
-                <a href="<?php echo url('index.php'); ?>" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors">
-                    <i class="fas fa-chart-line text-3xl text-orange-500 mb-2"></i>
-                    <span class="text-sm font-medium text-gray-700">Ver Estadísticas</span>
-                </a>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
             </div>
         </div>
-    </div>
-</div>
-
-<?php
-$content = ob_get_clean();
-include __DIR__ . '/app/views/layouts/main.php';
-?>
+    </footer>
+</body>
+</html>
