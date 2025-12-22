@@ -216,7 +216,7 @@ ob_start();
                 <!-- Previsualización -->
                 <div class="relative h-40 bg-gray-100 flex items-center justify-center">
                     <?php if ($archivo['tipo'] === 'imagen'): ?>
-                    <img src="<?php echo e($archivo['ruta']); ?>" alt="<?php echo e($archivo['alt_text']); ?>" 
+                    <img src="<?php echo url($archivo['ruta']); ?>" alt="<?php echo e($archivo['alt_text']); ?>" 
                          class="w-full h-full object-cover">
                     <?php elseif ($archivo['tipo'] === 'video'): ?>
                     <i class="fas fa-video text-6xl text-gray-400"></i>
@@ -392,7 +392,7 @@ ob_start();
 
 <script>
 function copyToClipboard(text) {
-    const fullUrl = window.location.origin + text;
+    const fullUrl = '<?php echo BASE_URL; ?>' + text;
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(fullUrl).then(() => {
             alert('URL copiada al portapapeles');

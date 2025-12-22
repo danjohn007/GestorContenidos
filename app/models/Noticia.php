@@ -113,9 +113,9 @@ class Noticia {
      */
     public function create($data) {
         $query = "INSERT INTO {$this->table} 
-                  (titulo, subtitulo, slug, contenido, resumen, autor_id, categoria_id, 
+                  (titulo, subtitulo, slug, contenido, resumen, tags, autor_id, categoria_id, 
                    imagen_destacada, estado, destacado, permitir_comentarios, fecha_programada) 
-                  VALUES (:titulo, :subtitulo, :slug, :contenido, :resumen, :autor_id, :categoria_id,
+                  VALUES (:titulo, :subtitulo, :slug, :contenido, :resumen, :tags, :autor_id, :categoria_id,
                           :imagen_destacada, :estado, :destacado, :permitir_comentarios, :fecha_programada)";
         
         $stmt = $this->db->prepare($query);
@@ -126,6 +126,7 @@ class Noticia {
             'slug' => $this->generateSlug($data['slug'] ?? $data['titulo']),
             'contenido' => $data['contenido'],
             'resumen' => $data['resumen'] ?? null,
+            'tags' => $data['tags'] ?? null,
             'autor_id' => $data['autor_id'],
             'categoria_id' => $data['categoria_id'],
             'imagen_destacada' => $data['imagen_destacada'] ?? null,
@@ -149,7 +150,7 @@ class Noticia {
         $fields = [];
         $params = ['id' => $id];
         
-        $allowedFields = ['titulo', 'subtitulo', 'slug', 'contenido', 'resumen', 
+        $allowedFields = ['titulo', 'subtitulo', 'slug', 'contenido', 'resumen', 'tags',
                           'categoria_id', 'imagen_destacada', 'estado', 'destacado', 
                           'orden_destacado', 'permitir_comentarios', 'fecha_programada', 
                           'fecha_publicacion', 'modificado_por'];
@@ -348,5 +349,50 @@ class Noticia {
         $stmt = $this->db->prepare($query);
         $stmt->execute(['noticia_id' => $noticiaId]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Busca noticias por término
+     */
+    public function search($termino, $page = 1, $perPage = 20) {
+        $offset = ($page - 1) * $perPage;
+        
+        $query = "SELECT n.*, c.nombre as categoria_nombre
+                  FROM {$this->table} n
+                  INNER JOIN categorias c ON n.categoria_id = c.id
+                  WHERE n.estado = 'publicado' 
+                  AND (n.titulo LIKE :termino 
+                       OR n.contenido LIKE :termino 
+                       OR n.resumen LIKE :termino 
+                       OR n.tags LIKE :termino)
+                  ORDER BY n.fecha_publicacion DESC
+                  LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':termino', '%' . $termino . '%');
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Cuenta resultados de búsqueda
+     */
+    public function countSearch($termino) {
+        $query = "SELECT COUNT(*) as total 
+                  FROM {$this->table} 
+                  WHERE estado = 'publicado' 
+                  AND (titulo LIKE :termino 
+                       OR contenido LIKE :termino 
+                       OR resumen LIKE :termino 
+                       OR tags LIKE :termino)";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->execute(['termino' => '%' . $termino . '%']);
+        $result = $stmt->fetch();
+        
+        return $result['total'];
     }
 }

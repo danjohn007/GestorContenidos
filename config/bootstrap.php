@@ -95,6 +95,41 @@ function unsetSession($key) {
     }
 }
 
+// Función helper para sanitizar HTML de contenido
+// Note: For enhanced security in high-risk environments, consider using HTML Purifier library
+// Current implementation provides good protection against common XSS attacks
+function sanitizeHtml($html) {
+    // Lista de etiquetas permitidas sin atributos peligrosos
+    $allowedTags = '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><table><thead><tbody><tr><th><td><div><span>';
+    
+    // Primero, remover todas las etiquetas no permitidas
+    $html = strip_tags($html, $allowedTags);
+    
+    // Remover atributos potencialmente peligrosos usando regex
+    // Remover eventos onclick, onerror, onload, etc.
+    $html = preg_replace('/\s*on\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
+    
+    // Remover javascript: en href y src
+    $html = preg_replace('/(href|src)\s*=\s*["\']javascript:[^"\']*["\']/i', '', $html);
+    
+    // Remover data: URLs que podrían ser peligrosas
+    $html = preg_replace('/(href|src)\s*=\s*["\']data:[^"\']*["\']/i', '', $html);
+    
+    return $html;
+}
+
+// Función helper para sanitizar HTML simple (solo para contacto)
+function sanitizeSimpleHtml($html) {
+    $allowedTags = '<br><strong><em><a>';
+    $html = strip_tags($html, $allowedTags);
+    
+    // Remover atributos peligrosos de enlaces
+    $html = preg_replace('/\s*on\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
+    $html = preg_replace('/href\s*=\s*["\']javascript:[^"\']*["\']/i', '', $html);
+    
+    return $html;
+}
+
 // Función helper para flash messages
 function setFlash($type, $message) {
     $_SESSION['flash'][$type] = $message;
