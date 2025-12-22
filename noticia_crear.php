@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subtitulo = trim($_POST['subtitulo'] ?? '');
     $contenido = trim($_POST['contenido'] ?? '');
     $resumen = trim($_POST['resumen'] ?? '');
+    $tags = trim($_POST['tags'] ?? '');
     $categoria_id = $_POST['categoria_id'] ?? '';
     $estado = $_POST['estado'] ?? 'borrador';
     $destacado = isset($_POST['destacado']) ? 1 : 0;
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'subtitulo' => $subtitulo,
             'contenido' => $contenido,
             'resumen' => $resumen,
+            'tags' => $tags,
             'categoria_id' => $categoria_id,
             'autor_id' => $currentUser['id'],
             'imagen_destacada' => $imagen_destacada,
@@ -77,6 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $result = $noticiaModel->create($data);
         if ($result) {
+            // Registrar auditoría
+            $logModel = new Log();
+            $logModel->registrarAuditoria(
+                $currentUser['id'],
+                'noticias',
+                'crear',
+                'noticias',
+                $result,
+                null,
+                $data
+            );
+            
             setFlash('success', 'Noticia creada exitosamente');
             redirect('noticias.php');
         } else {
@@ -170,18 +184,28 @@ ob_start();
                           placeholder="Breve resumen de la noticia"><?php echo e($_POST['resumen'] ?? ''); ?></textarea>
             </div>
 
+            <!-- Tags / Palabras Clave -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Palabras Clave (Tags)
+                </label>
+                <input type="text" name="tags" value="<?php echo e($_POST['tags'] ?? ''); ?>"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Separa las palabras clave con comas (ej: política, economía, salud)">
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-info-circle"></i>
+                    Las palabras clave ayudan a indexar y buscar las noticias
+                </p>
+            </div>
+
             <!-- Contenido -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Contenido <span class="text-red-500">*</span>
                 </label>
-                <textarea name="contenido" rows="12" required 
+                <textarea id="contenido" name="contenido" rows="12" required 
                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Contenido completo de la noticia"><?php echo e($_POST['contenido'] ?? ''); ?></textarea>
-                <p class="text-xs text-gray-500 mt-1">
-                    <i class="fas fa-info-circle"></i>
-                    Editor WYSIWYG disponible en la versión completa
-                </p>
             </div>
 
             <!-- Imagen Destacada -->
@@ -258,6 +282,27 @@ ob_start();
         </div>
     </div>
 </div>
+
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+tinymce.init({
+    selector: '#contenido',
+    height: 500,
+    menubar: true,
+    plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+             'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
+             'bullist numlist outdent indent | removeformat | link image media | help',
+    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
+    language: 'es',
+    branding: false,
+    promotion: false
+});
+</script>
 
 <?php
 $content = ob_get_clean();

@@ -69,6 +69,10 @@
                 <?php endif; ?>
                 
                 <?php if (hasPermission('configuracion') || hasPermission('all')): ?>
+                <a href="<?php echo url('pagina_inicio.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-home mr-3"></i>
+                    Página de Inicio
+                </a>
                 <a href="<?php echo url('configuracion.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
                     <i class="fas fa-cog mr-3"></i>
                     Configuración
