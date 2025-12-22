@@ -270,7 +270,11 @@ $redesSociales = $redesSocialesModel->getAll();
                             <?php echo e($infoContacto['subtitulo']); ?>
                         </p>
                         <div class="text-gray-300 space-y-2">
-                            <?php echo $infoContacto['contenido']; ?>
+                            <?php
+                            // Only allow specific safe HTML tags for contact info
+                            $allowedTags = '<br><strong><em><a>';
+                            echo strip_tags($infoContacto['contenido'], $allowedTags);
+                            ?>
                         </div>
                     </div>
                     <div class="text-center">

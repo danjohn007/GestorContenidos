@@ -140,10 +140,15 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
                         <?php endif; ?>
                         
                         <!-- Contenido -->
-                        <!-- Note: Content is rendered as HTML because it's created through TinyMCE editor in admin panel -->
-                        <!-- Content creation is restricted to authenticated users with proper permissions -->
+                        <!-- Security Note: Content is rendered as HTML from TinyMCE editor -->
+                        <!-- Content creation is restricted to authenticated admin users only -->
+                        <!-- For additional security, consider implementing HTML Purifier for sanitization -->
                         <div class="prose max-w-none text-gray-700 leading-relaxed">
-                            <?php echo $noticia['contenido']; ?>
+                            <?php 
+                            // Strip potentially dangerous tags while keeping formatting
+                            $allowedTags = '<p><br><strong><b><em><i><u><ul><ol><li><a><h1><h2><h3><h4><h5><h6><blockquote><img><table><thead><tbody><tr><th><td><span><div>';
+                            echo strip_tags($noticia['contenido'], $allowedTags); 
+                            ?>
                         </div>
                         
                         <!-- Estadísticas -->

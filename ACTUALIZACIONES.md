@@ -53,12 +53,16 @@ Este update incluye las siguientes mejoras:
 
 **Opción A - Mediante Script de Instalación (Recomendado)**
 
-1. Accede a: `http://tu-dominio.com/install_updates.php?secret=install123`
-2. El script ejecutará automáticamente todas las actualizaciones necesarias
-3. Verás un resumen de los cambios aplicados
-4. **IMPORTANTE**: Elimina inmediatamente el archivo `install_updates.php` después de usarlo
+1. **IMPORTANTE**: Antes de usar, considera cambiar el secreto en `install_updates.php` línea 12 por un valor más seguro
+2. Accede a: `http://tu-dominio.com/install_updates.php?secret=TU_SECRETO_AQUI`
+3. El script ejecutará automáticamente todas las actualizaciones necesarias
+4. Verás un resumen de los cambios aplicados
+5. **CRÍTICO**: Elimina inmediatamente el archivo `install_updates.php` después de usarlo
 
-**Nota de Seguridad**: El script solo funciona desde localhost o con el parámetro secret. Por seguridad, cambia el secreto en el código o elimina el archivo después de usarlo.
+**Notas de Seguridad**: 
+- El script solo funciona desde localhost o con el parámetro secret
+- El secreto por defecto es 'install123' - cámbialo antes de usar en producción
+- Siempre elimina el archivo después de la instalación
 
 **Opción B - Manualmente mediante phpMyAdmin**
 
@@ -111,18 +115,21 @@ El script crea automáticamente:
 
 ### Configurar Redes Sociales
 
-Las redes sociales se pueden configurar directamente en la base de datos en la tabla `redes_sociales`. Por defecto, se crean con URLs de placeholder (`#`). 
+Las redes sociales se crean desactivadas por defecto con URLs de placeholder. 
 
 **Actualizar URLs reales:**
 1. Accede a phpMyAdmin o tu cliente MySQL
 2. Edita la tabla `redes_sociales`
-3. Actualiza el campo `url` con las URLs reales de tus perfiles:
-   - Facebook: `https://facebook.com/tu-pagina`
-   - Twitter: `https://twitter.com/tu-usuario`
-   - Instagram: `https://instagram.com/tu-usuario`
-   - YouTube: `https://youtube.com/c/tu-canal`
+3. Actualiza los campos `url` y `activo`:
+   ```sql
+   UPDATE redes_sociales SET 
+     url = 'https://facebook.com/tu-pagina',
+     activo = 1
+   WHERE nombre = 'Facebook';
+   ```
+4. Repite para las otras redes sociales que uses
 
-O crea una interfaz de administración siguiendo el patrón de `pagina_inicio.php`.
+**O crea una interfaz de administración** siguiendo el patrón de `pagina_inicio.php` para gestionar las redes sociales desde el panel admin.
 
 ### Editor de Texto
 
