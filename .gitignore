@@ -1,5 +1,5 @@
 # Archivos de configuración sensibles
-config/config.php
+# config/config.php (descomentado para demo)
 
 # Directorios de uploads
 public/uploads/*
