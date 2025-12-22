@@ -122,7 +122,7 @@ ob_start();
             </div>
 
             <div class="flex items-center">
-                <input type="checkbox" name="visible" id="visible" value="1" <?php echo (!isset($_POST['visible']) || isset($_POST['visible'])) ? 'checked' : ''; ?>
+                <input type="checkbox" name="visible" id="visible" value="1" <?php echo (empty($_POST) || (isset($_POST['visible']) && $_POST['visible'])) ? 'checked' : ''; ?>
                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                 <label for="visible" class="ml-2 block text-sm text-gray-900">
                     Visible en el sitio público

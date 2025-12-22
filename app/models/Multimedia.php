@@ -157,9 +157,12 @@ class Multimedia {
             return false;
         }
         
-        // Eliminar el archivo físico
-        $rutaCompleta = __DIR__ . '/../../' . $archivo['ruta'];
-        if (file_exists($rutaCompleta)) {
+        // Eliminar el archivo físico con validación de ruta
+        $baseDir = realpath(__DIR__ . '/../../');
+        $rutaCompleta = realpath($baseDir . $archivo['ruta']);
+        
+        // Verificar que la ruta está dentro del directorio permitido
+        if ($rutaCompleta && strpos($rutaCompleta, $baseDir) === 0 && file_exists($rutaCompleta)) {
             unlink($rutaCompleta);
         }
         

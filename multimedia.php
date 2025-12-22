@@ -393,9 +393,34 @@ ob_start();
 <script>
 function copyToClipboard(text) {
     const fullUrl = window.location.origin + text;
-    navigator.clipboard.writeText(fullUrl).then(() => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullUrl).then(() => {
+            alert('URL copiada al portapapeles');
+        }).catch((err) => {
+            // Fallback para navegadores antiguos
+            fallbackCopyToClipboard(fullUrl);
+        });
+    } else {
+        fallbackCopyToClipboard(fullUrl);
+    }
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
         alert('URL copiada al portapapeles');
-    });
+    } catch (err) {
+        alert('Error al copiar la URL');
+    }
+    document.body.removeChild(textArea);
 }
 </script>
 

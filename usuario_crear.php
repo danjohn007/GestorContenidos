@@ -172,7 +172,7 @@ ob_start();
             </div>
 
             <div class="flex items-center">
-                <input type="checkbox" name="activo" id="activo" value="1" <?php echo (!isset($_POST['activo']) || isset($_POST['activo'])) ? 'checked' : ''; ?>
+                <input type="checkbox" name="activo" id="activo" value="1" <?php echo (empty($_POST) || (isset($_POST['activo']) && $_POST['activo'])) ? 'checked' : ''; ?>
                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                 <label for="activo" class="ml-2 block text-sm text-gray-900">
                     Usuario activo

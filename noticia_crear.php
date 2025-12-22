@@ -219,7 +219,7 @@ ob_start();
                 </div>
                 
                 <div class="flex items-center">
-                    <input type="checkbox" name="permitir_comentarios" id="comentarios" value="1" <?php echo (!isset($_POST['permitir_comentarios']) || isset($_POST['permitir_comentarios'])) ? 'checked' : ''; ?>
+                    <input type="checkbox" name="permitir_comentarios" id="comentarios" value="1" <?php echo (empty($_POST) || (isset($_POST['permitir_comentarios']) && $_POST['permitir_comentarios'])) ? 'checked' : ''; ?>
                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                     <label for="comentarios" class="ml-2 block text-sm text-gray-900">
                         Permitir comentarios
