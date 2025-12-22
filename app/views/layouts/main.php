@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo e($title ?? 'Dashboard'); ?> - <?php echo SITE_NAME; ?></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --color-primary: #1e40af;
+            --color-secondary: #3b82f6;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    
+    <?php if (isAuthenticated()): ?>
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
+            <div class="flex items-center justify-center h-16 bg-gray-800">
+                <h1 class="text-xl font-bold">CMS Noticias</h1>
+            </div>
+            
+            <nav class="mt-8">
+                <a href="<?php echo url('index.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-home mr-3"></i>
+                    Dashboard
+                </a>
+                
+                <?php if (hasPermission('noticias') || hasPermission('all')): ?>
+                <a href="<?php echo url('noticias.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-newspaper mr-3"></i>
+                    Noticias
+                </a>
+                <?php endif; ?>
+                
+                <?php if (hasPermission('categorias') || hasPermission('all')): ?>
+                <a href="<?php echo url('categorias.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-folder mr-3"></i>
+                    Categorías
+                </a>
+                <?php endif; ?>
+                
+                <?php if (hasPermission('multimedia') || hasPermission('all')): ?>
+                <a href="<?php echo url('multimedia.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-images mr-3"></i>
+                    Multimedia
+                </a>
+                <?php endif; ?>
+                
+                <?php if (hasPermission('usuarios') || hasPermission('all')): ?>
+                <a href="<?php echo url('usuarios.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-users mr-3"></i>
+                    Usuarios
+                </a>
+                <?php endif; ?>
+                
+                <?php if (hasPermission('configuracion') || hasPermission('all')): ?>
+                <a href="<?php echo url('configuracion.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-cog mr-3"></i>
+                    Configuración
+                </a>
+                <?php endif; ?>
+                
+                <?php if (hasPermission('logs') || hasPermission('all')): ?>
+                <a href="<?php echo url('logs.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    Logs
+                </a>
+                <?php endif; ?>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm h-16 fixed top-0 right-0 left-64 z-20">
+                <div class="flex items-center justify-between h-full px-6">
+                    <div class="flex items-center">
+                        <button id="menuToggle" class="text-gray-500 focus:outline-none lg:hidden">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">
+                            <i class="fas fa-user mr-2"></i>
+                            <?php 
+                            $user = getCurrentUser();
+                            echo e($user['nombre'] . ' (' . $user['rol'] . ')'); 
+                            ?>
+                        </span>
+                        <a href="<?php echo url('logout.php'); ?>" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-sign-out-alt mr-1"></i>
+                            Salir
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="pt-20 px-6 pb-6">
+                <?php
+                // Mostrar mensajes flash
+                $success = getFlash('success');
+                $error = getFlash('error');
+                $info = getFlash('info');
+                ?>
+                
+                <?php if ($success): ?>
+                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline"><?php echo e($success); ?></span>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($error): ?>
+                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline"><?php echo e($error); ?></span>
+                </div>
+                <?php endif; ?>
+                
+                <?php if ($info): ?>
+                <div class="mb-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline"><?php echo e($info); ?></span>
+                </div>
+                <?php endif; ?>
+                
+                <?php echo $content ?? ''; ?>
+            </main>
+        </div>
+    <?php else: ?>
+        <!-- Contenido sin autenticación -->
+        <?php echo $content ?? ''; ?>
+    <?php endif; ?>
+
+    <script>
+        // Toggle mobile menu
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+        }
+    </script>
+</body>
+</html>

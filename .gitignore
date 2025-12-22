@@ -1,0 +1,36 @@
+# Archivos de configuración sensibles
+# config/config.php (descomentado para demo)
+
+# Directorios de uploads
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Archivos temporales
+*.tmp
+*.log
+*.cache
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencias (si se agregan en el futuro)
+vendor/
+node_modules/
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+
+# Archivos de test local (no el test.php oficial)
+test_local.php
+pruebas/
