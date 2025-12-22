@@ -29,15 +29,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             mkdir($uploadDir, 0755, true);
         }
         
+        // Validar extensión
         $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         
-        if (in_array($extension, $allowedExtensions)) {
-            $filename = uniqid('homepage_') . '.' . $extension;
-            $uploadPath = $uploadDir . $filename;
+        if (!in_array($extension, $allowedExtensions)) {
+            $errors[] = 'Formato de imagen no permitido';
+        } else {
+            // Validar MIME type
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
+            finfo_close($finfo);
             
-            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
-                $data['imagen'] = '/public/uploads/homepage/' . $filename;
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            
+            if (!in_array($mimeType, $allowedMimes)) {
+                $errors[] = 'Tipo de archivo no válido';
+            } else {
+                $filename = uniqid('homepage_') . '.' . $extension;
+                $uploadPath = $uploadDir . $filename;
+                
+                if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
+                    $data['imagen'] = '/public/uploads/homepage/' . $filename;
+                } else {
+                    $errors[] = 'Error al subir la imagen';
+                }
             }
         }
     }
