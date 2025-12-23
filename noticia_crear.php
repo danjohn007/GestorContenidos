@@ -283,9 +283,9 @@ ob_start();
     </div>
 </div>
 
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<!-- Note: Using TinyMCE without API key has limitations -->
-<!-- For production, obtain free API key at: https://www.tiny.cloud/auth/signup/ -->
+<script src="https://cdn.tiny.cloud/1/<?php echo defined('TINYMCE_API_KEY') ? TINYMCE_API_KEY : 'no-api-key'; ?>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Note: Para producción, obtener una clave API gratuita en: https://www.tiny.cloud/auth/signup/ -->
+<!-- Configurar la clave en config/config.php como TINYMCE_API_KEY -->
 <script>
 tinymce.init({
     selector: '#contenido',
