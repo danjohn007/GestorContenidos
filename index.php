@@ -58,13 +58,25 @@ $redesSociales = $redesSocialesModel->getAll();
                 <div class="text-gray-600">
                     <i class="fas fa-calendar-alt mr-2"></i>
                     <?php 
-                    try {
-                        $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-                        $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
-                        echo $formatter->format(new DateTime());
-                    } catch (Exception $e) {
-                        // Fallback to simple date format if locale is not available
-                        echo date('l, d \d\e F \d\e Y');
+                    // Check if intl extension is available
+                    if (extension_loaded('intl')) {
+                        try {
+                            $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+                            $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
+                            echo $formatter->format(new DateTime());
+                        } catch (Exception $e) {
+                            // Fallback if locale is not available
+                            $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                            $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                            $fecha = new DateTime();
+                            echo $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                        }
+                    } else {
+                        // Fallback if intl extension is not available
+                        $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                        $fecha = new DateTime();
+                        echo $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
                     }
                     ?>
                 </div>
