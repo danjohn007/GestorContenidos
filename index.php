@@ -58,9 +58,14 @@ $redesSociales = $redesSocialesModel->getAll();
                 <div class="text-gray-600">
                     <i class="fas fa-calendar-alt mr-2"></i>
                     <?php 
-                    $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
-                    $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
-                    echo $formatter->format(new DateTime());
+                    try {
+                        $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+                        $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
+                        echo $formatter->format(new DateTime());
+                    } catch (Exception $e) {
+                        // Fallback to simple date format if locale is not available
+                        echo date('l, d \d\e F \d\e Y');
+                    }
                     ?>
                 </div>
             </div>
