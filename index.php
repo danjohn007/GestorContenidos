@@ -58,11 +58,15 @@ $redesSociales = $redesSocialesModel->getAll();
                 <div class="text-gray-600">
                     <i class="fas fa-calendar-alt mr-2"></i>
                     <?php 
-                    // Spanish month and day names for fallback
-                    $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-                    $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                    // Function to format date in Spanish
+                    $formatearFechaEspanol = function() {
+                        $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                        $fecha = new DateTime();
+                        return $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                    };
                     
-                    // Check if intl extension is available
+                    // Try to use IntlDateFormatter if available
                     if (extension_loaded('intl')) {
                         try {
                             $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
@@ -70,13 +74,11 @@ $redesSociales = $redesSocialesModel->getAll();
                             echo $formatter->format(new DateTime());
                         } catch (Exception $e) {
                             // Fallback if locale is not available
-                            $fecha = new DateTime();
-                            echo $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                            echo $formatearFechaEspanol();
                         }
                     } else {
                         // Fallback if intl extension is not available
-                        $fecha = new DateTime();
-                        echo $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                        echo $formatearFechaEspanol();
                     }
                     ?>
                 </div>
