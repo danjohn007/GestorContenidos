@@ -11,6 +11,15 @@ $categoriaModel = new Categoria();
 // Obtener filtros
 $estado = $_GET['estado'] ?? null;
 $categoriaId = $_GET['categoria'] ?? null;
+
+// Convertir strings vacíos a null
+if ($estado === '' || $estado === 'Todos') {
+    $estado = null;
+}
+if ($categoriaId === '' || $categoriaId === 'Todas') {
+    $categoriaId = null;
+}
+
 $page = $_GET['page'] ?? 1;
 $perPage = 20;
 
