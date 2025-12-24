@@ -71,6 +71,17 @@ INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) V
 ('color_texto', '#1f2937', 'color', 'diseno', 'Color principal del texto'),
 ('color_fondo', '#f3f4f6', 'color', 'diseno', 'Color de fondo del sitio'),
 ('fuente_principal', 'system-ui', 'texto', 'diseno', 'Fuente principal del sistema'),
-('fuente_titulos', 'system-ui', 'texto', 'diseno', 'Fuente para títulos')
+('fuente_titulos', 'system-ui', 'texto', 'diseno', 'Fuente para títulos'),
+('smtp_host', '', 'texto', 'correo', 'Servidor SMTP'),
+('smtp_port', '587', 'texto', 'correo', 'Puerto SMTP'),
+('smtp_usuario', '', 'texto', 'correo', 'Usuario SMTP'),
+('smtp_password', '', 'texto', 'correo', 'Contraseña SMTP'),
+('smtp_seguridad', 'tls', 'texto', 'correo', 'Seguridad SMTP (tls/ssl/none)'),
+('email_remitente', '', 'texto', 'correo', 'Email remitente'),
+('nombre_remitente', '', 'texto', 'correo', 'Nombre remitente'),
+('google_search_console', '', 'texto', 'seo', 'Código de verificación de Google Search Console'),
+('facebook_app_id', '', 'texto', 'seo', 'Facebook App ID para compartir'),
+('meta_keywords_default', '', 'texto', 'seo', 'Palabras clave por defecto'),
+('meta_description_default', '', 'texto', 'seo', 'Descripción meta por defecto')
 ON DUPLICATE KEY UPDATE clave=clave;
 
