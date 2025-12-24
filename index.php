@@ -57,7 +57,30 @@ $redesSociales = $redesSocialesModel->getAll();
                 </div>
                 <div class="text-gray-600">
                     <i class="fas fa-calendar-alt mr-2"></i>
-                    <?php setlocale(LC_TIME, 'es_ES.UTF-8', 'es_ES', 'spanish'); echo strftime('%A, %d de %B de %Y'); ?>
+                    <?php 
+                    // Function to format date in Spanish
+                    $formatearFechaEspanol = function() {
+                        $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                        $fecha = new DateTime();
+                        return $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                    };
+                    
+                    // Try to use IntlDateFormatter if available
+                    if (extension_loaded('intl')) {
+                        try {
+                            $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+                            $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
+                            echo $formatter->format(new DateTime());
+                        } catch (Exception $e) {
+                            // Fallback if locale is not available
+                            echo $formatearFechaEspanol();
+                        }
+                    } else {
+                        // Fallback if intl extension is not available
+                        echo $formatearFechaEspanol();
+                    }
+                    ?>
                 </div>
             </div>
             

@@ -38,6 +38,12 @@ define('ALLOWED_IMAGE_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
 define('ALLOWED_DOCUMENT_TYPES', ['pdf', 'doc', 'docx', 'xls', 'xlsx']);
 
 // =====================================================
+// CONFIGURACIÓN DE TINYMCE
+// =====================================================
+// Obtener una clave API gratuita en: https://www.tiny.cloud/auth/signup/
+define('TINYMCE_API_KEY', 'no-api-key'); // Reemplazar con tu clave API de TinyMCE
+
+// =====================================================
 // ENTORNO DE DESARROLLO
 // =====================================================
 define('ENVIRONMENT', 'development'); // development o production
