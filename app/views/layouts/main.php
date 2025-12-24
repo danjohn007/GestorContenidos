@@ -6,19 +6,47 @@
     <title><?php echo e($title ?? 'Dashboard'); ?> - <?php echo SITE_NAME; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <?php
+    // Cargar configuración de diseño si está autenticado
+    if (isAuthenticated()) {
+        $configuracionModel = new Configuracion();
+        $configGeneral = $configuracionModel->getByGrupo('general');
+        $configDiseno = $configuracionModel->getByGrupo('diseno');
+        
+        $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'CMS Noticias';
+        $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+        $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
+        $colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
+        $fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
+        $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
+    }
+    ?>
     <style>
+        <?php if (isAuthenticated()): ?>
+        :root {
+            --color-primary: <?php echo e($colorPrimario ?? '#1e40af'); ?>;
+            --color-secondary: <?php echo e($colorSecundario ?? '#3b82f6'); ?>;
+        }
+        body {
+            font-family: <?php echo e($fuentePrincipal ?? 'system-ui'); ?>;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: <?php echo e($fuenteTitulos ?? 'system-ui'); ?>;
+        }
+        <?php else: ?>
         :root {
             --color-primary: #1e40af;
             --color-secondary: #3b82f6;
         }
+        <?php endif; ?>
     </style>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#1e40af',
-                        secondary: '#3b82f6',
+                        primary: '<?php echo isAuthenticated() ? ($colorPrimario ?? '#1e40af') : '#1e40af'; ?>',
+                        secondary: '<?php echo isAuthenticated() ? ($colorSecundario ?? '#3b82f6') : '#3b82f6'; ?>',
                     }
                 }
             }
@@ -31,7 +59,11 @@
         <!-- Sidebar -->
         <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
             <div class="flex items-center justify-center h-16 bg-gray-800">
-                <h1 class="text-xl font-bold">CMS Noticias</h1>
+                <?php if (!empty($logoSitio)): ?>
+                <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                <?php else: ?>
+                <h1 class="text-xl font-bold"><?php echo e($nombreSitio ?? 'CMS Noticias'); ?></h1>
+                <?php endif; ?>
             </div>
             
             <nav class="mt-8">

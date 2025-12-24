@@ -6,6 +6,7 @@ require_once __DIR__ . '/config/bootstrap.php';
 
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
+$configuracionModel = new Configuracion();
 
 // Obtener slug de la noticia
 $slug = $_GET['slug'] ?? '';
@@ -34,19 +35,57 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
     return $n['id'] !== $noticia['id'];
 });
 
+// Obtener configuración del sitio
+$configGeneral = $configuracionModel->getByGrupo('general');
+$configDiseno = $configuracionModel->getByGrupo('diseno');
+
+// Valores de configuración
+$nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
+$logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
+$colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
+$colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
+$colorTexto = $configDiseno['color_texto']['valor'] ?? '#1f2937';
+$colorFondo = $configDiseno['color_fondo']['valor'] ?? '#f3f4f6';
+$fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
+$fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo e($noticia['titulo']); ?> - Portal de Noticias</title>
+    <title><?php echo e($noticia['titulo']); ?> - <?php echo e($nombreSitio); ?></title>
     <meta name="description" content="<?php echo e($noticia['resumen'] ?? substr(strip_tags($noticia['contenido']), 0, 160)); ?>">
     <?php if ($noticia['tags']): ?>
     <meta name="keywords" content="<?php echo e($noticia['tags']); ?>">
     <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --color-primario: <?php echo e($colorPrimario); ?>;
+            --color-secundario: <?php echo e($colorSecundario); ?>;
+            --color-acento: <?php echo e($colorAcento); ?>;
+            --color-texto: <?php echo e($colorTexto); ?>;
+            --color-fondo: <?php echo e($colorFondo); ?>;
+        }
+        body {
+            font-family: <?php echo e($fuentePrincipal); ?>;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: <?php echo e($fuenteTitulos); ?>;
+        }
+        .btn-primary {
+            background-color: var(--color-primario);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
@@ -54,9 +93,15 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
+                    <?php if ($logoSitio): ?>
+                    <a href="<?php echo url('index.php'); ?>">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                    </a>
+                    <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <?php endif; ?>
                     <h1 class="text-2xl font-bold text-gray-800">
-                        <a href="<?php echo url('index.php'); ?>">Portal de Noticias Querétaro</a>
+                        <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
                     </h1>
                 </div>
                 
@@ -94,7 +139,7 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
                 <article class="bg-white rounded-lg shadow-md overflow-hidden">
                     <!-- Imagen destacada -->
                     <?php if ($noticia['imagen_destacada']): ?>
-                    <img src="<?php echo e($noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-96 object-cover">
+                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-96 object-cover">
                     <?php endif; ?>
                     
                     <!-- Contenido -->
@@ -199,7 +244,7 @@ $noticiasRelacionadas = array_filter($noticiasRelacionadas, function($n) use ($n
                         <a href="<?php echo url('noticia_detalle.php?slug=' . $rel['slug']); ?>" class="block group">
                             <div class="flex space-x-3">
                                 <?php if ($rel['imagen_destacada']): ?>
-                                <img src="<?php echo e($rel['imagen_destacada']); ?>" alt="" class="w-20 h-20 object-cover rounded">
+                                <img src="<?php echo e(BASE_URL . $rel['imagen_destacada']); ?>" alt="" class="w-20 h-20 object-cover rounded">
                                 <?php else: ?>
                                 <div class="w-20 h-20 bg-gray-200 rounded flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-image text-gray-400"></i>

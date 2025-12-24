@@ -11,6 +11,15 @@ $categoriaModel = new Categoria();
 // Obtener filtros
 $estado = $_GET['estado'] ?? null;
 $categoriaId = $_GET['categoria'] ?? null;
+
+// Convertir strings vacíos a null
+if ($estado === '' || $estado === 'Todos') {
+    $estado = null;
+}
+if ($categoriaId === '' || $categoriaId === 'Todas') {
+    $categoriaId = null;
+}
+
 $page = $_GET['page'] ?? 1;
 $perPage = 20;
 
@@ -123,7 +132,7 @@ ob_start();
                     <td class="px-6 py-4">
                         <div class="flex items-center">
                             <?php if ($noticia['imagen_destacada']): ?>
-                            <img src="<?php echo e($noticia['imagen_destacada']); ?>" alt="" class="h-10 w-10 rounded object-cover mr-3">
+                            <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="" class="h-10 w-10 rounded object-cover mr-3">
                             <?php else: ?>
                             <div class="h-10 w-10 rounded bg-gray-200 flex items-center justify-center mr-3">
                                 <i class="fas fa-image text-gray-400"></i>
@@ -172,12 +181,25 @@ ob_start();
                         <?php echo number_format($noticia['visitas']); ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="<?php echo url('noticia_editar.php?id=' . $noticia['id']); ?>" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <a href="<?php echo url('noticia_editar.php?id=' . $noticia['id']); ?>" class="text-blue-600 hover:text-blue-900 mr-3" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
+                        <?php if ($noticia['estado'] === 'publicado'): ?>
+                        <a href="<?php echo url('noticia_accion.php?accion=suspender&id=' . $noticia['id']); ?>" 
+                           onclick="return confirm('¿Deseas suspender esta noticia?')" 
+                           class="text-orange-600 hover:text-orange-900 mr-3" title="Suspender">
+                            <i class="fas fa-pause-circle"></i>
+                        </a>
+                        <?php elseif ($noticia['estado'] === 'archivado'): ?>
+                        <a href="<?php echo url('noticia_accion.php?accion=vigencia&id=' . $noticia['id']); ?>" 
+                           onclick="return confirm('¿Deseas activar la vigencia de esta noticia?')" 
+                           class="text-green-600 hover:text-green-900 mr-3" title="Dar Vigencia">
+                            <i class="fas fa-check-circle"></i>
+                        </a>
+                        <?php endif; ?>
                         <a href="<?php echo url('noticia_eliminar.php?id=' . $noticia['id']); ?>" 
                            onclick="return confirm('¿Estás seguro de eliminar esta noticia?')" 
-                           class="text-red-600 hover:text-red-900">
+                           class="text-red-600 hover:text-red-900" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>
