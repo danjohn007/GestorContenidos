@@ -44,11 +44,11 @@ ob_start();
                 <h3 class="text-lg font-semibold text-gray-900">Correo Sistema</h3>
             </div>
             <p class="text-sm text-gray-600 mb-4">
-                Configura el correo para notificaciones automáticas
+                Configura el correo SMTP para notificaciones automáticas
             </p>
-            <button class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors">
+            <a href="<?php echo url('configuracion_correo.php'); ?>" class="block w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors text-center">
                 Configurar
-            </button>
+            </a>
         </div>
 
         <!-- Contacto -->
@@ -62,9 +62,9 @@ ob_start();
             <p class="text-sm text-gray-600 mb-4">
                 Teléfonos y horarios de atención
             </p>
-            <button class="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors">
+            <a href="<?php echo url('configuracion_sitio.php'); ?>" class="block w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors text-center">
                 Configurar
-            </button>
+            </a>
         </div>
 
         <!-- Diseño -->
@@ -94,9 +94,9 @@ ob_start();
             <p class="text-sm text-gray-600 mb-4">
                 Enlaces a perfiles en redes sociales
             </p>
-            <button class="w-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors">
+            <a href="<?php echo url('configuracion_redes_seo.php'); ?>" class="block w-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors text-center">
                 Configurar
-            </button>
+            </a>
         </div>
 
         <!-- SEO -->
@@ -110,9 +110,9 @@ ob_start();
             <p class="text-sm text-gray-600 mb-4">
                 Google Analytics y configuración SEO
             </p>
-            <button class="w-full bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition-colors">
+            <a href="<?php echo url('configuracion_redes_seo.php'); ?>" class="block w-full bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition-colors text-center">
                 Configurar
-            </button>
+            </a>
         </div>
     </div>
 
