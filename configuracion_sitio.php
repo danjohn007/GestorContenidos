@@ -46,21 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Formato de logo no permitido';
         } else {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['logo']['tmp_name']);
-            finfo_close($finfo);
-            
-            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
-            
-            if (!in_array($mimeType, $allowedMimes)) {
-                $errors[] = 'Tipo de archivo no válido';
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo';
             } else {
-                $filename = 'logo.' . $extension;
-                $uploadPath = $uploadDir . $filename;
+                $mimeType = finfo_file($finfo, $_FILES['logo']['tmp_name']);
+                finfo_close($finfo);
                 
-                if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadPath)) {
-                    $valores['logo_sitio'] = '/public/uploads/config/' . $filename;
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo no válido';
                 } else {
-                    $errors[] = 'Error al subir el logo';
+                    $filename = 'logo.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadPath)) {
+                        $valores['logo_sitio'] = '/public/uploads/config/' . $filename;
+                    } else {
+                        $errors[] = 'Error al subir el logo';
+                    }
                 }
             }
         }
@@ -76,13 +80,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($valores['tinymce_api_key'])) {
             $configFile = __DIR__ . '/config/config.php';
             if (file_exists($configFile)) {
-                $content = file_get_contents($configFile);
-                $newContent = preg_replace(
-                    "/define\('TINYMCE_API_KEY',\s*'[^']*'\);/",
-                    "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "');",
-                    $content
-                );
-                file_put_contents($configFile, $newContent);
+                // Verificar permisos de escritura
+                if (!is_writable($configFile)) {
+                    $errors[] = 'El archivo config.php no tiene permisos de escritura';
+                } else {
+                    // Crear backup
+                    $backupFile = $configFile . '.backup.' . time();
+                    if (!copy($configFile, $backupFile)) {
+                        $errors[] = 'No se pudo crear backup del archivo de configuración';
+                    } else {
+                        $content = file_get_contents($configFile);
+                        $newContent = preg_replace(
+                            "/define\('TINYMCE_API_KEY',\s*'[^']*'\);/",
+                            "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "');",
+                            $content
+                        );
+                        
+                        if ($newContent === null || $newContent === $content) {
+                            // Si no se encontró la línea, no actualizar
+                            $errors[] = 'No se pudo actualizar TINYMCE_API_KEY en config.php. Por favor actualízalo manualmente.';
+                        } elseif (file_put_contents($configFile, $newContent) === false) {
+                            $errors[] = 'Error al escribir en el archivo de configuración';
+                        }
+                    }
+                }
             }
         }
         

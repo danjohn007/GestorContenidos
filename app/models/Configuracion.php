@@ -125,6 +125,6 @@ class Configuracion {
         $query = "SELECT DISTINCT grupo FROM {$this->table} ORDER BY grupo";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 }

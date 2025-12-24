@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Guardar valores
     foreach ($valores as $clave => $valor) {
-        $configuracionModel->setOrCreate($clave, $valor, 'color', 'diseno', '');
+        $tipo = ($clave === 'fuente_principal' || $clave === 'fuente_titulos') ? 'texto' : 'color';
+        $configuracionModel->setOrCreate($clave, $valor, $tipo, 'diseno', '');
     }
     
     // Registrar auditoría
