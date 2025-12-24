@@ -314,7 +314,6 @@ tinymce.init({
     selector: '#contenido',
     height: 500,
     menubar: true,
-    readonly: false,
     plugins: [
         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -328,7 +327,11 @@ tinymce.init({
     branding: false,
     promotion: false,
     statusbar: true,
-    resize: true
+    resize: true,
+    init_instance_callback: function (editor) {
+        // Forzar que el editor sea editable incluso sin API key válida
+        editor.mode.set('design');
+    }
 });
 </script>
 
