@@ -92,8 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $content = file_get_contents($configFile);
                         
                         // Patrón para actualizar la línea define() de TINYMCE_API_KEY
-                        // Soporta comillas simples o dobles
-                        $tinymcePattern = "/define\s*\(\s*['\"]TINYMCE_API_KEY['\"]\s*,\s*['\"][^'\"]*['\"]\s*\)\s*;.*/";
+                        // Soporta comillas simples o dobles, ancla al final de línea para evitar reemplazos no intencionados
+                        $tinymcePattern = "/define\s*\(\s*['\"]TINYMCE_API_KEY['\"]\s*,\s*['\"][^'\"]*['\"]\s*\)\s*;.*$/m";
                         $tinymceReplacement = "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "'); // Reemplazar con tu clave API de TinyMCE";
                         $newContent = preg_replace($tinymcePattern, $tinymceReplacement, $content);
                         

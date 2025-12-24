@@ -307,7 +307,8 @@ tinymce.init({
     resize: true,
     init_instance_callback: function (editor) {
         // Forzar que el editor sea editable incluso sin API key válida
-        editor.mode.set('design');
+        // Compatible con TinyMCE 6.x
+        editor.setMode('design');
     }
 });
 </script>
