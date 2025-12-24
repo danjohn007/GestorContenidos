@@ -23,7 +23,9 @@ EXECUTE alterIfNotExists;
 DEALLOCATE PREPARE alterIfNotExists;
 
 -- 2. Asegurar que existen las configuraciones necesarias para el sistema
--- Insertar configuraciones si no existen (usando ON DUPLICATE KEY para evitar errores)
+-- Insertar configuraciones si no existen
+-- Nota: ON DUPLICATE KEY UPDATE clave=clave previene errores si ya existe la clave (UNIQUE KEY)
+-- y evita sobrescribir valores ya configurados por el usuario
 INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) VALUES
 ('tinymce_api_key', '', 'texto', 'general', 'API Key de TinyMCE para editor de texto enriquecido'),
 ('slogan_sitio', '', 'texto', 'general', 'Slogan del sitio web'),
