@@ -75,8 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (move_uploaded_file($_FILES['imagen_destacada']['tmp_name'], $uploadPath)) {
                 // Eliminar imagen anterior si existe
-                if ($noticia['imagen_destacada'] && file_exists(__DIR__ . $noticia['imagen_destacada'])) {
-                    unlink(__DIR__ . $noticia['imagen_destacada']);
+                if ($noticia['imagen_destacada']) {
+                    $oldImagePath = __DIR__ . $noticia['imagen_destacada'];
+                    // Ensure the path is safe and within the allowed directory
+                    if (file_exists($oldImagePath) && strpos(realpath($oldImagePath), realpath(__DIR__)) === 0) {
+                        unlink($oldImagePath);
+                    }
                 }
                 $imagen_destacada = '/public/uploads/noticias/' . $filename;
             } else {

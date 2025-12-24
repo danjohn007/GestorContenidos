@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $errors[] = 'No se pudo crear backup del archivo de configuración';
                     } else {
                         $content = file_get_contents($configFile);
-                        // Patrón mejorado que captura la línea completa con o sin comentarios
+                        // Patrón mejorado que captura la línea completa con comillas simples o dobles
                         $pattern = "/define\s*\(\s*['\"]TINYMCE_API_KEY['\"]\s*,\s*['\"][^'\"]*['\"]\s*\)\s*;.*$/m";
                         $replacement = "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "'); // Reemplazar con tu clave API de TinyMCE";
                         $newContent = preg_replace($pattern, $replacement, $content);
