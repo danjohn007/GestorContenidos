@@ -361,15 +361,19 @@ class Noticia {
                   FROM {$this->table} n
                   INNER JOIN categorias c ON n.categoria_id = c.id
                   WHERE n.estado = 'publicado' 
-                  AND (n.titulo LIKE :termino 
-                       OR n.contenido LIKE :termino 
-                       OR n.resumen LIKE :termino 
-                       OR n.tags LIKE :termino)
+                  AND (n.titulo LIKE :termino1 
+                       OR n.contenido LIKE :termino2 
+                       OR n.resumen LIKE :termino3 
+                       OR n.tags LIKE :termino4)
                   ORDER BY n.fecha_publicacion DESC
                   LIMIT :limit OFFSET :offset";
         
         $stmt = $this->db->prepare($query);
-        $stmt->bindValue(':termino', '%' . $termino . '%');
+        $searchTerm = '%' . $termino . '%';
+        $stmt->bindValue(':termino1', $searchTerm);
+        $stmt->bindValue(':termino2', $searchTerm);
+        $stmt->bindValue(':termino3', $searchTerm);
+        $stmt->bindValue(':termino4', $searchTerm);
         $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -384,13 +388,19 @@ class Noticia {
         $query = "SELECT COUNT(*) as total 
                   FROM {$this->table} 
                   WHERE estado = 'publicado' 
-                  AND (titulo LIKE :termino 
-                       OR contenido LIKE :termino 
-                       OR resumen LIKE :termino 
-                       OR tags LIKE :termino)";
+                  AND (titulo LIKE :termino1 
+                       OR contenido LIKE :termino2 
+                       OR resumen LIKE :termino3 
+                       OR tags LIKE :termino4)";
         
         $stmt = $this->db->prepare($query);
-        $stmt->execute(['termino' => '%' . $termino . '%']);
+        $searchTerm = '%' . $termino . '%';
+        $stmt->execute([
+            'termino1' => $searchTerm,
+            'termino2' => $searchTerm,
+            'termino3' => $searchTerm,
+            'termino4' => $searchTerm
+        ]);
         $result = $stmt->fetch();
         
         return $result['total'];

@@ -29,6 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             mkdir($uploadDir, 0755, true);
         }
         
+        // Validar tamaño (máximo 5MB)
+        $maxFileSize = 5 * 1024 * 1024; // 5MB
+        if ($_FILES['imagen']['size'] > $maxFileSize) {
+            $errors[] = 'El archivo es demasiado grande. Tamaño máximo: 5MB';
+        }
+        
         // Validar extensión
         $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -38,21 +44,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         } else {
             // Validar MIME type
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mimeType = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
-            finfo_close($finfo);
-            
-            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            
-            if (!in_array($mimeType, $allowedMimes)) {
-                $errors[] = 'Tipo de archivo no válido';
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo';
             } else {
-                $filename = uniqid('homepage_') . '.' . $extension;
-                $uploadPath = $uploadDir . $filename;
+                $mimeType = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
+                finfo_close($finfo);
                 
-                if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
-                    $data['imagen'] = '/public/uploads/homepage/' . $filename;
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo no válido';
                 } else {
-                    $errors[] = 'Error al subir la imagen';
+                    $filename = uniqid('homepage_') . '.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
+                        $data['imagen'] = '/public/uploads/homepage/' . $filename;
+                    } else {
+                        $errors[] = 'Error al subir la imagen';
+                    }
                 }
             }
         }
@@ -240,7 +250,22 @@ ob_start();
                                 <input type="text" name="contenido" value="<?php echo e($acceso['contenido']); ?>"
                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                        placeholder="fas fa-star">
+                                <p class="text-xs text-gray-500 mt-1">Se usará si no hay imagen</p>
                             </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Imagen (reemplaza al ícono)
+                            </label>
+                            <?php if (!empty($acceso['imagen'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo e($acceso['imagen']); ?>" alt="<?php echo e($acceso['titulo']); ?>" class="h-16 rounded">
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="imagen" accept="image/*"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Tamaño recomendado: 128x128px. Si se sube una imagen, reemplazará al ícono.</p>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
