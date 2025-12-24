@@ -59,3 +59,18 @@ INSERT INTO `pagina_inicio` (`seccion`, `titulo`, `subtitulo`, `contenido`, `url
 ('acceso_directo', 'Última Hora', 'Lo más reciente', 'fas fa-clock', 'index.php?recientes=1', 2, 1),
 ('acceso_directo', 'Categorías', 'Explora por tema', 'fas fa-th-large', 'categorias.php', 3, 1),
 ('acceso_directo', 'Multimedia', 'Fotos y videos', 'fas fa-images', 'multimedia.php', 4, 1);
+
+-- Agregar nuevas configuraciones para TinyMCE y otros ajustes
+INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) VALUES
+('tinymce_api_key', '', 'texto', 'general', 'API Key de TinyMCE para editor de texto enriquecido'),
+('slogan_sitio', '', 'texto', 'general', 'Slogan del sitio web'),
+('descripcion_sitio', '', 'texto', 'general', 'Descripción breve del sitio para SEO'),
+('logo_sitio', '', 'texto', 'general', 'Ruta del logo del sitio'),
+('direccion', '', 'texto', 'contacto', 'Dirección física'),
+('color_acento', '#10b981', 'color', 'diseno', 'Color de acento del sistema'),
+('color_texto', '#1f2937', 'color', 'diseno', 'Color principal del texto'),
+('color_fondo', '#f3f4f6', 'color', 'diseno', 'Color de fondo del sitio'),
+('fuente_principal', 'system-ui', 'texto', 'diseno', 'Fuente principal del sistema'),
+('fuente_titulos', 'system-ui', 'texto', 'diseno', 'Fuente para títulos')
+ON DUPLICATE KEY UPDATE clave=clave;
+

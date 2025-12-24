@@ -149,7 +149,11 @@ $redesSociales = $redesSocialesModel->getAll();
                 <?php foreach ($accesoDirecto as $acceso): ?>
                 <a href="<?php echo url($acceso['url']); ?>" class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow group">
                     <div class="text-blue-600 text-4xl mb-3 group-hover:scale-110 transition-transform">
-                        <i class="<?php echo e($acceso['contenido']); ?>"></i>
+                        <?php if (!empty($acceso['imagen'])): ?>
+                            <img src="<?php echo e($acceso['imagen']); ?>" alt="<?php echo e($acceso['titulo']); ?>" class="w-16 h-16 mx-auto object-contain">
+                        <?php else: ?>
+                            <i class="<?php echo e($acceso['contenido']); ?>"></i>
+                        <?php endif; ?>
                     </div>
                     <h3 class="text-lg font-bold text-gray-800 mb-1">
                         <?php echo e($acceso['titulo']); ?>

@@ -240,7 +240,22 @@ ob_start();
                                 <input type="text" name="contenido" value="<?php echo e($acceso['contenido']); ?>"
                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                        placeholder="fas fa-star">
+                                <p class="text-xs text-gray-500 mt-1">Se usará si no hay imagen</p>
                             </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Imagen (reemplaza al ícono)
+                            </label>
+                            <?php if (!empty($acceso['imagen'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo e($acceso['imagen']); ?>" alt="<?php echo e($acceso['titulo']); ?>" class="h-16 rounded">
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="imagen" accept="image/*"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Tamaño recomendado: 128x128px. Si se sube una imagen, reemplazará al ícono.</p>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
