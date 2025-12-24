@@ -314,6 +314,7 @@ tinymce.init({
     selector: '#contenido',
     height: 500,
     menubar: true,
+    readonly: false,
     plugins: [
         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -325,7 +326,9 @@ tinymce.init({
     content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
     language: 'es',
     branding: false,
-    promotion: false
+    promotion: false,
+    statusbar: true,
+    resize: true
 });
 </script>
 

@@ -75,7 +75,7 @@ function redirect($path = '') {
 
 // Función helper para escape HTML
 function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
 }
 
 // Función helper para obtener sesión
