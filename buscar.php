@@ -6,6 +6,7 @@ require_once __DIR__ . '/config/bootstrap.php';
 
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
+$configuracionModel = new Configuracion();
 
 // Obtener término de búsqueda
 $termino = trim($_GET['q'] ?? '');
@@ -26,15 +27,59 @@ if (!empty($termino)) {
 // Obtener categorías principales
 $categorias = $categoriaModel->getParents(1);
 
+// Obtener configuración del sitio
+$configGeneral = $configuracionModel->getByGrupo('general');
+$configDiseno = $configuracionModel->getByGrupo('diseno');
+
+// Valores de configuración
+$nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
+$logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
+$colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
+$colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
+$colorTexto = $configDiseno['color_texto']['valor'] ?? '#1f2937';
+$colorFondo = $configDiseno['color_fondo']['valor'] ?? '#f3f4f6';
+$fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
+$fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Búsqueda<?php echo !empty($termino) ? ': ' . e($termino) : ''; ?> - Portal de Noticias</title>
+    <title>Búsqueda<?php echo !empty($termino) ? ': ' . e($termino) : ''; ?> - <?php echo e($nombreSitio); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --color-primario: <?php echo e($colorPrimario); ?>;
+            --color-secundario: <?php echo e($colorSecundario); ?>;
+            --color-acento: <?php echo e($colorAcento); ?>;
+            --color-texto: <?php echo e($colorTexto); ?>;
+            --color-fondo: <?php echo e($colorFondo); ?>;
+        }
+        body {
+            font-family: <?php echo e($fuentePrincipal); ?>;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: <?php echo e($fuenteTitulos); ?>;
+        }
+        .btn-primary {
+            background-color: var(--color-primario);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .text-primary {
+            color: var(--color-primario);
+        }
+        .bg-primary {
+            background-color: var(--color-primario);
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
@@ -42,9 +87,13 @@ $categorias = $categoriaModel->getParents(1);
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
+                    <?php if ($logoSitio): ?>
+                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                    <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <?php endif; ?>
                     <h1 class="text-2xl font-bold text-gray-800">
-                        <a href="<?php echo url('index.php'); ?>">Portal de Noticias Querétaro</a>
+                        <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
                     </h1>
                 </div>
                 
@@ -187,7 +236,7 @@ $categorias = $categoriaModel->getParents(1);
     <footer class="bg-gray-800 text-white mt-12 py-8">
         <div class="container mx-auto px-4">
             <div class="text-center text-gray-400">
-                <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
+                <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
