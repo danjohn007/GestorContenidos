@@ -186,7 +186,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <div class="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-200">
                             <?php foreach (explode(',', $noticia['tags']) as $tag): ?>
                             <a href="<?php echo url('buscar.php?q=' . urlencode(trim($tag))); ?>" 
-                               class="inline-flex items-center px-3 py-1 rounded-full text-sm transition-colors" style="background-color: rgba(var(--color-secundario), 0.1); color: var(--color-primario);">
+                               class="inline-flex items-center px-3 py-1 rounded-full text-sm transition-colors" style="background-color: <?php echo e($colorSecundario); ?>20; color: var(--color-primario);">
                                 <i class="fas fa-tag mr-1 text-xs"></i>
                                 <?php echo e(trim($tag)); ?>
                             </a>

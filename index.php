@@ -149,8 +149,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <!-- Formulario de búsqueda -->
                 <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
                     <input type="text" name="q" placeholder="Buscar noticias..."
-                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 w-64"
-                           style="focus:ring-color: var(--color-primario);">
+                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 w-64">
                     <button type="submit" class="btn-primary text-white px-6 py-2 rounded-r-lg transition-colors">
                         <i class="fas fa-search"></i>
                     </button>
