@@ -85,6 +85,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         .btn-primary:hover {
             opacity: 0.9;
         }
+        .link-hover:hover {
+            color: var(--color-primario);
+        }
+        .text-primary {
+            color: var(--color-primario);
+        }
+        .bg-badge {
+            background-color: var(--color-secundario);
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -108,13 +118,13 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <!-- Formulario de búsqueda -->
                 <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
                     <input type="text" name="q" placeholder="Buscar noticias..."
-                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 w-64">
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-r-lg transition-colors">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
                 
-                <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <a href="<?php echo url('login.php'); ?>" class="btn-primary text-white px-6 py-2 rounded-lg transition-colors">
                     <i class="fas fa-sign-in-alt mr-2"></i>
                     Acceder
                 </a>
@@ -122,9 +132,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <!-- Navigation -->
             <nav class="border-t border-gray-200 py-3">
                 <ul class="flex space-x-6">
-                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium">Inicio</a></li>
+                    <li><a href="<?php echo url('index.php'); ?>" class="link-hover font-medium" style="color: var(--color-texto);">Inicio</a></li>
                     <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600"><?php echo e($cat['nombre']); ?></a></li>
+                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="link-hover" style="color: var(--color-texto);"><?php echo e($cat['nombre']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
@@ -146,7 +156,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <div class="p-8">
                         <!-- Categoría y fecha -->
                         <div class="flex items-center text-sm text-gray-500 mb-4">
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+                            <span class="bg-badge px-3 py-1 rounded-full font-medium">
                                 <?php echo e($noticia['categoria_nombre']); ?>
                             </span>
                             <span class="ml-4">
@@ -176,7 +186,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <div class="flex flex-wrap gap-2 mb-6 pb-6 border-b border-gray-200">
                             <?php foreach (explode(',', $noticia['tags']) as $tag): ?>
                             <a href="<?php echo url('buscar.php?q=' . urlencode(trim($tag))); ?>" 
-                               class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm hover:bg-blue-100">
+                               class="inline-flex items-center px-3 py-1 rounded-full text-sm transition-colors" style="background-color: rgba(var(--color-secundario), 0.1); color: var(--color-primario);">
                                 <i class="fas fa-tag mr-1 text-xs"></i>
                                 <?php echo e(trim($tag)); ?>
                             </a>
@@ -211,7 +221,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                             <div class="flex space-x-3">
                                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(url('noticia_detalle.php?slug=' . $noticia['slug'])); ?>" 
                                    target="_blank" 
-                                   class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                                   class="inline-flex items-center justify-center w-10 h-10 btn-primary text-white rounded-full">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
                                 <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode(url('noticia_detalle.php?slug=' . $noticia['slug'])); ?>&text=<?php echo urlencode($noticia['titulo']); ?>" 
@@ -236,7 +246,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <?php if (!empty($noticiasRelacionadas)): ?>
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">
-                        <i class="fas fa-newspaper text-blue-600 mr-2"></i>
+                        <i class="fas fa-newspaper mr-2" style="color: var(--color-primario);"></i>
                         Noticias Relacionadas
                     </h3>
                     <div class="space-y-4">
@@ -251,7 +261,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                                 </div>
                                 <?php endif; ?>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 group-hover:text-blue-600 line-clamp-2">
+                                    <p class="text-sm font-medium text-gray-900 link-hover line-clamp-2">
                                         <?php echo e($rel['titulo']); ?>
                                     </p>
                                     <p class="text-xs text-gray-500 mt-1">
@@ -269,14 +279,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <!-- Categorías -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">
-                        <i class="fas fa-th-large text-blue-600 mr-2"></i>
+                        <i class="fas fa-th-large mr-2" style="color: var(--color-primario);"></i>
                         Categorías
                     </h3>
                     <ul class="space-y-2">
                         <?php foreach ($categorias as $cat): ?>
                         <li>
                             <a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" 
-                               class="text-gray-700 hover:text-blue-600 flex items-center justify-between">
+                               class="text-gray-700 link-hover flex items-center justify-between">
                                 <span><?php echo e($cat['nombre']); ?></span>
                                 <i class="fas fa-chevron-right text-xs"></i>
                             </a>

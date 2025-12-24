@@ -84,6 +84,13 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         .bg-primary {
             background-color: var(--color-primario);
         }
+        .link-hover:hover {
+            color: var(--color-primario);
+        }
+        .bg-badge {
+            background-color: var(--color-secundario);
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -95,7 +102,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div class="flex items-center space-x-4">
                     <span class="text-gray-600">Síguenos:</span>
                     <?php foreach ($redesSociales as $red): ?>
-                    <a href="<?php echo e($red['url']); ?>" target="_blank" class="text-gray-600 hover:text-blue-600 transition-colors" title="<?php echo e($red['nombre']); ?>">
+                    <a href="<?php echo e($red['url']); ?>" target="_blank" class="text-gray-600 link-hover transition-colors" title="<?php echo e($red['nombre']); ?>">
                         <i class="<?php echo e($red['icono']); ?>"></i>
                     </a>
                     <?php endforeach; ?>
@@ -142,13 +149,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <!-- Formulario de búsqueda -->
                 <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
                     <input type="text" name="q" placeholder="Buscar noticias..."
-                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 w-64"
+                           style="focus:ring-color: var(--color-primario);">
+                    <button type="submit" class="btn-primary text-white px-6 py-2 rounded-r-lg transition-colors">
                         <i class="fas fa-search"></i>
                     </button>
                 </form>
                 
-                <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <a href="<?php echo url('login.php'); ?>" class="btn-primary text-white px-6 py-2 rounded-lg transition-colors">
                     <i class="fas fa-sign-in-alt mr-2"></i>
                     Acceder
                 </a>
@@ -156,9 +164,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <!-- Navigation -->
             <nav class="border-t border-gray-200 py-3">
                 <ul class="flex space-x-6">
-                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium">Inicio</a></li>
+                    <li><a href="<?php echo url('index.php'); ?>" class="link-hover font-medium" style="color: var(--color-texto);">Inicio</a></li>
                     <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600"><?php echo e($cat['nombre']); ?></a></li>
+                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="link-hover" style="color: var(--color-texto);"><?php echo e($cat['nombre']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
@@ -182,7 +190,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <p class="text-lg text-blue-50 mb-6">
                         <?php echo e($currentSlide['contenido']); ?>
                     </p>
-                    <a href="<?php echo url('buscar.php'); ?>" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    <a href="<?php echo url('buscar.php'); ?>" class="inline-block bg-white px-8 py-3 rounded-lg font-semibold transition-colors" style="color: var(--color-primario);">
                         Explorar Noticias <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
@@ -197,7 +205,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php foreach ($accesoDirecto as $acceso): ?>
                 <a href="<?php echo url($acceso['url']); ?>" class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow group">
-                    <div class="text-blue-600 text-4xl mb-3 group-hover:scale-110 transition-transform">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" style="color: var(--color-primario);">
                         <?php if (!empty($acceso['imagen'])): ?>
                             <img src="<?php echo e($acceso['imagen']); ?>" alt="<?php echo e($acceso['titulo']); ?>" class="w-16 h-16 mx-auto object-contain">
                         <?php else: ?>
@@ -235,7 +243,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <?php endif; ?>
                     <div class="p-6">
                         <div class="flex items-center text-sm text-gray-500 mb-2">
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                            <span class="bg-badge px-2 py-1 rounded text-xs font-medium">
                                 <?php echo e($noticia['categoria_nombre']); ?>
                             </span>
                             <span class="ml-auto">
@@ -243,7 +251,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                                 <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
                             </span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 link-hover">
                             <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
                                 <?php echo e($noticia['titulo']); ?>
                             </a>
@@ -258,7 +266,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                                 <i class="fas fa-eye mr-1"></i>
                                 <?php echo number_format($noticia['visitas']); ?> visitas
                             </span>
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-primary font-medium">
                                 Leer más <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -272,7 +280,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <!-- Noticias Recientes -->
         <section>
             <h2 class="text-3xl font-bold text-gray-800 mb-6">
-                <i class="fas fa-clock text-blue-600 mr-2"></i>
+                <i class="fas fa-clock mr-2" style="color: var(--color-primario);"></i>
                 Últimas Noticias
             </h2>
             <?php if (empty($noticiasRecientes)): ?>
@@ -305,7 +313,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                                 <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
                             </span>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-blue-600 line-clamp-2">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 link-hover line-clamp-2">
                             <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
                                 <?php echo e($noticia['titulo']); ?>
                             </a>
@@ -320,7 +328,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                                 <i class="fas fa-eye mr-1"></i>
                                 <?php echo number_format($noticia['visitas']); ?> visitas
                             </span>
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-primary font-medium">
                                 Leer más <i class="fas fa-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -350,7 +358,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         </div>
                     </div>
                     <div class="text-center">
-                        <a href="mailto:contacto@portalqueretaro.mx" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        <a href="mailto:contacto@portalqueretaro.mx" class="inline-block btn-primary text-white px-8 py-4 rounded-lg font-semibold transition-colors">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Contáctanos
                         </a>
@@ -376,7 +384,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <h4 class="text-lg font-semibold mb-4">Categorías</h4>
                     <ul class="space-y-2 text-gray-400">
                         <?php foreach (array_slice($categorias, 0, 5) as $cat): ?>
-                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="hover:text-white"><?php echo e($cat['nombre']); ?></a></li>
+                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="link-hover"><?php echo e($cat['nombre']); ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>

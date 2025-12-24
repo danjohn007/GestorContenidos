@@ -315,6 +315,7 @@ tinymce.init({
     height: 500,
     menubar: true,
     readonly: false,
+    disabled: false,
     plugins: [
         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
@@ -328,7 +329,13 @@ tinymce.init({
     branding: false,
     promotion: false,
     statusbar: true,
-    resize: true
+    resize: true,
+    setup: function(editor) {
+        editor.on('init', function() {
+            // Ensure editor is not in readonly mode
+            editor.mode.set('design');
+        });
+    }
 });
 </script>
 
