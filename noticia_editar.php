@@ -341,10 +341,19 @@ if (contenidoInicial) {
 
 // Cachear referencia al campo de contenido para mejor rendimiento
 var contenidoField = document.querySelector('textarea[name="contenido"]');
+var form = document.querySelector('form');
 
 // Al enviar el formulario, copiar el contenido de Quill al textarea oculto
-document.querySelector('form').addEventListener('submit', function() {
+form.addEventListener('submit', function(e) {
+    // Asegurarse de que el contenido se copie antes de enviar
     contenidoField.value = quill.root.innerHTML;
+    
+    // Validar que haya contenido
+    if (!contenidoField.value || contenidoField.value.trim() === '' || contenidoField.value === '<p><br></p>') {
+        e.preventDefault();
+        alert('Por favor ingresa el contenido de la noticia');
+        return false;
+    }
 });
 </script>
 

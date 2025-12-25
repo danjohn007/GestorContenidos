@@ -56,7 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!in_array($mimeType, $allowedMimes)) {
                     $errors[] = 'Tipo de archivo no válido';
                 } else {
-                    $filename = 'logo.' . $extension;
+                    // Delete old logo if exists
+                    if (!empty($config['logo_sitio']['valor'])) {
+                        $oldLogoPath = __DIR__ . $config['logo_sitio']['valor'];
+                        if (file_exists($oldLogoPath)) {
+                            unlink($oldLogoPath);
+                        }
+                    }
+                    
+                    $filename = 'logo_' . time() . '.' . $extension;
                     $uploadPath = $uploadDir . $filename;
                     
                     if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadPath)) {
@@ -181,7 +189,8 @@ ob_start();
                 </label>
                 <?php if (!empty($config['logo_sitio']['valor'])): ?>
                 <div class="mb-3">
-                    <img src="<?php echo e($config['logo_sitio']['valor']); ?>" alt="Logo actual" class="h-16">
+                    <img src="<?php echo e(BASE_URL . $config['logo_sitio']['valor'] . '?v=' . time()); ?>" alt="Logo actual" class="h-16" loading="eager">
+                    <p class="text-xs text-gray-500 mt-1">Logo actual</p>
                 </div>
                 <?php endif; ?>
                 <input type="file" name="logo" accept="image/*"

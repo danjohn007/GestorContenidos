@@ -72,10 +72,37 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         h1, h2, h3, h4, h5, h6 {
             font-family: <?php echo e($fuenteTitulos); ?>;
         }
-        .btn-primary {
-            background-color: var(--color-primario);
+        .btn-primary, .bg-blue-600, .hover\:bg-blue-700:hover, 
+        .text-blue-600, .hover\:text-blue-600:hover,
+        .bg-blue-100, .text-blue-800 {
+            background-color: var(--color-primario) !important;
+            color: white !important;
         }
-        .btn-primary:hover {
+        .text-blue-600 {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .hover\:text-blue-600:hover {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .bg-blue-100 {
+            background-color: rgba(<?php echo hexdec(substr($colorPrimario, 1, 2)) . ',' . hexdec(substr($colorPrimario, 3, 2)) . ',' . hexdec(substr($colorPrimario, 5, 2)); ?>, 0.1) !important;
+        }
+        .text-blue-800 {
+            color: var(--color-primario) !important;
+            background-color: transparent !important;
+        }
+        .from-blue-600 {
+            --tw-gradient-from: var(--color-primario) !important;
+        }
+        .to-blue-800 {
+            --tw-gradient-to: var(--color-secundario) !important;
+        }
+        .text-blue-100, .text-blue-50 {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        .btn-primary:hover, .bg-blue-600:hover {
             opacity: 0.9;
         }
         .text-primary {
@@ -132,7 +159,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
                     <?php if ($logoSitio): ?>
-                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
                     <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
                     <?php endif; ?>
@@ -227,7 +254,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <?php foreach ($noticiasDestacadas as $noticia): ?>
                 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
                     <?php if ($noticia['imagen_destacada']): ?>
-                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
+                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover" loading="eager">
                     <?php else: ?>
                     <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                         <i class="fas fa-newspaper text-white text-6xl"></i>
@@ -286,7 +313,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
                     <?php if ($noticia['imagen_destacada']): ?>
                     <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                        <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
+                        <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover" loading="eager">
                     </a>
                     <?php else: ?>
                     <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
