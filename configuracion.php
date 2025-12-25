@@ -28,7 +28,7 @@ ob_start();
                 <h3 class="text-lg font-semibold text-gray-900">Datos del Sitio</h3>
             </div>
             <p class="text-sm text-gray-600 mb-4">
-                Configura el nombre, logotipo, TinyMCE y datos generales del portal
+                Configura el nombre, logotipo y datos generales del portal
             </p>
             <a href="<?php echo url('configuracion_sitio.php'); ?>" class="block w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-center">
                 Configurar
