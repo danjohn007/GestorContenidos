@@ -309,16 +309,18 @@ var quill = new Quill('#contenido', {
 });
 
 // Cargar contenido inicial si existe
-var contenidoInicial = <?php echo json_encode($_POST['contenido'] ?? ''); ?>;
+var contenidoInicial = <?php echo json_encode($_POST['contenido'] ?? '', JSON_HEX_TAG | JSON_HEX_AMP); ?>;
 if (contenidoInicial) {
     quill.root.innerHTML = contenidoInicial;
 }
 
+// Cachear referencia al campo de contenido para mejor rendimiento
+var contenidoField = document.querySelector('textarea[name="contenido"]');
+
 // Al enviar el formulario, copiar el contenido de Quill al textarea oculto
-document.querySelector('form').onsubmit = function() {
-    var contenidoField = document.querySelector('textarea[name="contenido"]');
+document.querySelector('form').addEventListener('submit', function() {
     contenidoField.value = quill.root.innerHTML;
-};
+});
 </script>
 
 <?php
