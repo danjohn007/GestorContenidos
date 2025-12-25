@@ -94,7 +94,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             color: var(--color-primario) !important;
         }
         .bg-blue-100 {
-            background-color: rgba(<?php echo hexdec(substr($colorPrimario, 1, 2)) . ',' . hexdec(substr($colorPrimario, 3, 2)) . ',' . hexdec(substr($colorPrimario, 5, 2)); ?>, 0.1) !important;
+            background-color: rgba(<?php echo hexToRgbString($colorPrimario); ?>, 0.1) !important;
         }
         .text-blue-800 {
             color: var(--color-primario) !important;

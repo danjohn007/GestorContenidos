@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Delete old logo if exists
                     if (!empty($config['logo_sitio']['valor'])) {
                         $oldLogoPath = __DIR__ . $config['logo_sitio']['valor'];
-                        if (file_exists($oldLogoPath)) {
-                            unlink($oldLogoPath);
+                        if (file_exists($oldLogoPath) && is_file($oldLogoPath)) {
+                            @unlink($oldLogoPath);
                         }
                     }
                     
