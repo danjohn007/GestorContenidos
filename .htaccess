@@ -54,9 +54,9 @@ AddDefaultCharset UTF-8
     ExpiresByType image/x-icon "access plus 1 year"
 </IfModule>
 
-# Protección contra hotlinking de imágenes
-<IfModule mod_rewrite.c>
-    RewriteCond %{HTTP_REFERER} !^$
-    RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?yourdomain.com [NC]
-    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [NC,F,L]
-</IfModule>
+# Protección contra hotlinking de imágenes desactivada para permitir carga correcta de imágenes
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{HTTP_REFERER} !^$
+#     RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?yourdomain.com [NC]
+#     RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [NC,F,L]
+# </IfModule>
