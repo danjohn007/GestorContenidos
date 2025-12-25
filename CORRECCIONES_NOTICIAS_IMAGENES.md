@@ -47,6 +47,11 @@ mysql -u usuario -p nombre_base_datos < database_fix_tags.sql
   - `noticia_detalle.php`
   - `buscar.php`
 
+**Nota:** Si deseas reactivar la protección contra hotlinking en el futuro, debes:
+1. Descomentar las líneas 58-62 en `.htaccess`
+2. Reemplazar `yourdomain.com` con tu dominio real
+3. Probar que las imágenes se cargan correctamente desde tu propio sitio
+
 **No requiere acción adicional:** Los cambios en los archivos PHP y `.htaccess` ya están aplicados.
 
 ## Archivos Modificados

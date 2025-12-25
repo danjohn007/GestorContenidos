@@ -355,9 +355,6 @@ form.addEventListener('submit', function(e) {
         alert('Por favor ingresa el contenido de la noticia');
         return false;
     }
-    
-    // El formulario se enviará normalmente si hay contenido
-    return true;
 });
 </script>
 
