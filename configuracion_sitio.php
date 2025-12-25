@@ -19,8 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'email_sistema' => trim($_POST['email_sistema'] ?? ''),
         'telefono_contacto' => trim($_POST['telefono_contacto'] ?? ''),
         'direccion' => trim($_POST['direccion'] ?? ''),
-        'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City'),
-        'tinymce_api_key' => trim($_POST['tinymce_api_key'] ?? '')
+        'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City')
     ];
     
     // Validaciones
@@ -74,58 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Guardar valores
         foreach ($valores as $clave => $valor) {
             $configuracionModel->setOrCreate($clave, $valor, 'texto', 'general', '');
-        }
-        
-        // Actualizar el config.php si se cambió la API key de TinyMCE
-        if (!empty($valores['tinymce_api_key']) && $valores['tinymce_api_key'] !== 'no-api-key') {
-            $configFile = __DIR__ . '/config/config.php';
-            if (file_exists($configFile)) {
-                // Verificar permisos de escritura
-                if (!is_writable($configFile)) {
-                    $errors[] = 'El archivo config.php no tiene permisos de escritura. Actualiza manualmente: define(\'TINYMCE_API_KEY\', \'' . htmlspecialchars($valores['tinymce_api_key']) . '\');';
-                } else {
-                    // Crear backup
-                    $backupFile = $configFile . '.backup.' . time();
-                    if (!copy($configFile, $backupFile)) {
-                        $errors[] = 'No se pudo crear backup del archivo de configuración';
-                    } else {
-                        $content = file_get_contents($configFile);
-                        
-                        // Patrón para actualizar la línea define() de TINYMCE_API_KEY
-                        // Captura: define('TINYMCE_API_KEY', 'valor'); // comentario opcional
-                        // Maneja espacios variables, comillas simples/dobles y comentarios al final de línea
-                        $tinymcePattern = "/define\s*\(\s*['\"]TINYMCE_API_KEY['\"]\s*,\s*['\"][^'\"]*['\"]\s*\)\s*;[^\n]*$/m";
-                        $tinymceReplacement = "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "'); // Reemplazar con tu clave API de TinyMCE";
-                        $newContent = preg_replace($tinymcePattern, $tinymceReplacement, $content);
-                        
-                        if ($newContent === null) {
-                            $errors[] = 'Error en la expresión regular. Por favor actualiza manualmente la clave en config.php';
-                        } elseif ($newContent === $content) {
-                            // Si no se encontró la línea, intenta agregarla
-                            if (strpos($content, 'TINYMCE_API_KEY') === false) {
-                                // Agregar antes del comentario de ENTORNO DE DESARROLLO
-                                $insertPoint = "// =====================================================\n// ENTORNO DE DESARROLLO";
-                                if (strpos($content, $insertPoint) !== false) {
-                                    $newDefine = "\n// =====================================================\n// CONFIGURACIÓN DE TINYMCE\n// =====================================================\n";
-                                    $newDefine .= "// Obtener una clave API gratuita en: https://www.tiny.cloud/auth/signup/\n";
-                                    $newDefine .= "define('TINYMCE_API_KEY', '" . addslashes($valores['tinymce_api_key']) . "'); // Reemplazar con tu clave API de TinyMCE\n\n";
-                                    $newContent = str_replace($insertPoint, $newDefine . $insertPoint, $content);
-                                    
-                                    if (file_put_contents($configFile, $newContent) === false) {
-                                        $errors[] = 'Error al escribir en el archivo de configuración';
-                                    }
-                                } else {
-                                    $errors[] = 'No se pudo encontrar la sección adecuada en config.php. Por favor actualiza manualmente.';
-                                }
-                            } else {
-                                $errors[] = 'No se pudo actualizar TINYMCE_API_KEY en config.php. Verifica el formato del archivo.';
-                            }
-                        } elseif (file_put_contents($configFile, $newContent) === false) {
-                            $errors[] = 'Error al escribir en el archivo de configuración';
-                        }
-                    }
-                }
-            }
         }
         
         // Registrar auditoría
@@ -295,21 +242,6 @@ ob_start();
                                 Tijuana
                             </option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            TinyMCE API Key
-                        </label>
-                        <input type="text" name="tinymce_api_key" 
-                               value="<?php echo e($config['tinymce_api_key']['valor'] ?? ''); ?>" 
-                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="Ingresa tu clave API de TinyMCE">
-                        <p class="text-xs text-gray-500 mt-1">
-                            <a href="https://www.tiny.cloud/auth/signup/" target="_blank" class="text-blue-600 hover:text-blue-800">
-                                Obtén una clave API gratuita aquí
-                            </a>
-                        </p>
                     </div>
                 </div>
             </div>

@@ -234,9 +234,8 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Contenido <span class="text-red-500">*</span>
                 </label>
-                <textarea id="contenido" name="contenido" rows="12" required 
-                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Contenido completo de la noticia"><?php echo e($_POST['contenido'] ?? $noticia['contenido']); ?></textarea>
+                <div id="contenido" style="height: 400px; background: white;"></div>
+                <textarea name="contenido" required style="display:none;"><?php echo e($_POST['contenido'] ?? $noticia['contenido']); ?></textarea>
             </div>
 
             <!-- Imagen Destacada -->
@@ -308,28 +307,43 @@ ob_start();
     </div>
 </div>
 
-<script src="https://cdn.tiny.cloud/1/<?php echo htmlspecialchars(defined('TINYMCE_API_KEY') ? TINYMCE_API_KEY : 'no-api-key', ENT_QUOTES, 'UTF-8'); ?>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Quill.js Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
-tinymce.init({
-    selector: '#contenido',
-    height: 500,
-    menubar: true,
-    readonly: false,
-    plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'help', 'wordcount'
-    ],
-    toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
-             'forecolor backcolor | alignleft aligncenter alignright alignjustify | ' +
-             'bullist numlist outdent indent | removeformat | link image media | help',
-    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
-    language: 'es',
-    branding: false,
-    promotion: false,
-    statusbar: true,
-    resize: true
+// Inicializar Quill.js
+var quill = new Quill('#contenido', {
+    theme: 'snow',
+    modules: {
+        toolbar: [
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [{ 'font': [] }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'indent': '-1'}, { 'indent': '+1' }],
+            [{ 'align': [] }],
+            ['blockquote', 'code-block'],
+            ['link', 'image', 'video'],
+            ['clean']
+        ]
+    },
+    placeholder: 'Escribe el contenido de la noticia aquí...'
 });
+
+// Cargar contenido inicial si existe
+var contenidoInicial = <?php echo json_encode($_POST['contenido'] ?? $noticia['contenido']); ?>;
+if (contenidoInicial) {
+    quill.root.innerHTML = contenidoInicial;
+}
+
+// Al enviar el formulario, copiar el contenido de Quill al textarea oculto
+document.querySelector('form').onsubmit = function() {
+    var contenidoField = document.querySelector('textarea[name="contenido"]');
+    contenidoField.value = quill.root.innerHTML;
+};
 </script>
 
 <?php
