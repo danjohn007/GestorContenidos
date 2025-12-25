@@ -6,6 +6,7 @@ require_once __DIR__ . '/config/bootstrap.php';
 
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
+$configuracionModel = new Configuracion();
 
 // Obtener término de búsqueda
 $termino = trim($_GET['q'] ?? '');
@@ -26,15 +27,74 @@ if (!empty($termino)) {
 // Obtener categorías principales
 $categorias = $categoriaModel->getParents(1);
 
+// Obtener configuración del sitio
+$configGeneral = $configuracionModel->getByGrupo('general');
+$configDiseno = $configuracionModel->getByGrupo('diseno');
+
+// Valores de configuración
+$nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
+$logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
+$colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
+$colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
+$colorTexto = $configDiseno['color_texto']['valor'] ?? '#1f2937';
+$colorFondo = $configDiseno['color_fondo']['valor'] ?? '#f3f4f6';
+$fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
+$fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Búsqueda<?php echo !empty($termino) ? ': ' . e($termino) : ''; ?> - Portal de Noticias</title>
+    <title>Búsqueda<?php echo !empty($termino) ? ': ' . e($termino) : ''; ?> - <?php echo e($nombreSitio); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --color-primario: <?php echo e($colorPrimario); ?>;
+            --color-secundario: <?php echo e($colorSecundario); ?>;
+            --color-acento: <?php echo e($colorAcento); ?>;
+            --color-texto: <?php echo e($colorTexto); ?>;
+            --color-fondo: <?php echo e($colorFondo); ?>;
+        }
+        body {
+            font-family: <?php echo e($fuentePrincipal); ?>;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: <?php echo e($fuenteTitulos); ?>;
+        }
+        .btn-primary, .bg-blue-600, .hover\:bg-blue-700:hover, 
+        .text-blue-600, .hover\:text-blue-600:hover,
+        .bg-blue-100, .text-blue-800 {
+            background-color: var(--color-primario) !important;
+            color: white !important;
+        }
+        .text-blue-600 {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .hover\:text-blue-600:hover {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .bg-blue-100 {
+            background-color: rgba(<?php echo hexdec(substr($colorPrimario, 1, 2)) . ',' . hexdec(substr($colorPrimario, 3, 2)) . ',' . hexdec(substr($colorPrimario, 5, 2)); ?>, 0.1) !important;
+        }
+        .text-blue-800 {
+            color: var(--color-primario) !important;
+            background-color: transparent !important;
+        }
+        .ring-blue-500 {
+            --tw-ring-color: var(--color-primario) !important;
+        }
+        .focus\:ring-blue-500:focus {
+            --tw-ring-color: var(--color-primario) !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
@@ -42,9 +102,15 @@ $categorias = $categoriaModel->getParents(1);
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
+                    <?php if ($logoSitio): ?>
+                    <a href="<?php echo url('index.php'); ?>">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
+                    </a>
+                    <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <?php endif; ?>
                     <h1 class="text-2xl font-bold text-gray-800">
-                        <a href="<?php echo url('index.php'); ?>">Portal de Noticias Querétaro</a>
+                        <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
                     </h1>
                 </div>
                 
@@ -119,7 +185,7 @@ $categorias = $categoriaModel->getParents(1);
             <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
                 <?php if ($noticia['imagen_destacada']): ?>
                 <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                    <img src="<?php echo e($noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
+                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover" loading="eager">
                 </a>
                 <?php else: ?>
                 <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
