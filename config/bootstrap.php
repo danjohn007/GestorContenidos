@@ -163,6 +163,25 @@ function getCurrentUser() {
     return null;
 }
 
+// Función helper para convertir hex a RGB
+function hexToRgb($hex) {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) === 3) {
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    return [
+        'r' => hexdec(substr($hex, 0, 2)),
+        'g' => hexdec(substr($hex, 2, 2)),
+        'b' => hexdec(substr($hex, 4, 2))
+    ];
+}
+
+// Función helper para obtener string RGB desde hex
+function hexToRgbString($hex) {
+    $rgb = hexToRgb($hex);
+    return $rgb['r'] . ',' . $rgb['g'] . ',' . $rgb['b'];
+}
+
 // Función helper para verificar permisos
 function hasPermission($permission) {
     if (!isAuthenticated()) {

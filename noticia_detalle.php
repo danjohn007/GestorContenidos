@@ -79,10 +79,28 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         h1, h2, h3, h4, h5, h6 {
             font-family: <?php echo e($fuenteTitulos); ?>;
         }
-        .btn-primary {
-            background-color: var(--color-primario);
+        .btn-primary, .bg-blue-600, .hover\:bg-blue-700:hover, 
+        .text-blue-600, .hover\:text-blue-600:hover,
+        .bg-blue-100, .text-blue-800 {
+            background-color: var(--color-primario) !important;
+            color: white !important;
         }
-        .btn-primary:hover {
+        .text-blue-600 {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .hover\:text-blue-600:hover {
+            background-color: transparent !important;
+            color: var(--color-primario) !important;
+        }
+        .bg-blue-100 {
+            background-color: rgba(<?php echo hexToRgbString($colorPrimario); ?>, 0.1) !important;
+        }
+        .text-blue-800 {
+            color: var(--color-primario) !important;
+            background-color: transparent !important;
+        }
+        .btn-primary:hover, .bg-blue-600:hover {
             opacity: 0.9;
         }
     </style>
@@ -95,7 +113,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div class="flex items-center space-x-2">
                     <?php if ($logoSitio): ?>
                     <a href="<?php echo url('index.php'); ?>">
-                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
                     </a>
                     <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
@@ -139,7 +157,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <article class="bg-white rounded-lg shadow-md overflow-hidden">
                     <!-- Imagen destacada -->
                     <?php if ($noticia['imagen_destacada']): ?>
-                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-96 object-cover">
+                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-96 object-cover" loading="eager">
                     <?php endif; ?>
                     
                     <!-- Contenido -->
@@ -244,7 +262,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <a href="<?php echo url('noticia_detalle.php?slug=' . $rel['slug']); ?>" class="block group">
                             <div class="flex space-x-3">
                                 <?php if ($rel['imagen_destacada']): ?>
-                                <img src="<?php echo e(BASE_URL . $rel['imagen_destacada']); ?>" alt="" class="w-20 h-20 object-cover rounded">
+                                <img src="<?php echo e(BASE_URL . $rel['imagen_destacada']); ?>" alt="" class="w-20 h-20 object-cover rounded" loading="lazy">
                                 <?php else: ?>
                                 <div class="w-20 h-20 bg-gray-200 rounded flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-image text-gray-400"></i>

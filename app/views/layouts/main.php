@@ -60,7 +60,7 @@
         <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
             <div class="flex items-center justify-center h-16 bg-gray-800">
                 <?php if (!empty($logoSitio)): ?>
-                <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
                 <?php else: ?>
                 <h1 class="text-xl font-bold"><?php echo e($nombreSitio ?? 'CMS Noticias'); ?></h1>
                 <?php endif; ?>
