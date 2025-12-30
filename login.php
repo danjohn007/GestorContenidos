@@ -68,8 +68,8 @@ ob_start();
         background-color: <?php echo e($colorSecundario); ?>;
     }
     .login-focus:focus {
-        border-color: <?php echo e($colorPrimario); ?> !important;
-        --tw-ring-color: <?php echo e($colorPrimario); ?> !important;
+        border-color: <?php echo e($colorPrimario); ?>;
+        --tw-ring-color: <?php echo e($colorPrimario); ?>;
     }
     .login-checkbox:checked {
         background-color: <?php echo e($colorPrimario); ?>;

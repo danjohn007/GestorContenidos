@@ -19,9 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
     
     // Guardar valores
+    // Note: Descriptions are already set in database_modo_construccion.sql
+    // They only need to be provided on initial creation, not on updates
     foreach ($valores as $clave => $valor) {
         $tipo = ($clave === 'modo_construccion') ? 'boolean' : 'texto';
-        $descripcion = ''; // No description needed for these runtime configs
+        $descripcion = ''; // Empty on update; description preserved from initial creation
         $configuracionModel->setOrCreate($clave, $valor, $tipo, 'general', $descripcion);
     }
     
