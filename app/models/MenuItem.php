@@ -122,7 +122,7 @@ class MenuItem {
 
     /**
      * Sincroniza los ítems del menú con las categorías principales
-     * Crea ítems para categorías que no tienen y marca como inactivos por defecto
+     * Crea ítems para categorías que no tienen y los marca como activos por defecto
      */
     public function syncWithCategories() {
         // Obtener todas las categorías principales

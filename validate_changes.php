@@ -24,10 +24,10 @@ if (file_exists($menuItemPath)) {
 // 2. Validar cambios en index.php
 echo "\n2. Verificando cambios en index.php...\n";
 $indexContent = file_get_contents(__DIR__ . '/index.php');
-if (strpos($indexContent, 'MenuItemModel') !== false || strpos($indexContent, 'menuItemModel') !== false) {
-    echo "   ✓ MenuItemModel inicializado\n";
+if (strpos($indexContent, 'menuItemModel') !== false) {
+    echo "   ✓ menuItemModel inicializado\n";
 } else {
-    echo "   ✗ MenuItemModel no encontrado\n";
+    echo "   ✗ menuItemModel no encontrado\n";
 }
 
 if (strpos($indexContent, 'accesoLateral') !== false) {

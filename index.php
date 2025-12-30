@@ -25,12 +25,16 @@ $menuItemModel = new MenuItem();
 
 // Obtener categoría seleccionada del parámetro URL
 $categoriaSeleccionada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
+$destacadasFilter = isset($_GET['destacadas']) ? true : false;
+$recientesFilter = isset($_GET['recientes']) ? true : false;
 
-// Obtener noticias destacadas (si no hay categoría seleccionada)
-$noticiasDestacadas = !$categoriaSeleccionada ? $noticiaModel->getDestacadas(3) : [];
+// Obtener noticias destacadas (si no hay categoría seleccionada o si se pide destacadas)
+$noticiasDestacadas = (!$categoriaSeleccionada || $destacadasFilter) ? $noticiaModel->getDestacadas(6) : [];
 
 // Obtener noticias recientes publicadas (filtradas por categoría si está seleccionada)
-$noticiasRecientes = $noticiaModel->getAll('publicado', $categoriaSeleccionada, 1, 6);
+// Si se solicita destacadas o recientes, mostrar más resultados
+$limit = ($destacadasFilter || $recientesFilter) ? 12 : 6;
+$noticiasRecientes = $noticiaModel->getAll('publicado', $categoriaSeleccionada, 1, $limit);
 
 // Obtener categorías principales
 $categorias = $categoriaModel->getParents(1);
@@ -220,7 +224,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Slider Principal -->
-        <?php if (!empty($slider) && !$categoriaSeleccionada): ?>
+        <?php if (!empty($slider) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
         <section class="mb-12">
             <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
                 <div class="relative z-10 px-8 py-16 md:px-16 md:py-20">
@@ -244,7 +248,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <?php endif; ?>
 
         <!-- Accesos Directos -->
-        <?php if (!empty($accesoDirecto) && !$categoriaSeleccionada): ?>
+        <?php if (!empty($accesoDirecto) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
         <section class="mb-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php foreach ($accesoDirecto as $acceso): ?>
@@ -273,7 +277,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <!-- Columna Principal -->
             <div class="lg:col-span-2">
                 <!-- Noticias Destacadas -->
-                <?php if (!empty($noticiasDestacadas)): ?>
+                <?php if (!empty($noticiasDestacadas) && !$recientesFilter): ?>
                 <section class="mb-12">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">
                         <i class="fas fa-star text-yellow-500 mr-2"></i>
@@ -334,6 +338,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">
                         <i class="fas fa-folder-open text-blue-600 mr-2"></i>
                         Noticias de <?php echo e($categoriaActual['nombre']); ?>
+                    </h2>
+                    <?php elseif ($destacadasFilter): ?>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i>
+                        Todas las Noticias Destacadas
+                    </h2>
+                    <?php elseif ($recientesFilter): ?>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-clock text-blue-600 mr-2"></i>
+                        Noticias de Última Hora
                     </h2>
                     <?php else: ?>
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">
@@ -455,7 +469,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         </div>
 
         <!-- Sección de Contacto -->
-        <?php if (!empty($contacto) && !$categoriaSeleccionada): ?>
+        <?php if (!empty($contacto) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
         <section class="mt-12">
             <?php $infoContacto = $contacto[0]; ?>
             <div class="contact-bg rounded-lg shadow-xl p-8 text-white">
