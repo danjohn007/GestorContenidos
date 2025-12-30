@@ -204,7 +204,7 @@ ob_start();
                     Contenido <span class="text-red-500">*</span>
                 </label>
                 <div id="contenido" style="height: 400px; background: white;"></div>
-                <textarea name="contenido" required style="display:none;"><?php echo e($_POST['contenido'] ?? ''); ?></textarea>
+                <textarea name="contenido" style="display:none;"><?php echo e($_POST['contenido'] ?? ''); ?></textarea>
             </div>
 
             <!-- Imagen Destacada -->
