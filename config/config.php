@@ -7,9 +7,9 @@
 // CONFIGURACIÓN DE BASE DE DATOS
 // =====================================================
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'systemco_cms');
-define('DB_USER', 'systemco_cms');
-define('DB_PASS', 'Danjohn007!');
+define('DB_NAME', 'lacrudav_cms');
+define('DB_USER', 'lacrudav_cms');
+define('DB_PASS', ')xTu8jz%r7RU');
 define('DB_CHARSET', 'utf8mb4');
 
 // =====================================================
