@@ -33,10 +33,34 @@
         h1, h2, h3, h4, h5, h6 {
             font-family: <?php echo e($fuenteTitulos ?? 'system-ui'); ?>;
         }
+        /* Aplicar colores configurados al sidebar */
+        .sidebar-bg {
+            background-color: var(--color-primary);
+        }
+        .sidebar-header-bg {
+            background: linear-gradient(to bottom, var(--color-primary), var(--color-secondary));
+        }
+        .sidebar-link:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
         <?php else: ?>
         :root {
             --color-primary: #1e40af;
             --color-secondary: #3b82f6;
+        }
+        /* Aplicar colores configurados al login */
+        .login-gradient-bg {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        }
+        .login-btn-primary {
+            background-color: var(--color-primary);
+        }
+        .login-btn-primary:hover {
+            background-color: var(--color-secondary);
+        }
+        .login-focus:focus {
+            border-color: var(--color-primary);
+            --tw-ring-color: var(--color-primary);
         }
         <?php endif; ?>
     </style>
@@ -57,8 +81,8 @@
     
     <?php if (isAuthenticated()): ?>
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
-            <div class="flex items-center justify-center h-16 bg-gray-800">
+        <div class="fixed inset-y-0 left-0 w-64 sidebar-bg text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
+            <div class="flex items-center justify-center h-16 sidebar-header-bg">
                 <?php if (!empty($logoSitio)): ?>
                 <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
                 <?php else: ?>
@@ -67,52 +91,52 @@
             </div>
             
             <nav class="mt-8">
-                <a href="<?php echo url('dashboard.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('dashboard.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-home mr-3"></i>
                     Dashboard
                 </a>
                 
                 <?php if (hasPermission('noticias') || hasPermission('all')): ?>
-                <a href="<?php echo url('noticias.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('noticias.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-newspaper mr-3"></i>
                     Noticias
                 </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('categorias') || hasPermission('all')): ?>
-                <a href="<?php echo url('categorias.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('categorias.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-folder mr-3"></i>
                     Categorías
                 </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('multimedia') || hasPermission('all')): ?>
-                <a href="<?php echo url('multimedia.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('multimedia.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-images mr-3"></i>
                     Multimedia
                 </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('usuarios') || hasPermission('all')): ?>
-                <a href="<?php echo url('usuarios.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('usuarios.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-users mr-3"></i>
                     Usuarios
                 </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('configuracion') || hasPermission('all')): ?>
-                <a href="<?php echo url('pagina_inicio.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('pagina_inicio.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-home mr-3"></i>
                     Página de Inicio
                 </a>
-                <a href="<?php echo url('configuracion.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('configuracion.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-cog mr-3"></i>
                     Configuración
                 </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('logs') || hasPermission('all')): ?>
-                <a href="<?php echo url('logs.php'); ?>" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                <a href="<?php echo url('logs.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-file-alt mr-3"></i>
                     Logs
                 </a>

@@ -9,11 +9,18 @@ if (isAuthenticated()) {
     redirect('dashboard.php');
 }
 
+// Verificar modo en construcción
+$configuracionModel = new Configuracion();
+$modoConstruccion = $configuracionModel->get('modo_construccion', '0');
+if ($modoConstruccion === '1' && !isAuthenticated()) {
+    include __DIR__ . '/construccion.php';
+    exit;
+}
+
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 $paginaInicioModel = new PaginaInicio();
 $redesSocialesModel = new RedesSociales();
-$configuracionModel = new Configuracion();
 
 // Obtener noticias destacadas
 $noticiasDestacadas = $noticiaModel->getDestacadas(3);
@@ -110,6 +117,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         }
         .bg-primary {
             background-color: var(--color-primario);
+        }
+        /* Footer and contact section backgrounds */
+        .footer-bg {
+            background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+        }
+        .contact-bg {
+            background: linear-gradient(135deg, 
+                rgba(<?php echo hexToRgbString($colorPrimario); ?>, 0.9), 
+                rgba(<?php echo hexToRgbString($colorSecundario); ?>, 0.9)
+            );
         }
     </style>
 </head>
@@ -362,22 +379,22 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <?php if (!empty($contacto)): ?>
         <section class="mb-12">
             <?php $infoContacto = $contacto[0]; ?>
-            <div class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg shadow-xl p-8 text-white">
+            <div class="contact-bg rounded-lg shadow-xl p-8 text-white">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     <div>
                         <h2 class="text-3xl font-bold mb-2">
-                            <i class="fas fa-envelope text-blue-400 mr-2"></i>
+                            <i class="fas fa-envelope mr-2"></i>
                             <?php echo e($infoContacto['titulo']); ?>
                         </h2>
-                        <p class="text-xl text-gray-300 mb-4">
+                        <p class="text-xl mb-4 opacity-90">
                             <?php echo e($infoContacto['subtitulo']); ?>
                         </p>
-                        <div class="text-gray-300 space-y-2">
+                        <div class="space-y-2 opacity-90">
                             <?php echo sanitizeSimpleHtml($infoContacto['contenido']); ?>
                         </div>
                     </div>
                     <div class="text-center">
-                        <a href="mailto:contacto@portalqueretaro.mx" class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        <a href="mailto:contacto@portalqueretaro.mx" class="inline-block bg-white px-8 py-4 rounded-lg font-semibold hover:bg-opacity-90 transition-colors" style="color: var(--color-primario);">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Contáctanos
                         </a>
@@ -389,7 +406,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-12 py-8">
+    <footer class="footer-bg text-white mt-12 py-8">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
@@ -397,29 +414,29 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <i class="fas fa-newspaper mr-2"></i>
                         Portal de Noticias
                     </h3>
-                    <p class="text-gray-400">Tu fuente de noticias de Querétaro</p>
+                    <p class="opacity-80">Tu fuente de noticias de Querétaro</p>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Categorías</h4>
-                    <ul class="space-y-2 text-gray-400">
+                    <ul class="space-y-2 opacity-80">
                         <?php foreach (array_slice($categorias, 0, 5) as $cat): ?>
-                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="hover:text-white"><?php echo e($cat['nombre']); ?></a></li>
+                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="hover:opacity-100"><?php echo e($cat['nombre']); ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Contacto</h4>
-                    <p class="text-gray-400">
+                    <p class="opacity-80">
                         <i class="fas fa-phone mr-2"></i>
                         442-123-4567
                     </p>
-                    <p class="text-gray-400 mt-2">
+                    <p class="opacity-80 mt-2">
                         <i class="fas fa-envelope mr-2"></i>
                         contacto@portalqueretaro.mx
                     </p>
                 </div>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <div class="border-t border-white/20 mt-8 pt-8 text-center opacity-80">
                 <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
             </div>
         </div>

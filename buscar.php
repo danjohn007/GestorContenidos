@@ -94,6 +94,10 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         .focus\:ring-blue-500:focus {
             --tw-ring-color: var(--color-primario) !important;
         }
+        /* Footer background */
+        .footer-bg {
+            background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -250,9 +254,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-12 py-8">
+    <footer class="footer-bg text-white mt-12 py-8">
         <div class="container mx-auto px-4">
-            <div class="text-center text-gray-400">
+            <div class="text-center opacity-80">
                 <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
             </div>
         </div>
