@@ -45,6 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $title = 'Iniciar Sesión';
 
 // Get configuration for login styles (without authentication)
+// Note: Loading config on each login page load is acceptable since:
+// 1. Login page is accessed infrequently (only during login attempts)
+// 2. Ensures colors are always up-to-date without caching issues
+// 3. Query is simple and fast (single SELECT by group)
 $configuracionModel = new Configuracion();
 $configDiseno = $configuracionModel->getByGrupo('diseno');
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';

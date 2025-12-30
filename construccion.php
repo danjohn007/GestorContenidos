@@ -104,7 +104,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 Contáctanos
             </h3>
             <div class="text-lg space-y-2">
-                <?php echo $contactoConstruccion; ?>
+                <?php echo sanitizeSimpleHtml($contactoConstruccion); ?>
             </div>
         </div>
 

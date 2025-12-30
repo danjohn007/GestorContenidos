@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Guardar valores
     foreach ($valores as $clave => $valor) {
         $tipo = ($clave === 'modo_construccion') ? 'boolean' : 'texto';
-        $configuracionModel->setOrCreate($clave, $valor, $tipo, 'general', '');
+        $descripcion = ''; // No description needed for these runtime configs
+        $configuracionModel->setOrCreate($clave, $valor, $tipo, 'general', $descripcion);
     }
     
     // Registrar auditoría

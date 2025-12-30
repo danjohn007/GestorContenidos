@@ -60,7 +60,7 @@
         }
         .login-focus:focus {
             border-color: var(--color-primary);
-            ring-color: var(--color-primary);
+            --tw-ring-color: var(--color-primary);
         }
         <?php endif; ?>
     </style>
