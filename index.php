@@ -21,19 +21,27 @@ $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 $paginaInicioModel = new PaginaInicio();
 $redesSocialesModel = new RedesSociales();
+$menuItemModel = new MenuItem();
 
-// Obtener noticias destacadas
-$noticiasDestacadas = $noticiaModel->getDestacadas(3);
+// Obtener categoría seleccionada del parámetro URL
+$categoriaSeleccionada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
 
-// Obtener noticias recientes publicadas
-$noticiasRecientes = $noticiaModel->getAll('publicado', null, 1, 6);
+// Obtener noticias destacadas (si no hay categoría seleccionada)
+$noticiasDestacadas = !$categoriaSeleccionada ? $noticiaModel->getDestacadas(3) : [];
+
+// Obtener noticias recientes publicadas (filtradas por categoría si está seleccionada)
+$noticiasRecientes = $noticiaModel->getAll('publicado', $categoriaSeleccionada, 1, 6);
 
 // Obtener categorías principales
 $categorias = $categoriaModel->getParents(1);
 
+// Obtener ítems del menú principal (solo activos)
+$menuItems = $menuItemModel->getAll(1);
+
 // Obtener contenido de página de inicio
 $slider = $paginaInicioModel->getBySeccion('slider');
 $accesoDirecto = $paginaInicioModel->getBySeccion('acceso_directo');
+$accesoLateral = $paginaInicioModel->getBySeccion('acceso_lateral');
 $contacto = $paginaInicioModel->getBySeccion('contacto');
 
 // Obtener redes sociales
@@ -200,9 +208,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <!-- Navigation -->
             <nav class="border-t border-gray-200 py-3">
                 <ul class="flex space-x-6">
-                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium">Inicio</a></li>
-                    <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600"><?php echo e($cat['nombre']); ?></a></li>
+                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium <?php echo !$categoriaSeleccionada ? 'text-blue-600' : ''; ?>">Inicio</a></li>
+                    <?php foreach ($menuItems as $menuItem): ?>
+                    <li><a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="text-gray-700 hover:text-blue-600 <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'text-blue-600 font-medium' : ''; ?>"><?php echo e($menuItem['categoria_nombre']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
@@ -212,7 +220,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Slider Principal -->
-        <?php if (!empty($slider)): ?>
+        <?php if (!empty($slider) && !$categoriaSeleccionada): ?>
         <section class="mb-12">
             <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
                 <div class="relative z-10 px-8 py-16 md:px-16 md:py-20">
@@ -236,7 +244,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <?php endif; ?>
 
         <!-- Accesos Directos -->
-        <?php if (!empty($accesoDirecto)): ?>
+        <?php if (!empty($accesoDirecto) && !$categoriaSeleccionada): ?>
         <section class="mb-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php foreach ($accesoDirecto as $acceso): ?>
@@ -260,124 +268,195 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         </section>
         <?php endif; ?>
 
-        <!-- Noticias Destacadas -->
-        <?php if (!empty($noticiasDestacadas)): ?>
-        <section class="mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">
-                <i class="fas fa-star text-yellow-500 mr-2"></i>
-                Noticias Destacadas
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <?php foreach ($noticiasDestacadas as $noticia): ?>
-                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-                    <?php if ($noticia['imagen_destacada']): ?>
-                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
-                    <?php else: ?>
-                    <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                        <i class="fas fa-newspaper text-white text-6xl"></i>
+        <!-- Layout de dos columnas: Contenido principal y Accesos Laterales -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Columna Principal -->
+            <div class="lg:col-span-2">
+                <!-- Noticias Destacadas -->
+                <?php if (!empty($noticiasDestacadas)): ?>
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i>
+                        Noticias Destacadas
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <?php foreach ($noticiasDestacadas as $noticia): ?>
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                            <?php if ($noticia['imagen_destacada']): ?>
+                            <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
+                            <?php else: ?>
+                            <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                                <i class="fas fa-newspaper text-white text-6xl"></i>
+                            </div>
+                            <?php endif; ?>
+                            <div class="p-6">
+                                <div class="flex items-center text-sm text-gray-500 mb-2">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                        <?php echo e($noticia['categoria_nombre']); ?>
+                                    </span>
+                                    <span class="ml-auto">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600">
+                                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
+                                        <?php echo e($noticia['titulo']); ?>
+                                    </a>
+                                </h3>
+                                <?php if ($noticia['resumen']): ?>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                    <?php echo e($noticia['resumen']); ?>
+                                </p>
+                                <?php endif; ?>
+                                <div class="flex items-center justify-between text-sm text-gray-500">
+                                    <span>
+                                        <i class="fas fa-eye mr-1"></i>
+                                        <?php echo number_format($noticia['visitas']); ?> visitas
+                                    </span>
+                                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                        Leer más <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endif; ?>
-                    <div class="p-6">
-                        <div class="flex items-center text-sm text-gray-500 mb-2">
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                                <?php echo e($noticia['categoria_nombre']); ?>
-                            </span>
-                            <span class="ml-auto">
-                                <i class="fas fa-calendar mr-1"></i>
-                                <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
-                            </span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600">
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                                <?php echo e($noticia['titulo']); ?>
-                            </a>
-                        </h3>
-                        <?php if ($noticia['resumen']): ?>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                            <?php echo e($noticia['resumen']); ?>
-                        </p>
-                        <?php endif; ?>
-                        <div class="flex items-center justify-between text-sm text-gray-500">
-                            <span>
-                                <i class="fas fa-eye mr-1"></i>
-                                <?php echo number_format($noticia['visitas']); ?> visitas
-                            </span>
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
-                                Leer más <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </article>
-                <?php endforeach; ?>
-            </div>
-        </section>
-        <?php endif; ?>
+                </section>
+                <?php endif; ?>
 
-        <!-- Noticias Recientes -->
-        <section>
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">
-                <i class="fas fa-clock text-blue-600 mr-2"></i>
-                Últimas Noticias
-            </h2>
-            <?php if (empty($noticiasRecientes)): ?>
-            <div class="bg-white rounded-lg shadow-md p-12 text-center">
-                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg">No hay noticias disponibles en este momento</p>
-            </div>
-            <?php else: ?>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <?php foreach ($noticiasRecientes as $noticia): ?>
-                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-                    <?php if ($noticia['imagen_destacada']): ?>
-                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                        <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
-                    </a>
+                <!-- Noticias Recientes -->
+                <section>
+                    <?php if ($categoriaSeleccionada): ?>
+                    <?php 
+                    $categoriaActual = $categoriaModel->getById($categoriaSeleccionada);
+                    ?>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-folder-open text-blue-600 mr-2"></i>
+                        Noticias de <?php echo e($categoriaActual['nombre']); ?>
+                    </h2>
                     <?php else: ?>
-                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                        <div class="w-full h-40 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                            <i class="fas fa-newspaper text-white text-4xl"></i>
-                        </div>
-                    </a>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-clock text-blue-600 mr-2"></i>
+                        Últimas Noticias
+                    </h2>
                     <?php endif; ?>
-                    <div class="p-4">
-                        <div class="flex items-center text-xs text-gray-500 mb-2">
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
-                                <?php echo e($noticia['categoria_nombre']); ?>
-                            </span>
-                            <span class="ml-auto">
-                                <i class="fas fa-calendar mr-1"></i>
-                                <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
-                            </span>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-blue-600 line-clamp-2">
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                                <?php echo e($noticia['titulo']); ?>
-                            </a>
-                        </h3>
-                        <?php if ($noticia['resumen']): ?>
-                        <p class="text-gray-600 text-sm line-clamp-2 mb-3">
-                            <?php echo e($noticia['resumen']); ?>
-                        </p>
-                        <?php endif; ?>
-                        <div class="flex items-center justify-between text-xs text-gray-500">
-                            <span>
-                                <i class="fas fa-eye mr-1"></i>
-                                <?php echo number_format($noticia['visitas']); ?> visitas
-                            </span>
-                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
-                                Leer más <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
-                        </div>
+                    <?php if (empty($noticiasRecientes)): ?>
+                    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                        <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 text-lg">No hay noticias disponibles en este momento</p>
                     </div>
-                </article>
-                <?php endforeach; ?>
+                    <?php else: ?>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <?php foreach ($noticiasRecientes as $noticia): ?>
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                            <?php if ($noticia['imagen_destacada']): ?>
+                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
+                                <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
+                            </a>
+                            <?php else: ?>
+                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
+                                <div class="w-full h-40 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                                    <i class="fas fa-newspaper text-white text-4xl"></i>
+                                </div>
+                            </a>
+                            <?php endif; ?>
+                            <div class="p-4">
+                                <div class="flex items-center text-xs text-gray-500 mb-2">
+                                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                                        <?php echo e($noticia['categoria_nombre']); ?>
+                                    </span>
+                                    <span class="ml-auto">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        <?php echo date('d/m/Y', strtotime($noticia['fecha_publicacion'] ?? $noticia['fecha_creacion'])); ?>
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-blue-600 line-clamp-2">
+                                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
+                                        <?php echo e($noticia['titulo']); ?>
+                                    </a>
+                                </h3>
+                                <?php if ($noticia['resumen']): ?>
+                                <p class="text-gray-600 text-sm line-clamp-2 mb-3">
+                                    <?php echo e($noticia['resumen']); ?>
+                                </p>
+                                <?php endif; ?>
+                                <div class="flex items-center justify-between text-xs text-gray-500">
+                                    <span>
+                                        <i class="fas fa-eye mr-1"></i>
+                                        <?php echo number_format($noticia['visitas']); ?> visitas
+                                    </span>
+                                    <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                        Leer más <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </section>
             </div>
-            <?php endif; ?>
-        </section>
+
+            <!-- Columna Lateral - Accesos Laterales -->
+            <div class="lg:col-span-1">
+                <?php if (!empty($accesoLateral)): ?>
+                <div class="bg-white rounded-lg shadow-lg p-6 sticky top-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-th-list text-blue-600 mr-2"></i>
+                        Accesos Rápidos
+                    </h3>
+                    <div class="space-y-4">
+                        <?php foreach (array_slice($accesoLateral, 0, 3) as $lateral): ?>
+                        <a href="<?php echo url($lateral['url']); ?>" class="block bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 hover:from-blue-100 hover:to-blue-200 transition-all group">
+                            <div class="flex items-center">
+                                <div class="text-blue-600 text-3xl mr-4 group-hover:scale-110 transition-transform">
+                                    <?php if (!empty($lateral['imagen'])): ?>
+                                        <img src="<?php echo e($lateral['imagen']); ?>" alt="<?php echo e($lateral['titulo']); ?>" class="w-12 h-12 object-contain">
+                                    <?php else: ?>
+                                        <i class="<?php echo e($lateral['contenido']); ?>"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-blue-600">
+                                        <?php echo e($lateral['titulo']); ?>
+                                    </h4>
+                                    <p class="text-sm text-gray-600">
+                                        <?php echo e($lateral['subtitulo']); ?>
+                                    </p>
+                                </div>
+                                <div class="text-blue-600">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Categorías (en el sidebar también) -->
+                <div class="bg-white rounded-lg shadow-lg p-6 mt-6" id="categorias">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-th text-blue-600 mr-2"></i>
+                        Categorías
+                    </h3>
+                    <div class="space-y-2">
+                        <?php foreach ($menuItems as $menuItem): ?>
+                        <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
+                           class="block px-4 py-2 rounded hover:bg-blue-50 transition-colors <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'bg-blue-100 text-blue-600 font-medium' : 'text-gray-700'; ?>">
+                            <i class="fas fa-folder mr-2"></i>
+                            <?php echo e($menuItem['categoria_nombre']); ?>
+                        </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Sección de Contacto -->
-        <?php if (!empty($contacto)): ?>
-        <section class="mb-12">
+        <?php if (!empty($contacto) && !$categoriaSeleccionada): ?>
+        <section class="mt-12">
             <?php $infoContacto = $contacto[0]; ?>
             <div class="contact-bg rounded-lg shadow-xl p-8 text-white">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -419,8 +498,8 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Categorías</h4>
                     <ul class="space-y-2 opacity-80">
-                        <?php foreach (array_slice($categorias, 0, 5) as $cat): ?>
-                        <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="hover:opacity-100"><?php echo e($cat['nombre']); ?></a></li>
+                        <?php foreach (array_slice($menuItems, 0, 5) as $menuItem): ?>
+                        <li><a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="hover:opacity-100"><?php echo e($menuItem['categoria_nombre']); ?></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>

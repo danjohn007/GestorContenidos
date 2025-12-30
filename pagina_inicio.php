@@ -7,6 +7,8 @@ requireAuth();
 requirePermission('configuracion');
 
 $paginaInicioModel = new PaginaInicio();
+$menuItemModel = new MenuItem();
+$categoriaModel = new Categoria();
 $errors = [];
 $success = false;
 
@@ -89,10 +91,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     }
 }
 
+// Procesar acciones de menú principal
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['menu_action'])) {
+    $action = $_POST['menu_action'];
+    
+    if ($action === 'sync') {
+        // Sincronizar menú con categorías
+        $menuItemModel->syncWithCategories();
+        setFlash('success', 'Menú sincronizado exitosamente con las categorías');
+        redirect('pagina_inicio.php#menu');
+    } elseif ($action === 'toggle' && isset($_POST['menu_id'])) {
+        // Alternar estado activo/inactivo
+        $menuId = (int)$_POST['menu_id'];
+        $menuItem = $menuItemModel->getById($menuId);
+        if ($menuItem) {
+            $menuItemModel->update($menuId, ['activo' => $menuItem['activo'] ? 0 : 1]);
+            setFlash('success', 'Estado del ítem actualizado exitosamente');
+        }
+        redirect('pagina_inicio.php#menu');
+    } elseif ($action === 'update_order' && isset($_POST['menu_id']) && isset($_POST['orden'])) {
+        // Actualizar orden
+        $menuId = (int)$_POST['menu_id'];
+        $orden = (int)$_POST['orden'];
+        $menuItemModel->update($menuId, ['orden' => $orden]);
+        setFlash('success', 'Orden actualizado exitosamente');
+        redirect('pagina_inicio.php#menu');
+    }
+}
+
 // Obtener elementos por sección
 $sliders = $paginaInicioModel->getBySeccion('slider', false);
 $accesosDirectos = $paginaInicioModel->getBySeccion('acceso_directo', false);
+$accesosLaterales = $paginaInicioModel->getBySeccion('acceso_lateral', false);
 $contactos = $paginaInicioModel->getBySeccion('contacto', false);
+
+// Obtener ítems del menú principal
+$menuItems = $menuItemModel->getAll();
 
 $title = 'Gestión de Página de Inicio';
 ob_start();
@@ -153,6 +187,16 @@ ob_start();
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-th-large mr-2"></i>
                     Accesos Directos
+                </button>
+                <button onclick="showTab('laterales')" id="tab-laterales"
+                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-sidebar mr-2"></i>
+                    Accesos Laterales
+                </button>
+                <button onclick="showTab('menu')" id="tab-menu"
+                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-bars mr-2"></i>
+                    Menú Principal
                 </button>
                 <button onclick="showTab('contacto')" id="tab-contacto"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
@@ -300,6 +344,190 @@ ob_start();
                 </div>
                 <?php endforeach; ?>
             </div>
+        </div>
+
+        <!-- Accesos Laterales Section -->
+        <div id="content-laterales" class="tab-content p-6 hidden">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Accesos Laterales</h2>
+            <p class="text-gray-600 mb-6">Configura los 3 accesos directos que aparecen en el módulo lateral de la página principal</p>
+            
+            <div class="space-y-4">
+                <?php foreach ($accesosLaterales as $lateral): ?>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+                        <input type="hidden" name="id" value="<?php echo $lateral['id']; ?>">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                                <input type="text" name="titulo" value="<?php echo e($lateral['titulo']); ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Subtítulo</label>
+                                <input type="text" name="subtitulo" value="<?php echo e($lateral['subtitulo']); ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Icono (clase Font Awesome)</label>
+                                <input type="text" name="contenido" value="<?php echo e($lateral['contenido']); ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="fas fa-star">
+                                <p class="text-xs text-gray-500 mt-1">Se usará si no hay imagen</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Imagen (reemplaza al ícono)
+                            </label>
+                            <?php if (!empty($lateral['imagen'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo e($lateral['imagen']); ?>" alt="<?php echo e($lateral['titulo']); ?>" class="h-16 rounded">
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="imagen" accept="image/*"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Tamaño recomendado: 128x128px. Si se sube una imagen, reemplazará al ícono.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+                                <input type="text" name="url" value="<?php echo e($lateral['url']); ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Orden</label>
+                                <input type="number" name="orden" value="<?php echo $lateral['orden']; ?>"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="flex items-end justify-between">
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="activo" id="activo_lat_<?php echo $lateral['id']; ?>" value="1" <?php echo $lateral['activo'] ? 'checked' : ''; ?>
+                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <label for="activo_lat_<?php echo $lateral['id']; ?>" class="ml-2 block text-sm text-gray-900">
+                                        Activo
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Menú Principal Section -->
+        <div id="content-menu" class="tab-content p-6 hidden">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Gestión de Menú Principal</h2>
+            <p class="text-gray-600 mb-4">Administra los ítems del menú principal. Cada ítem representa una categoría y puedes habilitar o deshabilitar los que se muestren en la parte pública.</p>
+            
+            <div class="mb-6">
+                <form method="POST" class="inline">
+                    <input type="hidden" name="menu_action" value="sync">
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-sync mr-2"></i>
+                        Sincronizar con Categorías
+                    </button>
+                </form>
+                <p class="text-xs text-gray-500 mt-2">Sincroniza el menú con las categorías principales del sistema</p>
+            </div>
+            
+            <?php if (empty($menuItems)): ?>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-800">
+                            No hay ítems de menú configurados. Haz clic en "Sincronizar con Categorías" para crear los ítems automáticamente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <?php else: ?>
+            <div class="space-y-4">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Categoría
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Orden
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estado
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($menuItems as $menuItem): ?>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        <?php echo e($menuItem['categoria_nombre']); ?>
+                                    </div>
+                                    <?php if (!empty($menuItem['categoria_descripcion'])): ?>
+                                    <div class="text-sm text-gray-500">
+                                        <?php echo e(substr($menuItem['categoria_descripcion'], 0, 50)); ?><?php echo strlen($menuItem['categoria_descripcion']) > 50 ? '...' : ''; ?>
+                                    </div>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <form method="POST" class="flex items-center space-x-2">
+                                        <input type="hidden" name="menu_action" value="update_order">
+                                        <input type="hidden" name="menu_id" value="<?php echo $menuItem['id']; ?>">
+                                        <input type="number" name="orden" value="<?php echo $menuItem['orden']; ?>" 
+                                               class="w-20 border border-gray-300 rounded px-2 py-1 text-sm">
+                                        <button type="submit" class="text-blue-600 hover:text-blue-800">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <?php if ($menuItem['activo']): ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Activo
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Inactivo
+                                    </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <form method="POST" class="inline">
+                                        <input type="hidden" name="menu_action" value="toggle">
+                                        <input type="hidden" name="menu_id" value="<?php echo $menuItem['id']; ?>">
+                                        <button type="submit" class="text-blue-600 hover:text-blue-800 mr-3">
+                                            <i class="fas fa-toggle-<?php echo $menuItem['activo'] ? 'on' : 'off'; ?> mr-1"></i>
+                                            <?php echo $menuItem['activo'] ? 'Desactivar' : 'Activar'; ?>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Contacto Section -->

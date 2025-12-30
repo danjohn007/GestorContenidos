@@ -150,3 +150,39 @@ INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) V
 ('meta_keywords_default', '', 'texto', 'seo', 'Palabras clave por defecto'),
 ('meta_description_default', '', 'texto', 'seo', 'Descripción meta por defecto')
 ON DUPLICATE KEY UPDATE clave=clave;
+
+-- =====================================================
+-- Actualización: Accesos Laterales y Menú Principal
+-- =====================================================
+
+-- Insertar datos por defecto para accesos laterales (solo si no existen)
+INSERT INTO `pagina_inicio` (`seccion`, `titulo`, `subtitulo`, `contenido`, `url`, `orden`, `activo`)
+SELECT * FROM (SELECT 'acceso_lateral' as seccion, 'Noticias Destacadas' as titulo, 'Las más importantes' as subtitulo, 'fas fa-star' as contenido, 'index.php?destacadas=1' as url, 1 as orden, 1 as activo) AS tmp
+WHERE NOT EXISTS (
+    SELECT seccion FROM `pagina_inicio` WHERE seccion = 'acceso_lateral' AND orden = 1
+) LIMIT 1;
+
+INSERT INTO `pagina_inicio` (`seccion`, `titulo`, `subtitulo`, `contenido`, `url`, `orden`, `activo`)
+SELECT * FROM (SELECT 'acceso_lateral' as seccion, 'Última Hora' as titulo, 'Lo más reciente' as subtitulo, 'fas fa-clock' as contenido, 'index.php?recientes=1' as url, 2 as orden, 1 as activo) AS tmp
+WHERE NOT EXISTS (
+    SELECT seccion FROM `pagina_inicio` WHERE seccion = 'acceso_lateral' AND orden = 2
+) LIMIT 1;
+
+INSERT INTO `pagina_inicio` (`seccion`, `titulo`, `subtitulo`, `contenido`, `url`, `orden`, `activo`)
+SELECT * FROM (SELECT 'acceso_lateral' as seccion, 'Categorías' as titulo, 'Explora por tema' as subtitulo, 'fas fa-th-large' as contenido, '#categorias' as url, 3 as orden, 1 as activo) AS tmp
+WHERE NOT EXISTS (
+    SELECT seccion FROM `pagina_inicio` WHERE seccion = 'acceso_lateral' AND orden = 3
+) LIMIT 1;
+
+-- Crear tabla para gestión de ítems del menú principal
+CREATE TABLE IF NOT EXISTS `menu_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `categoria_id` int(11) NOT NULL,
+  `orden` int(11) DEFAULT 0,
+  `activo` tinyint(1) DEFAULT 1,
+  `fecha_modificacion` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `categoria_id` (`categoria_id`),
+  KEY `orden` (`orden`),
+  FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
