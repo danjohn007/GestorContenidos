@@ -159,7 +159,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
                     <?php if ($logoSitio): ?>
-                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
+                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
                     <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
                     <?php endif; ?>
@@ -254,7 +254,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <?php foreach ($noticiasDestacadas as $noticia): ?>
                 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
                     <?php if ($noticia['imagen_destacada']): ?>
-                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover" loading="eager">
+                    <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
                     <?php else: ?>
                     <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                         <i class="fas fa-newspaper text-white text-6xl"></i>
@@ -313,7 +313,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
                     <?php if ($noticia['imagen_destacada']): ?>
                     <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
-                        <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover" loading="eager">
+                        <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
                     </a>
                     <?php else: ?>
                     <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">

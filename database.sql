@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS `noticias` (
   `slug` varchar(255) NOT NULL,
   `contenido` longtext NOT NULL,
   `resumen` text,
+  `tags` varchar(500) DEFAULT NULL,
   `autor_id` int(11) NOT NULL,
   `categoria_id` int(11) NOT NULL,
   `imagen_destacada` varchar(255) DEFAULT NULL,

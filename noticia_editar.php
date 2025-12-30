@@ -349,7 +349,8 @@ form.addEventListener('submit', function(e) {
     contenidoField.value = quill.root.innerHTML;
     
     // Validar que haya contenido
-    if (!contenidoField.value || contenidoField.value.trim() === '' || contenidoField.value === '<p><br></p>') {
+    var contenidoTexto = quill.getText().trim();
+    if (!contenidoTexto || contenidoTexto === '') {
         e.preventDefault();
         alert('Por favor ingresa el contenido de la noticia');
         return false;
