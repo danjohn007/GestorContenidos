@@ -19,6 +19,22 @@ ob_start();
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Modo en Construcción -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center mb-4">
+                <div class="bg-orange-100 rounded-lg p-3 mr-3">
+                    <i class="fas fa-hard-hat text-orange-600 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Modo Construcción</h3>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">
+                Activa el modo construcción en el sitio público
+            </p>
+            <a href="<?php echo url('configuracion_construccion.php'); ?>" class="block w-full bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors text-center">
+                Configurar
+            </a>
+        </div>
+
         <!-- Configuración del Sitio -->
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center mb-4">

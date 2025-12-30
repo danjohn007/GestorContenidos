@@ -43,10 +43,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $title = 'Iniciar Sesión';
+
+// Get configuration for login styles (without authentication)
+$configuracionModel = new Configuracion();
+$configDiseno = $configuracionModel->getByGrupo('diseno');
+$colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
+$colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
+
 ob_start();
 ?>
 
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700 py-12 px-4 sm:px-6 lg:px-8">
+<style>
+    .login-gradient-bg {
+        background: linear-gradient(135deg, <?php echo e($colorPrimario); ?>, <?php echo e($colorSecundario); ?>);
+    }
+    .login-btn-primary {
+        background-color: <?php echo e($colorPrimario); ?>;
+    }
+    .login-btn-primary:hover {
+        background-color: <?php echo e($colorSecundario); ?>;
+    }
+    .login-focus:focus {
+        border-color: <?php echo e($colorPrimario); ?> !important;
+        --tw-ring-color: <?php echo e($colorPrimario); ?> !important;
+    }
+    .login-checkbox:checked {
+        background-color: <?php echo e($colorPrimario); ?>;
+    }
+</style>
+
+<div class="min-h-screen flex items-center justify-center login-gradient-bg py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-2xl">
         <div>
             <h2 class="text-center text-3xl font-extrabold text-gray-900">
@@ -77,7 +103,7 @@ ob_start();
                         name="email" 
                         type="email" 
                         required 
-                        class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        class="login-focus appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:z-10 sm:text-sm"
                         placeholder="correo@ejemplo.com"
                         value="<?php echo e($_POST['email'] ?? ''); ?>"
                     >
@@ -91,7 +117,7 @@ ob_start();
                         name="password" 
                         type="password" 
                         required 
-                        class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        class="login-focus appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:z-10 sm:text-sm"
                         placeholder="••••••••"
                     >
                 </div>
@@ -103,7 +129,7 @@ ob_start();
                         id="remember" 
                         name="remember" 
                         type="checkbox" 
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        class="login-checkbox h-4 w-4 focus:ring-2 border-gray-300 rounded"
                     >
                     <label for="remember" class="ml-2 block text-sm text-gray-900">
                         Recordarme
@@ -114,10 +140,10 @@ ob_start();
             <div>
                 <button 
                     type="submit" 
-                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                    class="login-btn-primary group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200"
                 >
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <i class="fas fa-lock text-blue-500 group-hover:text-blue-400"></i>
+                        <i class="fas fa-lock text-white opacity-75 group-hover:opacity-100"></i>
                     </span>
                     Iniciar Sesión
                 </button>

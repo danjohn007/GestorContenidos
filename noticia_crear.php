@@ -323,11 +323,28 @@ form.addEventListener('submit', function(e) {
     // Asegurarse de que el contenido se copie antes de enviar
     contenidoField.value = quill.root.innerHTML;
     
-    // Validar que haya contenido
+    // Validar campos requeridos
+    var titulo = document.querySelector('input[name="titulo"]').value.trim();
+    var categoriaId = document.querySelector('select[name="categoria_id"]').value;
     var contenidoTexto = quill.getText().trim();
+    
+    var errores = [];
+    
+    if (!titulo) {
+        errores.push('El título es requerido');
+    }
+    
+    if (!categoriaId) {
+        errores.push('Debe seleccionar una categoría');
+    }
+    
     if (!contenidoTexto || contenidoTexto === '') {
+        errores.push('El contenido de la noticia es requerido');
+    }
+    
+    if (errores.length > 0) {
         e.preventDefault();
-        alert('Por favor ingresa el contenido de la noticia');
+        alert('Por favor complete los siguientes campos:\n\n- ' + errores.join('\n- '));
         return false;
     }
 });
