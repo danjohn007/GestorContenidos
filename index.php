@@ -51,6 +51,9 @@ $bannersVerticales = $paginaInicioModel->getBySeccion('banner_vertical');
 $anunciosFooter = $paginaInicioModel->getBySeccion('anuncio_footer');
 $bannersIntermedios = $paginaInicioModel->getBySeccion('banner_intermedio');
 
+// Variable helper para determinar si se muestra contenido de página principal
+$mostrarContenidoPaginaPrincipal = !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter;
+
 // Obtener redes sociales
 $redesSociales = $redesSocialesModel->getAll();
 
@@ -403,7 +406,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Slider Principal -->
-        <?php if (!empty($slider) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+        <?php if (!empty($slider) && $mostrarContenidoPaginaPrincipal): ?>
         <section class="mb-12">
             <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
                 <div class="relative z-10 px-8 py-16 md:px-16 md:py-20">
@@ -427,7 +430,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <?php endif; ?>
 
         <!-- Accesos Directos -->
-        <?php if (!empty($accesoDirecto) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+        <?php if (!empty($accesoDirecto) && $mostrarContenidoPaginaPrincipal): ?>
         <section class="mb-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php foreach ($accesoDirecto as $acceso): ?>
@@ -510,7 +513,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 </section>
                 
                 <!-- Banner Intermedio 1 -->
-                <?php if (!empty($bannersIntermedios) && isset($bannersIntermedios[0]) && $bannersIntermedios[0]['activo'] && !empty($bannersIntermedios[0]['imagen']) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+                <?php if (!empty($bannersIntermedios) && isset($bannersIntermedios[0]) && $bannersIntermedios[0]['activo'] && !empty($bannersIntermedios[0]['imagen']) && $mostrarContenidoPaginaPrincipal): ?>
                 <div class="banner-intermedio">
                     <a href="<?php echo e($bannersIntermedios[0]['url'] ?? '#'); ?>" target="_blank">
                         <img src="<?php echo e($bannersIntermedios[0]['imagen']); ?>" alt="<?php echo e($bannersIntermedios[0]['titulo']); ?>">
@@ -674,7 +677,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         </div>
 
         <!-- Sección de Contacto -->
-        <?php if (!empty($contacto) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+        <?php if (!empty($contacto) && $mostrarContenidoPaginaPrincipal): ?>
         <section class="mt-12">
             <?php $infoContacto = $contacto[0]; ?>
             <div class="contact-bg rounded-lg shadow-xl p-8 text-white">
@@ -708,7 +711,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             return $anuncio['activo'] && !empty($anuncio['imagen']);
         });
         ?>
-        <?php if (!empty($anunciosFooterActivos) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+        <?php if (!empty($anunciosFooterActivos) && $mostrarContenidoPaginaPrincipal): ?>
         <section class="mt-12">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <?php foreach ($anunciosFooterActivos as $anuncio): ?>
