@@ -47,6 +47,9 @@ $slider = $paginaInicioModel->getBySeccion('slider');
 $accesoDirecto = $paginaInicioModel->getBySeccion('acceso_directo');
 $accesoLateral = $paginaInicioModel->getBySeccion('acceso_lateral');
 $contacto = $paginaInicioModel->getBySeccion('contacto');
+$bannersVerticales = $paginaInicioModel->getBySeccion('banner_vertical');
+$anunciosFooter = $paginaInicioModel->getBySeccion('anuncio_footer');
+$bannersIntermedios = $paginaInicioModel->getBySeccion('banner_intermedio');
 
 // Obtener redes sociales
 $redesSociales = $redesSocialesModel->getAll();
@@ -140,11 +143,148 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 rgba(<?php echo hexToRgbString($colorSecundario); ?>, 0.9)
             );
         }
+        
+        /* Sticky header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile menu styles */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+        
+        .mobile-menu-overlay.active {
+            display: block;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: white;
+            z-index: 999;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mobile-menu-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .mobile-menu-items {
+            padding: 1rem 0;
+        }
+        
+        .mobile-menu-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #374151;
+            text-decoration: none;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .mobile-menu-item:hover {
+            background: #f9fafb;
+            color: var(--color-primario);
+        }
+        
+        .mobile-menu-item.active {
+            background: #eff6ff;
+            color: var(--color-primario);
+            font-weight: 600;
+        }
+        
+        .hamburger-btn {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #374151;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .hamburger-btn {
+                display: block;
+            }
+        }
+        
+        /* Sidebar sticky with limit */
+        .sidebar-sticky {
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        
+        /* Banner styles */
+        .banner-vertical {
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .banner-vertical:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner-vertical img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .banner-intermedio {
+            margin: 2rem 0;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner-intermedio img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
-    <header class="bg-white shadow-md">
+    <header class="bg-white shadow-md sticky-header">
         <div class="container mx-auto px-4">
             <!-- Top Bar - Social Media -->
             <div class="flex justify-between items-center py-2 text-sm border-b border-gray-200">
@@ -156,7 +296,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     </a>
                     <?php endforeach; ?>
                 </div>
-                <div class="text-gray-600">
+                <div class="text-gray-600 hidden md:block">
                     <i class="fas fa-calendar-alt mr-2"></i>
                     <?php 
                     // Function to format date in Spanish
@@ -195,22 +335,31 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <h1 class="text-2xl font-bold text-gray-800"><?php echo e($nombreSitio); ?></h1>
                 </div>
                 
-                <!-- Formulario de búsqueda -->
-                <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
-                    <input type="text" name="q" placeholder="Buscar noticias..."
-                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+                <!-- Hamburger button for mobile -->
+                <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
                 
-                <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-sign-in-alt mr-2"></i>
-                    Acceder
-                </a>
+                <!-- Desktop Search and Login -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <!-- Formulario de búsqueda -->
+                    <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
+                        <input type="text" name="q" placeholder="Buscar noticias..."
+                               class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    
+                    <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Acceder
+                    </a>
+                </div>
             </div>
-            <!-- Navigation -->
-            <nav class="border-t border-gray-200 py-3">
+            
+            <!-- Desktop Navigation -->
+            <nav class="border-t border-gray-200 py-3 desktop-nav">
                 <ul class="flex space-x-6">
                     <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium <?php echo !$categoriaSeleccionada ? 'text-blue-600' : ''; ?>">Inicio</a></li>
                     <?php foreach ($menuItems as $menuItem): ?>
@@ -220,6 +369,36 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             </nav>
         </div>
     </header>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3 class="text-lg font-bold text-gray-800">Menú</h3>
+            <span class="mobile-menu-close" onclick="toggleMobileMenu()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div class="mobile-menu-items">
+            <a href="<?php echo url('index.php'); ?>" class="mobile-menu-item <?php echo !$categoriaSeleccionada ? 'active' : ''; ?>">
+                <i class="fas fa-home mr-2"></i> Inicio
+            </a>
+            <?php foreach ($menuItems as $menuItem): ?>
+            <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="mobile-menu-item <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'active' : ''; ?>">
+                <i class="fas fa-folder mr-2"></i> <?php echo e($menuItem['categoria_nombre']); ?>
+            </a>
+            <?php endforeach; ?>
+            <div class="border-t border-gray-200 my-2"></div>
+            <a href="<?php echo url('buscar.php'); ?>" class="mobile-menu-item">
+                <i class="fas fa-search mr-2"></i> Buscar
+            </a>
+            <a href="<?php echo url('login.php'); ?>" class="mobile-menu-item">
+                <i class="fas fa-sign-in-alt mr-2"></i> Acceder
+            </a>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
@@ -286,13 +465,15 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <?php foreach ($noticiasDestacadas as $noticia): ?>
                         <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-                            <?php if ($noticia['imagen_destacada']): ?>
-                            <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover">
-                            <?php else: ?>
-                            <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                                <i class="fas fa-newspaper text-white text-6xl"></i>
-                            </div>
-                            <?php endif; ?>
+                            <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
+                                <?php if ($noticia['imagen_destacada']): ?>
+                                <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover hover:opacity-90 transition-opacity cursor-pointer">
+                                <?php else: ?>
+                                <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer">
+                                    <i class="fas fa-newspaper text-white text-6xl"></i>
+                                </div>
+                                <?php endif; ?>
+                            </a>
                             <div class="p-6">
                                 <div class="flex items-center text-sm text-gray-500 mb-2">
                                     <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
@@ -327,6 +508,15 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <?php endforeach; ?>
                     </div>
                 </section>
+                
+                <!-- Banner Intermedio 1 -->
+                <?php if (!empty($bannersIntermedios) && isset($bannersIntermedios[0]) && $bannersIntermedios[0]['activo'] && !empty($bannersIntermedios[0]['imagen']) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+                <div class="banner-intermedio">
+                    <a href="<?php echo e($bannersIntermedios[0]['url'] ?? '#'); ?>" target="_blank">
+                        <img src="<?php echo e($bannersIntermedios[0]['imagen']); ?>" alt="<?php echo e($bannersIntermedios[0]['titulo']); ?>">
+                    </a>
+                </div>
+                <?php endif; ?>
                 <?php endif; ?>
 
                 <!-- Noticias Recientes -->
@@ -412,42 +602,57 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 </section>
             </div>
 
-            <!-- Columna Lateral - Accesos Laterales -->
+            <!-- Columna Lateral - Accesos Laterales y Banners Verticales -->
             <div class="lg:col-span-1">
-                <?php if (!empty($accesoLateral)): ?>
-                <div class="bg-white rounded-lg shadow-lg p-6 sticky top-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
-                        <i class="fas fa-th-list text-blue-600 mr-2"></i>
-                        Accesos Rápidos
-                    </h3>
-                    <div class="space-y-4">
-                        <?php foreach (array_slice($accesoLateral, 0, 3) as $lateral): ?>
-                        <a href="<?php echo url($lateral['url']); ?>" class="block bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 hover:from-blue-100 hover:to-blue-200 transition-all group">
-                            <div class="flex items-center">
-                                <div class="text-blue-600 text-3xl mr-4 group-hover:scale-110 transition-transform">
-                                    <?php if (!empty($lateral['imagen'])): ?>
-                                        <img src="<?php echo e($lateral['imagen']); ?>" alt="<?php echo e($lateral['titulo']); ?>" class="w-12 h-12 object-contain">
-                                    <?php else: ?>
-                                        <i class="<?php echo e($lateral['contenido']); ?>"></i>
-                                    <?php endif; ?>
+                <div class="sidebar-sticky">
+                    <?php if (!empty($accesoLateral)): ?>
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="fas fa-th-list text-blue-600 mr-2"></i>
+                            Accesos Rápidos
+                        </h3>
+                        <div class="space-y-4">
+                            <?php foreach (array_slice($accesoLateral, 0, 3) as $lateral): ?>
+                            <a href="<?php echo url($lateral['url']); ?>" class="block bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 hover:from-blue-100 hover:to-blue-200 transition-all group">
+                                <div class="flex items-center">
+                                    <div class="text-blue-600 text-3xl mr-4 group-hover:scale-110 transition-transform">
+                                        <?php if (!empty($lateral['imagen'])): ?>
+                                            <img src="<?php echo e($lateral['imagen']); ?>" alt="<?php echo e($lateral['titulo']); ?>" class="w-12 h-12 object-contain">
+                                        <?php else: ?>
+                                            <i class="<?php echo e($lateral['contenido']); ?>"></i>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-gray-800 group-hover:text-blue-600">
+                                            <?php echo e($lateral['titulo']); ?>
+                                        </h4>
+                                        <p class="text-sm text-gray-600">
+                                            <?php echo e($lateral['subtitulo']); ?>
+                                        </p>
+                                    </div>
+                                    <div class="text-blue-600">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
                                 </div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 group-hover:text-blue-600">
-                                        <?php echo e($lateral['titulo']); ?>
-                                    </h4>
-                                    <p class="text-sm text-gray-600">
-                                        <?php echo e($lateral['subtitulo']); ?>
-                                    </p>
-                                </div>
-                                <div class="text-blue-600">
-                                    <i class="fas fa-chevron-right"></i>
-                                </div>
-                            </div>
-                        </a>
-                        <?php endforeach; ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
+                    <?php endif; ?>
+                    
+                    <!-- Banners Verticales -->
+                    <?php if (!empty($bannersVerticales)): ?>
+                        <?php foreach ($bannersVerticales as $banner): ?>
+                            <?php if ($banner['activo'] && !empty($banner['imagen'])): ?>
+                            <div class="banner-vertical">
+                                <a href="<?php echo e($banner['url'] ?? '#'); ?>" target="_blank">
+                                    <img src="<?php echo e($banner['imagen']); ?>" alt="<?php echo e($banner['titulo']); ?>">
+                                </a>
+                            </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
 
                 <!-- Categorías (en el sidebar también) -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mt-6" id="categorias">
@@ -496,6 +701,26 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             </div>
         </section>
         <?php endif; ?>
+        
+        <!-- Grid de Anuncios Footer -->
+        <?php 
+        $anunciosFooterActivos = array_filter($anunciosFooter, function($anuncio) {
+            return $anuncio['activo'] && !empty($anuncio['imagen']);
+        });
+        ?>
+        <?php if (!empty($anunciosFooterActivos) && !$categoriaSeleccionada && !$destacadasFilter && !$recientesFilter): ?>
+        <section class="mt-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <?php foreach ($anunciosFooterActivos as $anuncio): ?>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <a href="<?php echo e($anuncio['url'] ?? '#'); ?>" target="_blank">
+                        <img src="<?php echo e($anuncio['imagen']); ?>" alt="<?php echo e($anuncio['titulo']); ?>" class="w-full h-auto">
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+        <?php endif; ?>
     </main>
 
     <!-- Footer -->
@@ -534,5 +759,37 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             </div>
         </div>
     </footer>
+    
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        mobileMenu.classList.toggle('active');
+        mobileMenuOverlay.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (mobileMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Close mobile menu on window resize to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    </script>
 </body>
 </html>
