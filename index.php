@@ -249,12 +249,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             }
         }
         
-        /* Sidebar sticky with limit */
+        /* Sidebar sticky - increased height for full ad display without scroll */
         .sidebar-sticky {
             position: sticky;
             top: 80px;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
+            /* Removed max-height and overflow-y to show full ads without internal scroll */
         }
         
         /* Banner styles */

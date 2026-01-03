@@ -191,25 +191,10 @@ ob_start();
                     <i class="fas fa-th-large mr-2"></i>
                     Accesos Directos
                 </button>
-                <button onclick="showTab('laterales')" id="tab-laterales"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-sidebar mr-2"></i>
-                    Accesos Laterales
-                </button>
                 <button onclick="showTab('bannersvert')" id="tab-bannersvert"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-ad mr-2"></i>
-                    Banners Verticales
-                </button>
-                <button onclick="showTab('bannersinter')" id="tab-bannersinter"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-image mr-2"></i>
-                    Banners Intermedios
-                </button>
-                <button onclick="showTab('anunciosfoot')" id="tab-anunciosfoot"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-th mr-2"></i>
-                    Anuncios Footer
+                    Sidebar lateral - Banners
                 </button>
                 <button onclick="showTab('menu')" id="tab-menu"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
@@ -364,8 +349,10 @@ ob_start();
             </div>
         </div>
 
-        <!-- Accesos Laterales Section -->
-        <div id="content-laterales" class="tab-content p-6 hidden">
+        <!-- Accesos Laterales Section - HIDDEN FROM UI BUT DATA PRESERVED -->
+        <!-- This section is hidden from the admin interface to simplify management -->
+        <!-- Data is still stored in database and will be kept for future use -->
+        <div id="content-laterales" class="tab-content p-6 hidden" style="display: none !important;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Accesos Laterales</h2>
             <p class="text-gray-600 mb-6">Configura los 3 accesos directos que aparecen en el módulo lateral de la página principal</p>
             
@@ -602,7 +589,7 @@ ob_start();
         
         <!-- Banners Verticales Section -->
         <div id="content-bannersvert" class="tab-content p-6 hidden">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Banners Publicitarios Verticales</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Sidebar lateral - Banners</h2>
             <p class="text-gray-600 mb-6">Configura los banners publicitarios que aparecen en el módulo lateral de la página principal</p>
             
             <div class="space-y-4">
@@ -665,8 +652,10 @@ ob_start();
             </div>
         </div>
         
-        <!-- Banners Intermedios Section -->
-        <div id="content-bannersinter" class="tab-content p-6 hidden">
+        <!-- Banners Intermedios Section - HIDDEN FROM UI BUT DATA PRESERVED -->
+        <!-- This section is hidden from the admin interface to simplify management -->
+        <!-- Data is still stored in database and will be kept for future use -->
+        <div id="content-bannersinter" class="tab-content p-6 hidden" style="display: none !important;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Banners Entre Secciones</h2>
             <p class="text-gray-600 mb-6">Configura los banners publicitarios que aparecen entre las secciones de la página principal</p>
             
@@ -730,8 +719,10 @@ ob_start();
             </div>
         </div>
         
-        <!-- Anuncios Footer Section -->
-        <div id="content-anunciosfoot" class="tab-content p-6 hidden">
+        <!-- Anuncios Footer Section - HIDDEN FROM UI BUT DATA PRESERVED -->
+        <!-- This section is hidden from the admin interface to simplify management -->
+        <!-- Data is still stored in database and will be kept for future use -->
+        <div id="content-anunciosfoot" class="tab-content p-6 hidden" style="display: none !important;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Anuncios del Footer</h2>
             <p class="text-gray-600 mb-6">Configura los anuncios que aparecen en un grid de 3-4 espacios antes del footer</p>
             
