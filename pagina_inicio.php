@@ -432,10 +432,8 @@ ob_start();
             </div>
         </div>
 
-        <!-- Accesos Laterales Section - HIDDEN FROM UI BUT DATA PRESERVED -->
-        <!-- This section is hidden from the admin interface to simplify management -->
-        <!-- Data is still stored in database and will be kept for future use -->
-        <div id="content-laterales" class="tab-content p-6 hidden" style="display: none !important;">
+        <!-- Accesos Laterales Section - HIDDEN FROM UI -->
+        <div id="content-laterales" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Accesos Laterales</h2>
             <p class="text-gray-600 mb-6">Configura los 3 accesos directos que aparecen en el módulo lateral de la página principal</p>
             
@@ -735,10 +733,8 @@ ob_start();
             </div>
         </div>
         
-        <!-- Banners Intermedios Section - HIDDEN FROM UI BUT DATA PRESERVED -->
-        <!-- This section is hidden from the admin interface to simplify management -->
-        <!-- Data is still stored in database and will be kept for future use -->
-        <div id="content-bannersinter" class="tab-content p-6 hidden" style="display: none !important;">
+        <!-- Banners Intermedios Section - HIDDEN FROM UI -->
+        <div id="content-bannersinter" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Banners Entre Secciones</h2>
             <p class="text-gray-600 mb-6">Configura los banners publicitarios que aparecen entre las secciones de la página principal</p>
             
@@ -802,10 +798,8 @@ ob_start();
             </div>
         </div>
         
-        <!-- Anuncios Footer Section - HIDDEN FROM UI BUT DATA PRESERVED -->
-        <!-- This section is hidden from the admin interface to simplify management -->
-        <!-- Data is still stored in database and will be kept for future use -->
-        <div id="content-anunciosfoot" class="tab-content p-6 hidden" style="display: none !important;">
+        <!-- Anuncios Footer Section - HIDDEN FROM UI -->
+        <div id="content-anunciosfoot" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Anuncios del Footer</h2>
             <p class="text-gray-600 mb-6">Configura los anuncios que aparecen en un grid de 3-4 espacios antes del footer</p>
             

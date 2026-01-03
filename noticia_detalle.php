@@ -414,9 +414,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             
             <!-- Sidebar -->
             <div class="lg:col-span-1">
-                <!-- Banners Sidebar -->
+                <!-- Banners Sidebar (primeros 2 banners) -->
                 <div class="mb-6">
-                    <?php displayBanners('sidebar', 3); ?>
+                    <?php displayBanners('sidebar', 2); ?>
                 </div>
                 
                 <!-- Noticias Relacionadas -->
@@ -453,9 +453,28 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 </div>
                 <?php endif; ?>
                 
-                <!-- Banners Sidebar (más banners) -->
+                <!-- Banners Sidebar (siguientes banners con offset) -->
                 <div class="mb-6">
-                    <?php displayBanners('sidebar', 2); ?>
+                    <?php 
+                    // Obtener banners adicionales saltando los primeros 2 ya mostrados
+                    $bannersSidebarAdicionales = $bannerModel->getByUbicacion('sidebar', 5);
+                    if (count($bannersSidebarAdicionales) > 2) {
+                        $bannersSidebarAdicionales = array_slice($bannersSidebarAdicionales, 2, 2);
+                        foreach ($bannersSidebarAdicionales as $banner):
+                    ?>
+                    <div class="banner-vertical">
+                        <a href="<?php echo e($banner['url_destino'] ?? '#'); ?>" 
+                           target="_blank"
+                           onclick="trackBannerClick(<?php echo $banner['id']; ?>)">
+                            <img src="<?php echo e(BASE_URL . $banner['imagen_url']); ?>" 
+                                 alt="<?php echo e($banner['nombre']); ?>"
+                                 onload="trackBannerImpression(<?php echo $banner['id']; ?>)">
+                        </a>
+                    </div>
+                    <?php 
+                        endforeach;
+                    }
+                    ?>
                 </div>
                 
                 <!-- Categorías -->
