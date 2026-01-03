@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Actualizaciones del Sitio Público</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Sticky header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Mobile menu styles */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+        
+        .mobile-menu-overlay.active {
+            display: block;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: white;
+            z-index: 999;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mobile-menu-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .mobile-menu-items {
+            padding: 1rem 0;
+        }
+        
+        .mobile-menu-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #374151;
+            text-decoration: none;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .mobile-menu-item:hover {
+            background: #f9fafb;
+            color: #1e40af;
+        }
+        
+        .mobile-menu-item.active {
+            background: #eff6ff;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .hamburger-btn {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #374151;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .hamburger-btn {
+                display: block;
+            }
+        }
+        
+        /* Sidebar sticky with limit */
+        .sidebar-sticky {
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        
+        /* Banner styles */
+        .banner-vertical {
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .banner-vertical:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner-intermedio {
+            margin: 2rem 0;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky-header">
+        <div class="container mx-auto px-4">
+            <!-- Top Bar - Social Media -->
+            <div class="flex justify-between items-center py-2 text-sm border-b border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Síguenos:</span>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+                <div class="text-gray-600 hidden md:block">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    jueves, 02 de enero de 2026
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">La Cruda Verdad.</h1>
+                </div>
+                
+                <!-- Hamburger button for mobile -->
+                <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <!-- Desktop Search and Login -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <form class="flex items-center">
+                        <input type="text" name="q" placeholder="Buscar noticias..."
+                               class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    
+                    <a href="#" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Acceder
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="border-t border-gray-200 py-3 desktop-nav">
+                <ul class="flex space-x-6">
+                    <li><a href="#" class="text-blue-600 hover:text-blue-600 font-medium">Inicio</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Nacional</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Política</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Economía</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Seguridad</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Cultura</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-blue-600">Deportes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3 class="text-lg font-bold text-gray-800">Menú</h3>
+            <span class="mobile-menu-close" onclick="toggleMobileMenu()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div class="mobile-menu-items">
+            <a href="#" class="mobile-menu-item active">
+                <i class="fas fa-home mr-2"></i> Inicio
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Nacional
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Política
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Economía
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Seguridad
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Cultura
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> Deportes
+            </a>
+            <div class="border-t border-gray-200 my-2"></div>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-search mr-2"></i> Buscar
+            </a>
+            <a href="#" class="mobile-menu-item">
+                <i class="fas fa-sign-in-alt mr-2"></i> Acceder
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Slider Principal -->
+        <section class="mb-12">
+            <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
+                <div class="relative z-10 px-8 py-16 md:px-16 md:py-20">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                        La Cruda Verdad.
+                    </h2>
+                    <p class="text-xl text-blue-100 mb-6">
+                        Explorar Noticias
+                    </p>
+                    <a href="#" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                        Explorar Noticias <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Layout de dos columnas: Contenido principal y Sidebar -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Columna Principal -->
+            <div class="lg:col-span-2">
+                <!-- Noticias Destacadas -->
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i>
+                        Noticias Destacadas
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                            <a href="#" class="cursor-pointer">
+                                <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center hover:opacity-90 transition-opacity">
+                                    <i class="fas fa-newspaper text-white text-6xl"></i>
+                                </div>
+                            </a>
+                            <div class="p-6">
+                                <div class="flex items-center text-sm text-gray-500 mb-2">
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                        Nacional
+                                    </span>
+                                    <span class="ml-auto">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        02/01/2026
+                                    </span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2 hover:text-blue-600">
+                                    <a href="#">Noticia Destacada de Ejemplo</a>
+                                </h3>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    Esta es una noticia destacada de ejemplo. Las imágenes ahora son clickeables.
+                                </p>
+                                <div class="flex items-center justify-between text-sm text-gray-500">
+                                    <span>
+                                        <i class="fas fa-eye mr-1"></i>
+                                        123 visitas
+                                    </span>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">
+                                        Leer más <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+                
+                <!-- Banner Intermedio -->
+                <div class="banner-intermedio">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-8 rounded-lg">
+                        <h3 class="text-2xl font-bold">Banner Publicitario Intermedio</h3>
+                        <p class="text-sm mt-2">Espacio 1200x200px - Entre secciones</p>
+                    </div>
+                </div>
+
+                <!-- Últimas Noticias -->
+                <section>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-clock text-blue-600 mr-2"></i>
+                        Últimas Noticias
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                            <a href="#" class="cursor-pointer">
+                                <div class="w-full h-40 bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center hover:opacity-90 transition-opacity">
+                                    <i class="fas fa-newspaper text-white text-4xl"></i>
+                                </div>
+                            </a>
+                            <div class="p-4">
+                                <div class="flex items-center text-xs text-gray-500 mb-2">
+                                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-medium">
+                                        Política
+                                    </span>
+                                    <span class="ml-auto">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        02/01/2026
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 hover:text-blue-600">
+                                    <a href="#">Noticia Reciente - Imagen Clickeable</a>
+                                </h3>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Columna Lateral - Accesos Laterales y Banners Verticales -->
+            <div class="lg:col-span-1">
+                <div class="sidebar-sticky">
+                    <!-- Accesos Rápidos -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+                            <i class="fas fa-th-list text-blue-600 mr-2"></i>
+                            Accesos Rápidos
+                        </h3>
+                        <div class="space-y-4">
+                            <a href="#" class="block bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 hover:from-blue-100 hover:to-blue-200 transition-all">
+                                <div class="flex items-center">
+                                    <div class="text-blue-600 text-3xl mr-4">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-gray-800">Noticias Destacadas</h4>
+                                        <p class="text-sm text-gray-600">Las más importantes</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-blue-600"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Banners Verticales -->
+                    <div class="banner-vertical">
+                        <div class="bg-gradient-to-br from-green-600 to-teal-600 text-white p-8 text-center rounded-lg">
+                            <i class="fas fa-ad text-4xl mb-2"></i>
+                            <h3 class="text-lg font-bold">Banner Vertical 1</h3>
+                            <p class="text-sm mt-2">300x600px</p>
+                        </div>
+                    </div>
+                    
+                    <div class="banner-vertical">
+                        <div class="bg-gradient-to-br from-orange-600 to-red-600 text-white p-8 text-center rounded-lg">
+                            <i class="fas fa-ad text-4xl mb-2"></i>
+                            <h3 class="text-lg font-bold">Banner Vertical 2</h3>
+                            <p class="text-sm mt-2">300x600px</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grid de Anuncios Footer -->
+        <section class="mt-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-8 text-center">
+                        <i class="fas fa-rectangle-ad text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">Anuncio 1</p>
+                        <p class="text-xs mt-1">300x250px</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-600 text-white p-8 text-center">
+                        <i class="fas fa-rectangle-ad text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">Anuncio 2</p>
+                        <p class="text-xs mt-1">300x250px</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="bg-gradient-to-br from-green-500 to-teal-600 text-white p-8 text-center">
+                        <i class="fas fa-rectangle-ad text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">Anuncio 3</p>
+                        <p class="text-xs mt-1">300x250px</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white p-8 text-center">
+                        <i class="fas fa-rectangle-ad text-3xl mb-2"></i>
+                        <p class="text-sm font-bold">Anuncio 4</p>
+                        <p class="text-xs mt-1">300x250px</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-blue-600 to-blue-800 text-white mt-12 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2026 La Cruda Verdad. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        mobileMenu.classList.toggle('active');
+        mobileMenuOverlay.classList.toggle('active');
+        
+        if (mobileMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Close mobile menu on window resize to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    </script>
+</body>
+</html>
