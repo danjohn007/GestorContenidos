@@ -309,6 +309,28 @@ ob_start();
 
 <!-- Quill.js Rich Text Editor -->
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+/* Quill alignment styles for editor */
+.ql-editor .ql-align-center {
+    text-align: center;
+}
+.ql-editor .ql-align-right {
+    text-align: right;
+}
+.ql-editor .ql-align-justify {
+    text-align: justify;
+}
+/* Ensure alignment persists in saved content */
+.ql-align-center {
+    text-align: center;
+}
+.ql-align-right {
+    text-align: right;
+}
+.ql-align-justify {
+    text-align: justify;
+}
+</style>
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
 // Inicializar Quill.js

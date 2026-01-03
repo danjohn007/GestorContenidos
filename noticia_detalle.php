@@ -113,6 +113,117 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         .footer-bg {
             background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
         }
+        
+        /* Mobile menu styles */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+        
+        .mobile-menu-overlay.active {
+            display: block;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100%;
+            background: white;
+            z-index: 999;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mobile-menu-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .mobile-menu-items {
+            padding: 1rem 0;
+        }
+        
+        .mobile-menu-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #374151;
+            text-decoration: none;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .mobile-menu-item:hover {
+            background: #f9fafb;
+            color: var(--color-primario);
+        }
+        
+        .hamburger-btn {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #374151;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .desktop-search {
+                display: none;
+            }
+            
+            .desktop-login {
+                display: none;
+            }
+            
+            .hamburger-btn {
+                display: block;
+            }
+        }
+        
+        /* Responsive prose content */
+        .prose img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .prose {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        
+        /* Quill alignment styles for content display */
+        .prose .ql-align-center, .ql-align-center {
+            text-align: center;
+        }
+        .prose .ql-align-right, .ql-align-right {
+            text-align: right;
+        }
+        .prose .ql-align-justify, .ql-align-justify {
+            text-align: justify;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -128,36 +239,74 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <?php else: ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
                     <?php endif; ?>
-                    <h1 class="text-2xl font-bold text-gray-800">
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800">
                         <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
                     </h1>
                 </div>
                 
-                <!-- Formulario de búsqueda -->
-                <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center">
-                    <input type="text" name="q" placeholder="Buscar noticias..."
-                           class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
+                <!-- Hamburger button for mobile -->
+                <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
                 
-                <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-sign-in-alt mr-2"></i>
-                    Acceder
-                </a>
+                <!-- Desktop Search and Login -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <!-- Formulario de búsqueda -->
+                    <form method="GET" action="<?php echo url('buscar.php'); ?>" class="flex items-center desktop-search">
+                        <input type="text" name="q" placeholder="Buscar noticias..."
+                               class="border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    
+                    <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors desktop-login">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Acceder
+                    </a>
+                </div>
             </div>
             <!-- Navigation -->
-            <nav class="border-t border-gray-200 py-3">
-                <ul class="flex space-x-6">
-                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium">Inicio</a></li>
+            <nav class="border-t border-gray-200 py-3 desktop-nav">
+                <ul class="flex space-x-6 overflow-x-auto">
+                    <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap">Inicio</a></li>
                     <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600"><?php echo e($cat['nombre']); ?></a></li>
+                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600 whitespace-nowrap"><?php echo e($cat['nombre']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
         </div>
     </header>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3 class="text-lg font-bold text-gray-800">Menú</h3>
+            <span class="mobile-menu-close" onclick="toggleMobileMenu()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div class="mobile-menu-items">
+            <a href="<?php echo url('index.php'); ?>" class="mobile-menu-item">
+                <i class="fas fa-home mr-2"></i> Inicio
+            </a>
+            <?php foreach ($categorias as $cat): ?>
+            <a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> <?php echo e($cat['nombre']); ?>
+            </a>
+            <?php endforeach; ?>
+            <div class="border-t border-gray-200 my-2"></div>
+            <a href="<?php echo url('buscar.php'); ?>" class="mobile-menu-item">
+                <i class="fas fa-search mr-2"></i> Buscar
+            </a>
+            <a href="<?php echo url('login.php'); ?>" class="mobile-menu-item">
+                <i class="fas fa-sign-in-alt mr-2"></i> Acceder
+            </a>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
@@ -265,6 +414,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             
             <!-- Sidebar -->
             <div class="lg:col-span-1">
+                <!-- Banners Sidebar -->
+                <div class="mb-6">
+                    <?php displayBanners('sidebar', 3); ?>
+                </div>
+                
                 <!-- Noticias Relacionadas -->
                 <?php if (!empty($noticiasRelacionadas)): ?>
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -299,6 +453,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 </div>
                 <?php endif; ?>
                 
+                <!-- Banners Sidebar (más banners) -->
+                <div class="mb-6">
+                    <?php displayBanners('sidebar', 2); ?>
+                </div>
+                
                 <!-- Categorías -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">
@@ -329,5 +488,37 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             </div>
         </div>
     </footer>
+    
+    <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        
+        mobileMenu.classList.toggle('active');
+        mobileMenuOverlay.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (mobileMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Close mobile menu on window resize to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+            
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                mobileMenuOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    </script>
 </body>
 </html>
