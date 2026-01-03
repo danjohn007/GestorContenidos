@@ -197,13 +197,18 @@ class Banner {
             $imagePath = $banner['imagen_url'];
             if (strpos($imagePath, '..') === false && strpos($imagePath, '/public/uploads/banners/') === 0) {
                 $fullPath = __DIR__ . '/../../' . $imagePath;
-                $realPath = realpath(dirname($fullPath));
-                $expectedPath = realpath(__DIR__ . '/../../public/uploads/banners');
+                
+                // Resolver rutas absolutas para validación
+                $realFullPath = realpath($fullPath);
+                $expectedBasePath = realpath(__DIR__ . '/../../public/uploads/banners');
                 
                 // Verificar que la ruta real está dentro del directorio permitido
-                if ($realPath && $expectedPath && strpos($realPath, $expectedPath) === 0) {
-                    if (file_exists($fullPath) && is_file($fullPath)) {
-                        unlink($fullPath);
+                // usando rutas absolutas resueltas
+                if ($realFullPath !== false && $expectedBasePath !== false) {
+                    if (strpos($realFullPath, $expectedBasePath . DIRECTORY_SEPARATOR) === 0) {
+                        if (is_file($realFullPath)) {
+                            unlink($realFullPath);
+                        }
                     }
                 }
             }

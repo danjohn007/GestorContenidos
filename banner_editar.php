@@ -80,13 +80,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Validar que la ruta no contiene secuencias peligrosas
                         if (strpos($oldImagePath, '..') === false && strpos($oldImagePath, '/public/uploads/banners/') === 0) {
                             $fullOldPath = __DIR__ . $oldImagePath;
-                            $realPath = realpath(dirname($fullOldPath));
-                            $expectedPath = realpath(__DIR__ . '/public/uploads/banners');
+                            
+                            // Resolver rutas absolutas para validación
+                            $realFullPath = realpath($fullOldPath);
+                            $expectedBasePath = realpath(__DIR__ . '/public/uploads/banners');
                             
                             // Verificar que la ruta real está dentro del directorio permitido
-                            if ($realPath && $expectedPath && strpos($realPath, $expectedPath) === 0) {
-                                if (file_exists($fullOldPath) && is_file($fullOldPath)) {
-                                    unlink($fullOldPath);
+                            if ($realFullPath !== false && $expectedBasePath !== false) {
+                                if (strpos($realFullPath, $expectedBasePath . DIRECTORY_SEPARATOR) === 0) {
+                                    if (is_file($realFullPath)) {
+                                        unlink($realFullPath);
+                                    }
                                 }
                             }
                         }

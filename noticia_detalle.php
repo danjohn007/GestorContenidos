@@ -60,6 +60,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?php echo BASE_URL; ?>">
     <title><?php echo e($noticia['titulo']); ?> - <?php echo e($nombreSitio); ?></title>
     <meta name="description" content="<?php echo e($noticia['resumen'] ?? substr(strip_tags($noticia['contenido']), 0, 160)); ?>">
     <?php if ($noticia['tags']): ?>
@@ -67,6 +68,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="<?php echo url('public/js/banner-tracking.js'); ?>"></script>
     <style>
         :root {
             --color-primario: <?php echo e($colorPrimario); ?>;
@@ -112,33 +114,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
         }
     </style>
-    <script>
-        // Banner tracking functions
-        function trackBannerImpression(bannerId) {
-            if (!bannerId) return;
-            fetch('<?php echo url("api/banner_track.php"); ?>?action=impression&id=' + encodeURIComponent(bannerId))
-                .catch(err => console.error('Error tracking impression:', err));
-        }
-        
-        function trackBannerClick(element) {
-            const bannerId = element.closest('[data-banner-id]')?.getAttribute('data-banner-id');
-            if (bannerId) {
-                fetch('<?php echo url("api/banner_track.php"); ?>?action=click&id=' + encodeURIComponent(bannerId))
-                    .catch(err => console.error('Error tracking click:', err));
-            }
-            return true;
-        }
-        
-        // Track impressions on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[data-banner-id]').forEach(function(banner) {
-                const bannerId = banner.getAttribute('data-banner-id');
-                if (bannerId) {
-                    trackBannerImpression(bannerId);
-                }
-            });
-        });
-    </script>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
