@@ -7,6 +7,10 @@ require_once __DIR__ . '/config/bootstrap.php';
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 $configuracionModel = new Configuracion();
+$bannerModel = new Banner();
+
+// Incluir helper de banners
+require_once __DIR__ . '/app/helpers/banner_helper.php';
 
 // Obtener slug de la noticia
 $slug = $_GET['slug'] ?? '';
@@ -56,6 +60,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?php echo BASE_URL; ?>">
     <title><?php echo e($noticia['titulo']); ?> - <?php echo e($nombreSitio); ?></title>
     <meta name="description" content="<?php echo e($noticia['resumen'] ?? substr(strip_tags($noticia['contenido']), 0, 160)); ?>">
     <?php if ($noticia['tags']): ?>
@@ -63,6 +68,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="<?php echo url('public/js/banner-tracking.js'); ?>"></script>
     <style>
         :root {
             --color-primario: <?php echo e($colorPrimario); ?>;
@@ -211,6 +217,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <!-- Removes dangerous attributes and JavaScript pseudo-protocols -->
                         <div class="prose max-w-none text-gray-700 leading-relaxed">
                             <?php echo sanitizeHtml($noticia['contenido']); ?>
+                        </div>
+                        
+                        <!-- Banners dentro de noticias -->
+                        <div class="my-8">
+                            <?php displayBanners('dentro_notas', 1); ?>
                         </div>
                         
                         <!-- Estadísticas -->

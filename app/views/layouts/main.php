@@ -129,6 +129,10 @@
                     <i class="fas fa-home mr-3"></i>
                     Página de Inicio
                 </a>
+                <a href="<?php echo url('banners.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
+                    <i class="fas fa-ad mr-3"></i>
+                    Banners
+                </a>
                 <a href="<?php echo url('configuracion.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
                     <i class="fas fa-cog mr-3"></i>
                     Configuración

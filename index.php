@@ -22,6 +22,10 @@ $categoriaModel = new Categoria();
 $paginaInicioModel = new PaginaInicio();
 $redesSocialesModel = new RedesSociales();
 $menuItemModel = new MenuItem();
+$bannerModel = new Banner();
+
+// Incluir helper de banners
+require_once __DIR__ . '/app/helpers/banner_helper.php';
 
 // Obtener categoría seleccionada del parámetro URL
 $categoriaSeleccionada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
@@ -78,9 +82,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?php echo BASE_URL; ?>">
     <title><?php echo e($nombreSitio); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="<?php echo url('public/js/banner-tracking.js'); ?>"></script>
     <style>
         :root {
             --color-primario: <?php echo e($colorPrimario); ?>;
@@ -279,6 +285,19 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         }
         
         .banner-intermedio img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .banner-horizontal {
+            margin: 1.5rem 0;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .banner-horizontal img {
             width: 100%;
             height: auto;
             display: block;
@@ -512,7 +531,12 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     </div>
                 </section>
                 
-                <!-- Banner Intermedio 1 -->
+                <!-- Banner Intermedio desde sistema de gestión -->
+                <?php if ($mostrarContenidoPaginaPrincipal): ?>
+                    <?php displayBanners('entre_secciones', 1); ?>
+                <?php endif; ?>
+                
+                <!-- Banner Intermedio antiguo (PaginaInicio) - Mantener compatibilidad -->
                 <?php if (!empty($bannersIntermedios) && isset($bannersIntermedios[0]) && $bannersIntermedios[0]['activo'] && !empty($bannersIntermedios[0]['imagen']) && $mostrarContenidoPaginaPrincipal): ?>
                 <div class="banner-intermedio">
                     <a href="<?php echo e($bannersIntermedios[0]['url'] ?? '#'); ?>" target="_blank">
@@ -643,7 +667,10 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     </div>
                     <?php endif; ?>
                     
-                    <!-- Banners Verticales -->
+                    <!-- Banners Verticales desde el sistema de gestión -->
+                    <?php displayBanners('sidebar', 3); ?>
+                    
+                    <!-- Banners Verticales antiguos (PaginaInicio) - Mantener compatibilidad -->
                     <?php if (!empty($bannersVerticales)): ?>
                         <?php foreach ($bannersVerticales as $banner): ?>
                             <?php if ($banner['activo'] && !empty($banner['imagen'])): ?>
@@ -705,7 +732,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         </section>
         <?php endif; ?>
         
-        <!-- Grid de Anuncios Footer -->
+        <!-- Banners Footer desde sistema de gestión -->
+        <?php if ($mostrarContenidoPaginaPrincipal): ?>
+        <section class="mt-12">
+            <?php displayBanners('footer', 4); ?>
+        </section>
+        <?php endif; ?>
+        
+        <!-- Grid de Anuncios Footer antiguos (PaginaInicio) - Mantener compatibilidad -->
         <?php 
         $anunciosFooterActivos = array_filter($anunciosFooter, function($anuncio) {
             return $anuncio['activo'] && !empty($anuncio['imagen']);
