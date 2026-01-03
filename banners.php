@@ -199,8 +199,7 @@ ob_start();
                                    class="text-blue-600 hover:text-blue-900" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button onclick="confirmarEliminacion(<?php echo $banner['id']; ?>)" 
-                                        class="text-red-600 hover:text-red-900" title="Eliminar">
+                                <button data-banner-id="<?php echo (int)$banner['id']; ?>" class="btn-delete-banner text-red-600 hover:text-red-900" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -237,11 +236,17 @@ ob_start();
 </div>
 
 <script>
-function confirmarEliminacion(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar este banner? Esta acción no se puede deshacer.')) {
-        window.location.href = '<?php echo url("banner_accion.php?accion=eliminar&id="); ?>' + id;
-    }
-}
+// Manejar eliminación con evento delegado
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-delete-banner').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const bannerId = this.getAttribute('data-banner-id');
+            if (bannerId && confirm('¿Estás seguro de que deseas eliminar este banner? Esta acción no se puede deshacer.')) {
+                window.location.href = '<?php echo url("banner_accion.php?accion=eliminar&id="); ?>' + encodeURIComponent(bannerId);
+            }
+        });
+    });
+});
 </script>
 
 <?php

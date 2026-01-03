@@ -56,31 +56,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $imagen_url = $banner['imagen_url'];
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/public/uploads/banners/';
+        
+        // Crear directorio con manejo de errores
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!mkdir($uploadDir, 0755, true)) {
+                $errors[] = 'Error al crear el directorio de uploads. Verifique los permisos.';
+            }
         }
         
-        $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        
-        if (in_array($extension, $allowedExtensions)) {
-            $filename = uniqid('banner_') . '.' . $extension;
-            $uploadPath = $uploadDir . $filename;
+        if (empty($errors)) {
+            $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
             
-            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
-                // Eliminar imagen anterior
-                if ($banner['imagen_url']) {
-                    $oldImagePath = __DIR__ . $banner['imagen_url'];
-                    if (file_exists($oldImagePath)) {
-                        @unlink($oldImagePath);
+            if (in_array($extension, $allowedExtensions)) {
+                // Usar random_bytes para nombre de archivo seguro
+                $filename = 'banner_' . bin2hex(random_bytes(16)) . '.' . $extension;
+                $uploadPath = $uploadDir . $filename;
+                
+                if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadPath)) {
+                    // Eliminar imagen anterior de forma segura
+                    if ($banner['imagen_url']) {
+                        $oldImagePath = $banner['imagen_url'];
+                        // Validar que la ruta no contiene secuencias peligrosas
+                        if (strpos($oldImagePath, '..') === false && strpos($oldImagePath, '/public/uploads/banners/') === 0) {
+                            $fullOldPath = __DIR__ . $oldImagePath;
+                            $realPath = realpath(dirname($fullOldPath));
+                            $expectedPath = realpath(__DIR__ . '/public/uploads/banners');
+                            
+                            // Verificar que la ruta real está dentro del directorio permitido
+                            if ($realPath && $expectedPath && strpos($realPath, $expectedPath) === 0) {
+                                if (file_exists($fullOldPath) && is_file($fullOldPath)) {
+                                    unlink($fullOldPath);
+                                }
+                            }
+                        }
                     }
+                    $imagen_url = '/public/uploads/banners/' . $filename;
+                } else {
+                    $errors[] = 'Error al subir la nueva imagen';
                 }
-                $imagen_url = '/public/uploads/banners/' . $filename;
             } else {
-                $errors[] = 'Error al subir la nueva imagen';
+                $errors[] = 'Solo se permiten imágenes JPG, JPEG, PNG, GIF o WebP';
             }
-        } else {
-            $errors[] = 'Solo se permiten imágenes JPG, JPEG, PNG, GIF o WebP';
         }
     }
     

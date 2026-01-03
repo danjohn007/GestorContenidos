@@ -304,15 +304,29 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <script>
         // Banner tracking functions
         function trackBannerImpression(bannerId) {
-            fetch('<?php echo url("api/banner_track.php"); ?>?action=impression&id=' + bannerId)
+            if (!bannerId) return;
+            fetch('<?php echo url("api/banner_track.php"); ?>?action=impression&id=' + encodeURIComponent(bannerId))
                 .catch(err => console.error('Error tracking impression:', err));
         }
         
-        function trackBannerClick(bannerId) {
-            fetch('<?php echo url("api/banner_track.php"); ?>?action=click&id=' + bannerId)
-                .catch(err => console.error('Error tracking click:', err));
+        function trackBannerClick(element) {
+            const bannerId = element.closest('[data-banner-id]')?.getAttribute('data-banner-id');
+            if (bannerId) {
+                fetch('<?php echo url("api/banner_track.php"); ?>?action=click&id=' + encodeURIComponent(bannerId))
+                    .catch(err => console.error('Error tracking click:', err));
+            }
             return true;
         }
+        
+        // Track impressions on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-banner-id]').forEach(function(banner) {
+                const bannerId = banner.getAttribute('data-banner-id');
+                if (bannerId) {
+                    trackBannerImpression(bannerId);
+                }
+            });
+        });
     </script>
 </head>
 <body class="bg-gray-100">

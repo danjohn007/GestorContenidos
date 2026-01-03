@@ -193,9 +193,19 @@ class Banner {
         $banner = $this->getById($id);
         
         if ($banner && !empty($banner['imagen_url'])) {
-            $imagePath = __DIR__ . '/../../' . $banner['imagen_url'];
-            if (file_exists($imagePath)) {
-                @unlink($imagePath);
+            // Validar que la ruta de imagen no contiene secuencias peligrosas
+            $imagePath = $banner['imagen_url'];
+            if (strpos($imagePath, '..') === false && strpos($imagePath, '/public/uploads/banners/') === 0) {
+                $fullPath = __DIR__ . '/../../' . $imagePath;
+                $realPath = realpath(dirname($fullPath));
+                $expectedPath = realpath(__DIR__ . '/../../public/uploads/banners');
+                
+                // Verificar que la ruta real está dentro del directorio permitido
+                if ($realPath && $expectedPath && strpos($realPath, $expectedPath) === 0) {
+                    if (file_exists($fullPath) && is_file($fullPath)) {
+                        unlink($fullPath);
+                    }
+                }
             }
         }
         

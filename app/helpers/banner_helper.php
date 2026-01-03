@@ -35,10 +35,13 @@ function displayBanners($ubicacion, $limit = null, $cssClass = '') {
         // Determinar clase según orientación
         $orientacionClass = $banner['orientacion'] === 'vertical' ? 'banner-vertical' : 'banner-horizontal';
         
-        echo '<div class="' . $orientacionClass . ' ' . $cssClass . ' ' . $deviceClass . '">';
+        // Sanitize CSS class
+        $safeCssClass = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
+        
+        echo '<div class="' . $orientacionClass . ' ' . $safeCssClass . ' ' . $deviceClass . '" data-banner-id="' . (int)$banner['id'] . '">';
         
         if (!empty($banner['url_destino'])) {
-            echo '<a href="' . e($banner['url_destino']) . '" target="_blank" onclick="trackBannerClick(' . $banner['id'] . ')">';
+            echo '<a href="' . e($banner['url_destino']) . '" target="_blank" onclick="return trackBannerClick(this);">';
         }
         
         if (!empty($banner['imagen_url'])) {
@@ -50,9 +53,6 @@ function displayBanners($ubicacion, $limit = null, $cssClass = '') {
         }
         
         echo '</div>';
-        
-        // Track impression
-        echo '<script>trackBannerImpression(' . $banner['id'] . ');</script>';
     }
 }
 ?>

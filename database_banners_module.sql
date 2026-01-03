@@ -2,9 +2,15 @@
 -- Actualización de Base de Datos - Módulo de Banners Completo
 -- Fecha: 2026-01-03
 -- Descripción: Actualiza la tabla banners para soporte completo
+-- ADVERTENCIA: Este script eliminará la tabla banners existente
+-- Asegúrese de hacer un backup antes de ejecutar en producción
 -- =====================================================
 
--- Primero eliminamos la tabla existente si existe para recrearla con la estructura correcta
+-- Respaldar datos existentes si la tabla existe
+CREATE TABLE IF NOT EXISTS `banners_backup` LIKE `banners`;
+INSERT INTO `banners_backup` SELECT * FROM `banners` WHERE EXISTS (SELECT 1 FROM `banners`);
+
+-- Eliminar tabla existente
 DROP TABLE IF EXISTS `banners`;
 
 -- Crear tabla banners con estructura completa
@@ -38,3 +44,6 @@ INSERT INTO `banners` (`nombre`, `tipo`, `imagen_url`, `url_destino`, `ubicacion
 ('Banner Ejemplo Sidebar', 'imagen', NULL, '#', 'sidebar', 'vertical', 'todos', 1, 0),
 ('Banner Ejemplo Footer', 'imagen', NULL, '#', 'footer', 'horizontal', 'todos', 1, 0),
 ('Banner Ejemplo Inicio', 'imagen', NULL, '#', 'inicio', 'horizontal', 'todos', 1, 0);
+
+-- Nota: Para restaurar datos antiguos si es necesario, ejecute:
+-- INSERT INTO `banners` SELECT * FROM `banners_backup`;
