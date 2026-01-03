@@ -7,6 +7,10 @@ require_once __DIR__ . '/config/bootstrap.php';
 $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 $configuracionModel = new Configuracion();
+$bannerModel = new Banner();
+
+// Incluir helper de banners
+require_once __DIR__ . '/app/helpers/banner_helper.php';
 
 // Obtener slug de la noticia
 $slug = $_GET['slug'] ?? '';
@@ -108,6 +112,19 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
         }
     </style>
+    <script>
+        // Banner tracking functions
+        function trackBannerImpression(bannerId) {
+            fetch('<?php echo url("api/banner_track.php"); ?>?action=impression&id=' + bannerId)
+                .catch(err => console.error('Error tracking impression:', err));
+        }
+        
+        function trackBannerClick(bannerId) {
+            fetch('<?php echo url("api/banner_track.php"); ?>?action=click&id=' + bannerId)
+                .catch(err => console.error('Error tracking click:', err));
+            return true;
+        }
+    </script>
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
@@ -211,6 +228,11 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <!-- Removes dangerous attributes and JavaScript pseudo-protocols -->
                         <div class="prose max-w-none text-gray-700 leading-relaxed">
                             <?php echo sanitizeHtml($noticia['contenido']); ?>
+                        </div>
+                        
+                        <!-- Banners dentro de noticias -->
+                        <div class="my-8">
+                            <?php displayBanners('dentro_notas', 1); ?>
                         </div>
                         
                         <!-- Estadísticas -->
