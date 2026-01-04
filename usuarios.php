@@ -109,12 +109,15 @@ ob_start();
                         ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="<?php echo url('usuario_editar.php?id=' . $usuario['id']); ?>" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <a href="<?php echo url('usuario_editar.php?id=' . $usuario['id']); ?>" class="text-blue-600 hover:text-blue-900 mr-3" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
                         <?php if ($usuario['id'] != getCurrentUser()['id']): ?>
-                        <a href="<?php echo url('usuario_cambiar_estado.php?id=' . $usuario['id']); ?>" class="text-orange-600 hover:text-orange-900">
+                        <a href="<?php echo url('usuario_cambiar_estado.php?id=' . $usuario['id']); ?>" class="text-orange-600 hover:text-orange-900 mr-3" title="<?php echo $usuario['activo'] ? 'Desactivar' : 'Activar'; ?>">
                             <i class="fas fa-<?php echo $usuario['activo'] ? 'ban' : 'check'; ?>"></i>
+                        </a>
+                        <a href="<?php echo url('usuario_eliminar.php?id=' . $usuario['id']); ?>" class="text-red-600 hover:text-red-900" title="Eliminar">
+                            <i class="fas fa-trash"></i>
                         </a>
                         <?php endif; ?>
                     </td>

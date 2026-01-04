@@ -256,6 +256,40 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Header -->
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4">
+            <!-- Date and Time Bar -->
+            <div class="flex justify-end items-center py-2 text-sm border-b border-gray-200">
+                <div class="text-gray-600">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span id="fecha-hora-header">
+                    <?php 
+                    // Function to format date in Spanish
+                    $formatearFechaEspanol = function() {
+                        $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                        $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                        $fecha = new DateTime();
+                        return $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y') . ' - ' . $fecha->format('H:i:s');
+                    };
+                    
+                    // Try to use IntlDateFormatter if available
+                    if (extension_loaded('intl')) {
+                        try {
+                            $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+                            $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
+                            echo $formatter->format(new DateTime());
+                            echo ' - ' . (new DateTime())->format('H:i:s');
+                        } catch (Exception $e) {
+                            // Fallback if locale is not available
+                            echo $formatearFechaEspanol();
+                        }
+                    } else {
+                        // Fallback if intl extension is not available
+                        echo $formatearFechaEspanol();
+                    }
+                    ?>
+                    </span>
+                </div>
+            </div>
+            
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
                     <?php if ($modoLogo === 'imagen' && $logoSitio): ?>
@@ -469,9 +503,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             
             <!-- Sidebar -->
             <div class="lg:col-span-1">
-                <!-- Banners Sidebar (primeros 2 banners) -->
+                <!-- Banners Sidebar -->
                 <div class="mb-6">
-                    <?php displayBanners('sidebar', 2); ?>
+                    <?php displayBanners('sidebar', 3); ?>
                 </div>
                 
                 <!-- Noticias Relacionadas -->
@@ -507,30 +541,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     </div>
                 </div>
                 <?php endif; ?>
-                
-                <!-- Banners Sidebar (siguientes banners con offset) -->
-                <div class="mb-6">
-                    <?php 
-                    // Obtener banners adicionales saltando los primeros 2 ya mostrados
-                    $bannersSidebarAdicionales = $bannerModel->getByUbicacion('sidebar', 5);
-                    if (count($bannersSidebarAdicionales) > 2) {
-                        $bannersSidebarAdicionales = array_slice($bannersSidebarAdicionales, 2, 2);
-                        foreach ($bannersSidebarAdicionales as $banner):
-                    ?>
-                    <div class="banner-vertical">
-                        <a href="<?php echo e($banner['url_destino'] ?? '#'); ?>" 
-                           target="_blank"
-                           onclick="trackBannerClick(<?php echo $banner['id']; ?>)">
-                            <img src="<?php echo e(BASE_URL . $banner['imagen_url']); ?>" 
-                                 alt="<?php echo e($banner['nombre']); ?>"
-                                 onload="trackBannerImpression(<?php echo $banner['id']; ?>)">
-                        </a>
-                    </div>
-                    <?php 
-                        endforeach;
-                    }
-                    ?>
-                </div>
                 
                 <!-- Categorías -->
                 <div class="bg-white rounded-lg shadow-md p-6">
@@ -593,6 +603,34 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             }
         }
     });
+    
+    // Update clock in header
+    function actualizarReloj() {
+        const ahora = new Date();
+        const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        
+        const diaSemana = dias[ahora.getDay()];
+        const dia = ahora.getDate();
+        const mes = meses[ahora.getMonth()];
+        const anio = ahora.getFullYear();
+        
+        const horas = String(ahora.getHours()).padStart(2, '0');
+        const minutos = String(ahora.getMinutes()).padStart(2, '0');
+        const segundos = String(ahora.getSeconds()).padStart(2, '0');
+        
+        const textoFecha = `${diaSemana}, ${dia} de ${mes} de ${anio} - ${horas}:${minutos}:${segundos}`;
+        
+        const elementoFecha = document.getElementById('fecha-hora-header');
+        if (elementoFecha) {
+            elementoFecha.textContent = textoFecha;
+        }
+    }
+    
+    // Actualizar el reloj cada segundo
+    setInterval(actualizarReloj, 1000);
+    // Actualizar inmediatamente al cargar
+    actualizarReloj();
     </script>
 </body>
 </html>
