@@ -4,7 +4,7 @@
 
 -- Agregar configuración para modo de logo (imagen o texto)
 INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) 
-SELECT * FROM (SELECT 'modo_logo' as clave, 'imagen' as valor, 'texto' as tipo, 'general' as grupo, 'Modo de visualización del logo: imagen o texto' as descripcion) AS tmp
+SELECT * FROM (SELECT 'modo_logo' as clave, 'imagen' as valor, 'texto' as tipo, 'general' as grupo, 'Modo de visualización del logo:  imagen o texto' as descripcion) AS tmp
 WHERE NOT EXISTS (
     SELECT clave FROM `configuracion` WHERE clave = 'modo_logo'
 ) LIMIT 1;
@@ -38,10 +38,57 @@ WHERE NOT EXISTS (
 ) LIMIT 1;
 
 -- Agregar campo para marcar imágenes de slider en pagina_inicio
-ALTER TABLE `pagina_inicio` 
-ADD COLUMN IF NOT EXISTS `imagen_slider` VARCHAR(500) DEFAULT NULL AFTER `imagen`;
+-- Verificar si la columna existe antes de agregarla
+SET @dbname = DATABASE();
+SET @tablename = 'pagina_inicio';
+SET @columnname = 'imagen_slider';
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE `pagina_inicio` ADD COLUMN `imagen_slider` VARCHAR(500) DEFAULT NULL AFTER `imagen`'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
 
 -- Agregar campo para vincular noticias al slider
-ALTER TABLE `pagina_inicio` 
-ADD COLUMN IF NOT EXISTS `noticia_id` INT(11) DEFAULT NULL AFTER `imagen_slider`,
-ADD KEY IF NOT EXISTS `noticia_id` (`noticia_id`);
+SET @columnname = 'noticia_id';
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (column_name = @columnname)
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE `pagina_inicio` ADD COLUMN `noticia_id` INT(11) DEFAULT NULL AFTER `imagen_slider`'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
+
+-- Agregar índice para noticia_id si no existe
+SET @dbname = DATABASE();
+SET @tablename = 'pagina_inicio';
+SET @indexname = 'noticia_id';
+SET @preparedStatement = (SELECT IF(
+  (
+    SELECT COUNT(*) FROM INFORMATION_SCHEMA. STATISTICS
+    WHERE
+      (table_name = @tablename)
+      AND (table_schema = @dbname)
+      AND (index_name = @indexname)
+  ) > 0,
+  'SELECT 1',
+  'ALTER TABLE `pagina_inicio` ADD KEY `noticia_id` (`noticia_id`)'
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;
