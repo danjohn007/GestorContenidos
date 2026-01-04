@@ -44,7 +44,7 @@ $noticiasRecientes = $noticiaModel->getAll('publicado', $categoriaSeleccionada, 
 $categorias = $categoriaModel->getParents(1);
 
 // Obtener ítems del menú principal (solo activos)
-$menuItems = $menuItemModel->getAll(1);
+$menuItems = $menuItemModel->getAllWithSubcategories(1);
 
 // Obtener configuración del slider
 $sliderTipo = $configuracionModel->get('slider_tipo', 'estatico');
@@ -445,7 +445,28 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <ul class="flex space-x-6">
                     <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium <?php echo !$categoriaSeleccionada ? 'text-blue-600' : ''; ?>">Inicio</a></li>
                     <?php foreach ($menuItems as $menuItem): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="text-gray-700 hover:text-blue-600 <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'text-blue-600 font-medium' : ''; ?>"><?php echo e($menuItem['categoria_nombre']); ?></a></li>
+                    <li class="relative group">
+                        <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
+                           class="text-gray-700 hover:text-blue-600 <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'text-blue-600 font-medium' : ''; ?>">
+                            <?php echo e($menuItem['categoria_nombre']); ?>
+                            <?php if (!empty($menuItem['subcategorias'])): ?>
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                            <?php endif; ?>
+                        </a>
+                        <?php if (!empty($menuItem['subcategorias'])): ?>
+                        <!-- Submenu -->
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="py-2">
+                                <?php foreach ($menuItem['subcategorias'] as $subcat): ?>
+                                <a href="<?php echo url('index.php?categoria=' . $subcat['id']); ?>" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                    <?php echo e($subcat['nombre']); ?>
+                                </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
@@ -468,9 +489,18 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <i class="fas fa-home mr-2"></i> Inicio
             </a>
             <?php foreach ($menuItems as $menuItem): ?>
-            <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="mobile-menu-item <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'active' : ''; ?>">
+            <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
+               class="mobile-menu-item <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'active' : ''; ?>">
                 <i class="fas fa-folder mr-2"></i> <?php echo e($menuItem['categoria_nombre']); ?>
             </a>
+            <?php if (!empty($menuItem['subcategorias'])): ?>
+                <?php foreach ($menuItem['subcategorias'] as $subcat): ?>
+                <a href="<?php echo url('index.php?categoria=' . $subcat['id']); ?>" 
+                   class="mobile-menu-item pl-8 text-sm <?php echo $categoriaSeleccionada == $subcat['id'] ? 'active' : ''; ?>">
+                    <i class="fas fa-angle-right mr-2"></i> <?php echo e($subcat['nombre']); ?>
+                </a>
+                <?php endforeach; ?>
+            <?php endif; ?>
             <?php endforeach; ?>
             <div class="border-t border-gray-200 my-2"></div>
             <a href="<?php echo url('buscar.php'); ?>" class="mobile-menu-item">
