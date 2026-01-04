@@ -19,7 +19,7 @@ class MenuItem {
         $query = "SELECT mi.*, c.nombre as categoria_nombre, c.slug as categoria_slug, c.descripcion as categoria_descripcion
                   FROM {$this->table} mi
                   INNER JOIN categorias c ON mi.categoria_id = c.id
-                  WHERE 1=1";
+                  WHERE c.visible = 1";
         
         if ($activo !== null) {
             $query .= " AND mi.activo = :activo";

@@ -8,6 +8,7 @@ $noticiaModel = new Noticia();
 $categoriaModel = new Categoria();
 $configuracionModel = new Configuracion();
 $bannerModel = new Banner();
+$menuItemModel = new MenuItem();
 
 // Incluir helper de banners
 require_once __DIR__ . '/app/helpers/banner_helper.php';
@@ -32,6 +33,9 @@ $noticiaModel->incrementVisitas($noticia['id']);
 // Obtener categorías principales
 $categorias = $categoriaModel->getParents(1);
 
+// Obtener ítems del menú principal (solo activos y con categorías visibles)
+$menuItems = $menuItemModel->getAll(1);
+
 // Obtener noticias relacionadas de la misma categoría
 $noticiasRelacionadas = $noticiaModel->getAll('publicado', $noticia['categoria_id'], 1, 3);
 // Filtrar la noticia actual
@@ -46,6 +50,7 @@ $configDiseno = $configuracionModel->getByGrupo('diseno');
 // Valores de configuración
 $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
 $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$modoLogo = $configGeneral['modo_logo']['valor'] ?? 'imagen';
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
 $colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
 $colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
@@ -232,16 +237,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
-                    <?php if ($logoSitio): ?>
+                    <?php if ($modoLogo === 'imagen' && $logoSitio): ?>
                     <a href="<?php echo url('index.php'); ?>">
                         <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
                     </a>
-                    <?php else: ?>
+                    <?php elseif ($modoLogo === 'texto' || !$logoSitio): ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
-                    <?php endif; ?>
                     <h1 class="text-xl md:text-2xl font-bold text-gray-800">
                         <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
                     </h1>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Hamburger button for mobile -->
@@ -270,8 +275,8 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <nav class="border-t border-gray-200 py-3 desktop-nav">
                 <ul class="flex space-x-6 overflow-x-auto">
                     <li><a href="<?php echo url('index.php'); ?>" class="text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap">Inicio</a></li>
-                    <?php foreach (array_slice($categorias, 0, 6) as $cat): ?>
-                    <li><a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="text-gray-700 hover:text-blue-600 whitespace-nowrap"><?php echo e($cat['nombre']); ?></a></li>
+                    <?php foreach ($menuItems as $menuItem): ?>
+                    <li><a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="text-gray-700 hover:text-blue-600 whitespace-nowrap"><?php echo e($menuItem['categoria_nombre']); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             </nav>
@@ -293,9 +298,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <a href="<?php echo url('index.php'); ?>" class="mobile-menu-item">
                 <i class="fas fa-home mr-2"></i> Inicio
             </a>
-            <?php foreach ($categorias as $cat): ?>
-            <a href="<?php echo url('index.php?categoria=' . $cat['id']); ?>" class="mobile-menu-item">
-                <i class="fas fa-folder mr-2"></i> <?php echo e($cat['nombre']); ?>
+            <?php foreach ($menuItems as $menuItem): ?>
+            <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="mobile-menu-item">
+                <i class="fas fa-folder mr-2"></i> <?php echo e($menuItem['categoria_nombre']); ?>
             </a>
             <?php endforeach; ?>
             <div class="border-t border-gray-200 my-2"></div>

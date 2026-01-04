@@ -68,6 +68,7 @@ $configDiseno = $configuracionModel->getByGrupo('diseno');
 // Valores de configuración
 $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
 $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$modoLogo = $configGeneral['modo_logo']['valor'] ?? 'imagen';
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
 $colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
 $colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
@@ -348,12 +349,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-2">
-                    <?php if ($logoSitio): ?>
-                    <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
-                    <?php else: ?>
+                    <?php if ($modoLogo === 'imagen' && $logoSitio): ?>
+                    <a href="<?php echo url('index.php'); ?>">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                    </a>
+                    <?php elseif ($modoLogo === 'texto' || !$logoSitio): ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">
+                        <a href="<?php echo url('index.php'); ?>"><?php echo e($nombreSitio); ?></a>
+                    </h1>
                     <?php endif; ?>
-                    <h1 class="text-2xl font-bold text-gray-800"><?php echo e($nombreSitio); ?></h1>
                 </div>
                 
                 <!-- Hamburger button for mobile -->
@@ -443,31 +448,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     </a>
                 </div>
                 <div class="absolute top-0 right-0 bottom-0 w-1/3 bg-gradient-to-l from-blue-900/50 to-transparent"></div>
-            </div>
-        </section>
-        <?php endif; ?>
-
-        <!-- Accesos Directos -->
-        <?php if (!empty($accesoDirecto) && $mostrarContenidoPaginaPrincipal): ?>
-        <section class="mb-12">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <?php foreach ($accesoDirecto as $acceso): ?>
-                <a href="<?php echo url($acceso['url']); ?>" class="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow group">
-                    <div class="text-blue-600 text-4xl mb-3 group-hover:scale-110 transition-transform">
-                        <?php if (!empty($acceso['imagen'])): ?>
-                            <img src="<?php echo e($acceso['imagen']); ?>" alt="<?php echo e($acceso['titulo']); ?>" class="w-16 h-16 mx-auto object-contain">
-                        <?php else: ?>
-                            <i class="<?php echo e($acceso['contenido']); ?>"></i>
-                        <?php endif; ?>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-1">
-                        <?php echo e($acceso['titulo']); ?>
-                    </h3>
-                    <p class="text-sm text-gray-600">
-                        <?php echo e($acceso['subtitulo']); ?>
-                    </p>
-                </a>
-                <?php endforeach; ?>
             </div>
         </section>
         <?php endif; ?>
@@ -755,23 +735,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                             <?php endif; ?>
                         <?php endforeach; ?>
                     <?php endif; ?>
-                </div>
-
-                <!-- Categorías (en el sidebar también) -->
-                <div class="bg-white rounded-lg shadow-lg p-6 mt-6" id="categorias">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
-                        <i class="fas fa-th text-blue-600 mr-2"></i>
-                        Categorías
-                    </h3>
-                    <div class="space-y-2">
-                        <?php foreach ($menuItems as $menuItem): ?>
-                        <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
-                           class="block px-4 py-2 rounded hover:bg-blue-50 transition-colors <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'bg-blue-100 text-blue-600 font-medium' : 'text-gray-700'; ?>">
-                            <i class="fas fa-folder mr-2"></i>
-                            <?php echo e($menuItem['categoria_nombre']); ?>
-                        </a>
-                        <?php endforeach; ?>
-                    </div>
                 </div>
             </div>
         </div>

@@ -8,22 +8,53 @@ if (!isset($bannerModel)) {
     $bannerModel = new Banner();
 }
 
+// Variable global para tracking de banners ya mostrados
+if (!isset($GLOBALS['displayed_banners'])) {
+    $GLOBALS['displayed_banners'] = [];
+}
+
 /**
  * Muestra banners de una ubicación específica
  * @param string $ubicacion - La ubicación del banner (inicio, sidebar, footer, etc.)
  * @param int $limit - Número máximo de banners a mostrar
  * @param string $cssClass - Clase CSS adicional para el contenedor
+ * @param bool $random - Si se debe aleatorizar la selección de banners
  */
-function displayBanners($ubicacion, $limit = null, $cssClass = '') {
+function displayBanners($ubicacion, $limit = null, $cssClass = '', $random = true) {
     global $bannerModel;
     
-    $banners = $bannerModel->getByUbicacion($ubicacion, $limit);
+    // Obtener todos los banners disponibles para esta ubicación
+    $allBanners = $bannerModel->getByUbicacion($ubicacion);
     
-    if (empty($banners)) {
+    if (empty($allBanners)) {
         return;
     }
     
-    foreach ($banners as $banner) {
+    // Filtrar banners ya mostrados para evitar repetición
+    $availableBanners = array_filter($allBanners, function($banner) {
+        return !in_array($banner['id'], $GLOBALS['displayed_banners']);
+    });
+    
+    // Si no hay banners disponibles (todos ya mostrados), resetear y usar todos
+    if (empty($availableBanners)) {
+        $availableBanners = $allBanners;
+    }
+    
+    // Aleatorizar si se solicita
+    if ($random && count($availableBanners) > 1) {
+        shuffle($availableBanners);
+    }
+    
+    // Limitar cantidad si se especifica
+    if ($limit !== null) {
+        $availableBanners = array_slice($availableBanners, 0, $limit);
+    }
+    
+    // Mostrar banners
+    foreach ($availableBanners as $banner) {
+        // Registrar como mostrado
+        $GLOBALS['displayed_banners'][] = $banner['id'];
+        
         // Determinar si se debe mostrar según el dispositivo
         $deviceClass = '';
         if ($banner['dispositivo'] === 'desktop') {
@@ -54,5 +85,13 @@ function displayBanners($ubicacion, $limit = null, $cssClass = '') {
         
         echo '</div>';
     }
+}
+
+/**
+ * Resetea el tracking de banners mostrados
+ * Útil cuando se necesita volver a mostrar banners
+ */
+function resetDisplayedBanners() {
+    $GLOBALS['displayed_banners'] = [];
 }
 ?>
