@@ -8,9 +8,18 @@ if (!isset($bannerModel)) {
     $bannerModel = new Banner();
 }
 
+if (!isset($bannerImagenModel)) {
+    $bannerImagenModel = new BannerImagen();
+}
+
 // Variable global para tracking de banners ya mostrados
 if (!isset($GLOBALS['displayed_banners'])) {
     $GLOBALS['displayed_banners'] = [];
+}
+
+// Variable global para tracking de script de carrusel
+if (!isset($GLOBALS['carousel_script_loaded'])) {
+    $GLOBALS['carousel_script_loaded'] = false;
 }
 
 /**
@@ -107,7 +116,7 @@ function resetDisplayedBanners() {
  * @param string $cssClass - Clase CSS adicional para el contenedor
  */
 function displayCarouselBanners($ubicacion, $interval = 5000, $cssClass = '') {
-    global $bannerModel;
+    global $bannerModel, $bannerImagenModel;
     
     // Obtener banners rotativos de esta ubicación
     $banners = $bannerModel->getByUbicacion($ubicacion);
@@ -117,7 +126,6 @@ function displayCarouselBanners($ubicacion, $interval = 5000, $cssClass = '') {
     }
     
     // Filtrar solo los banners marcados como rotativos o si hay múltiples imágenes
-    $bannerImagenModel = new BannerImagen();
     $carouselBanners = [];
     
     foreach ($banners as $banner) {
@@ -229,9 +237,9 @@ function displayCarouselBanners($ubicacion, $interval = 5000, $cssClass = '') {
         echo '<script>';
         echo '(function() {';
         echo '  let currentBanner = 0;';
-        echo '  const totalBanners = ' . count($carouselBanners) . ';';
+        echo '  const totalBanners = ' . (int)count($carouselBanners) . ';';
         echo '  const interval = ' . (int)$interval . ';';
-        echo '  const carouselId = "' . $carouselId . '";';
+        echo '  const carouselId = ' . json_encode($carouselId) . ';';
         echo '  ';
         echo '  function rotateBanners() {';
         echo '    const items = document.querySelectorAll("#" + carouselId + " .banner-carousel-item");';
@@ -246,49 +254,52 @@ function displayCarouselBanners($ubicacion, $interval = 5000, $cssClass = '') {
         echo '})();';
         echo '</script>';
     }
+    
+    // Load carousel navigation script only once
+    if (!$GLOBALS['carousel_script_loaded']) {
+        loadCarouselNavigationScript();
+        $GLOBALS['carousel_script_loaded'] = true;
+    }
 }
 
 /**
- * Navegación del carrusel de imágenes interno
+ * Carga el script de navegación del carrusel (solo una vez por página)
  */
-if (!function_exists('carouselNavigateScript')) {
-    function carouselNavigateScript() {
-        echo '<script>';
-        echo 'function carouselNavigate(button, direction) {';
-        echo '  const container = button.closest(".banner-carousel-item");';
-        echo '  const slides = container.querySelectorAll(".carousel-slide");';
-        echo '  const indicators = container.querySelectorAll(".carousel-indicator");';
-        echo '  let current = 0;';
-        echo '  slides.forEach((slide, idx) => {';
-        echo '    if (slide.style.display === "block") current = idx;';
-        echo '  });';
-        echo '  slides[current].style.display = "none";';
-        echo '  indicators[current].classList.remove("bg-white");';
-        echo '  indicators[current].classList.add("bg-white/50");';
-        echo '  current = (current + direction + slides.length) % slides.length;';
-        echo '  slides[current].style.display = "block";';
-        echo '  indicators[current].classList.remove("bg-white/50");';
-        echo '  indicators[current].classList.add("bg-white");';
-        echo '}';
-        echo 'function carouselGoTo(button, index) {';
-        echo '  const container = button.closest(".banner-carousel-item");';
-        echo '  const slides = container.querySelectorAll(".carousel-slide");';
-        echo '  const indicators = container.querySelectorAll(".carousel-indicator");';
-        echo '  slides.forEach((slide, idx) => {';
-        echo '    slide.style.display = idx === index ? "block" : "none";';
-        echo '  });';
-        echo '  indicators.forEach((ind, idx) => {';
-        echo '    if (idx === index) {';
-        echo '      ind.classList.remove("bg-white/50");';
-        echo '      ind.classList.add("bg-white");';
-        echo '    } else {';
-        echo '      ind.classList.remove("bg-white");';
-        echo '      ind.classList.add("bg-white/50");';
-        echo '    }';
-        echo '  });';
-        echo '}';
-        echo '</script>';
-    }
-    carouselNavigateScript();
+function loadCarouselNavigationScript() {
+    echo '<script>';
+    echo 'function carouselNavigate(button, direction) {';
+    echo '  const container = button.closest(".banner-carousel-item");';
+    echo '  const slides = container.querySelectorAll(".carousel-slide");';
+    echo '  const indicators = container.querySelectorAll(".carousel-indicator");';
+    echo '  let current = 0;';
+    echo '  slides.forEach((slide, idx) => {';
+    echo '    if (slide.style.display === "block") current = idx;';
+    echo '  });';
+    echo '  slides[current].style.display = "none";';
+    echo '  indicators[current].classList.remove("bg-white");';
+    echo '  indicators[current].classList.add("bg-white/50");';
+    echo '  current = (current + direction + slides.length) % slides.length;';
+    echo '  slides[current].style.display = "block";';
+    echo '  indicators[current].classList.remove("bg-white/50");';
+    echo '  indicators[current].classList.add("bg-white");';
+    echo '}';
+    echo 'function carouselGoTo(button, index) {';
+    echo '  const container = button.closest(".banner-carousel-item");';
+    echo '  const slides = container.querySelectorAll(".carousel-slide");';
+    echo '  const indicators = container.querySelectorAll(".carousel-indicator");';
+    echo '  slides.forEach((slide, idx) => {';
+    echo '    slide.style.display = idx === index ? "block" : "none";';
+    echo '  });';
+    echo '  indicators.forEach((ind, idx) => {';
+    echo '    if (idx === index) {';
+    echo '      ind.classList.remove("bg-white/50");';
+    echo '      ind.classList.add("bg-white");';
+    echo '    } else {';
+    echo '      ind.classList.remove("bg-white");';
+    echo '      ind.classList.add("bg-white/50");';
+    echo '    }';
+    echo '  });';
+    echo '}';
+    echo '</script>';
 }
 ?>
