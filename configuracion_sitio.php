@@ -97,6 +97,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    // Manejar favicon si se sube
+    if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/public/uploads/config/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $extension = strtolower(pathinfo($_FILES['favicon']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['ico', 'png', 'jpg', 'jpeg', 'svg'];
+        
+        if (!in_array($extension, $allowedExtensions)) {
+            $errors[] = 'Formato de favicon no permitido. Use ICO, PNG, JPG o SVG';
+        } else {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo del favicon';
+            } else {
+                $mimeType = finfo_file($finfo, $_FILES['favicon']['tmp_name']);
+                finfo_close($finfo);
+                
+                $allowedMimes = ['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/jpeg', 'image/svg+xml'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo de favicon no válido';
+                } else {
+                    // Delete old favicon if exists
+                    if (!empty($config['favicon_sitio']['valor'])) {
+                        $oldFaviconPath = __DIR__ . $config['favicon_sitio']['valor'];
+                        if (file_exists($oldFaviconPath) && is_file($oldFaviconPath)) {
+                            @unlink($oldFaviconPath);
+                        }
+                    }
+                    
+                    $filename = 'favicon_' . time() . '.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['favicon']['tmp_name'], $uploadPath)) {
+                        $valores['favicon_sitio'] = '/public/uploads/config/' . $filename;
+                    } else {
+                        $errors[] = 'Error al subir el favicon';
+                    }
+                }
+            }
+        }
+    }
+    
     if (empty($errors)) {
         // Guardar valores
         foreach ($valores as $clave => $valor) {
@@ -284,6 +330,28 @@ ob_start();
                     toggleLogoFields();
                 });
                 </script>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Favicon del Sitio</h3>
+                
+                <?php if (!empty($config['favicon_sitio']['valor'])): ?>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Favicon Actual</label>
+                    <img src="<?php echo e(BASE_URL . $config['favicon_sitio']['valor'] . '?v=' . time()); ?>" alt="Favicon actual" class="h-8 border border-gray-300 p-1 bg-white" loading="eager">
+                </div>
+                <?php endif; ?>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Cargar Favicon
+                    </label>
+                    <input type="file" name="favicon" accept=".ico,.png,.jpg,.jpeg,.svg"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Formatos permitidos: ICO, PNG, JPG, SVG. Tamaño recomendado: 32x32 o 16x16 píxeles
+                    </p>
+                </div>
             </div>
 
             <div class="border-t border-gray-200 pt-6">
