@@ -24,6 +24,13 @@ class Banner {
     const DISPOSITIVO_DESKTOP = 'desktop';
     const DISPOSITIVO_MOVIL = 'movil';
 
+    // Tamaños de display
+    const TAMANO_AUTO = 'auto';
+    const TAMANO_HORIZONTAL = 'horizontal';
+    const TAMANO_CUADRADO = 'cuadrado';
+    const TAMANO_VERTICAL = 'vertical';
+    const TAMANO_REAL = 'real';
+
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
@@ -58,6 +65,19 @@ class Banner {
             self::DISPOSITIVO_TODOS => 'Todos los dispositivos',
             self::DISPOSITIVO_DESKTOP => 'Solo Desktop',
             self::DISPOSITIVO_MOVIL => 'Solo Móvil'
+        ];
+    }
+
+    /**
+     * Obtiene todos los tamaños de display disponibles
+     */
+    public static function getTamanosDisplay() {
+        return [
+            self::TAMANO_AUTO => 'Automático (responsive)',
+            self::TAMANO_HORIZONTAL => 'Banner horizontal (1200×400)',
+            self::TAMANO_CUADRADO => 'Banner cuadrado (600×600)',
+            self::TAMANO_VERTICAL => 'Banner vertical / sidebar (300×600)',
+            self::TAMANO_REAL => 'Tamaño real de la imagen (sin escalar)'
         ];
     }
 
@@ -128,9 +148,9 @@ class Banner {
     public function create($data) {
         $query = "INSERT INTO {$this->table} 
                   (nombre, tipo, imagen_url, url_destino, ubicacion, orientacion, 
-                   dispositivo, orden, activo, fecha_inicio, fecha_fin, rotativo) 
+                   dispositivo, tamano_display, orden, activo, fecha_inicio, fecha_fin, rotativo) 
                   VALUES (:nombre, :tipo, :imagen_url, :url_destino, :ubicacion, :orientacion,
-                         :dispositivo, :orden, :activo, :fecha_inicio, :fecha_fin, :rotativo)";
+                         :dispositivo, :tamano_display, :orden, :activo, :fecha_inicio, :fecha_fin, :rotativo)";
         
         $stmt = $this->db->prepare($query);
         
@@ -142,6 +162,7 @@ class Banner {
             'ubicacion' => $data['ubicacion'],
             'orientacion' => $data['orientacion'] ?? self::ORIENTACION_HORIZONTAL,
             'dispositivo' => $data['dispositivo'] ?? self::DISPOSITIVO_TODOS,
+            'tamano_display' => $data['tamano_display'] ?? self::TAMANO_AUTO,
             'orden' => $data['orden'] ?? 0,
             'activo' => $data['activo'] ?? 1,
             'fecha_inicio' => $data['fecha_inicio'] ?? null,
@@ -164,7 +185,7 @@ class Banner {
         $params = ['id' => $id];
         
         $allowedFields = ['nombre', 'tipo', 'imagen_url', 'url_destino', 'ubicacion', 
-                          'orientacion', 'dispositivo', 'orden', 'activo', 
+                          'orientacion', 'dispositivo', 'tamano_display', 'orden', 'activo', 
                           'fecha_inicio', 'fecha_fin', 'rotativo'];
         
         foreach ($allowedFields as $field) {

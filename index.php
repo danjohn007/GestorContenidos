@@ -116,8 +116,29 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-url" content="<?php echo BASE_URL; ?>">
     <title><?php echo e($nombreSitio); ?></title>
+    <?php 
+    // Cargar favicon si está configurado
+    $faviconSitio = $configGeneral['favicon_sitio']['valor'] ?? null;
+    if ($faviconSitio): 
+        // Determinar tipo MIME según extensión
+        $faviconExt = strtolower(pathinfo($faviconSitio, PATHINFO_EXTENSION));
+        $faviconType = 'image/x-icon'; // default
+        if ($faviconExt === 'png') {
+            $faviconType = 'image/png';
+        } elseif ($faviconExt === 'jpg' || $faviconExt === 'jpeg') {
+            $faviconType = 'image/jpeg';
+        } elseif ($faviconExt === 'svg') {
+            $faviconType = 'image/svg+xml';
+        }
+    ?>
+    <link rel="icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <link rel="shortcut icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- AOS - Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="<?php echo url('public/js/banner-tracking.js'); ?>"></script>
     <style>
         :root {
@@ -361,6 +382,30 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             width: 100%;
             height: auto;
             display: block;
+        }
+        
+        /* Banner size classes */
+        .banner-size-horizontal {
+            max-width: 1200px;
+            max-height: 400px;
+        }
+        
+        .banner-size-cuadrado {
+            max-width: 600px;
+            max-height: 600px;
+        }
+        
+        .banner-size-vertical {
+            max-width: 300px;
+            max-height: 600px;
+        }
+        
+        .banner-size-real {
+            /* No constraints - natural size */
+        }
+        
+        .banner-size-auto {
+            /* Responsive - no constraints */
         }
     </style>
 </head>
@@ -698,14 +743,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <div class="lg:col-span-2">
                 <!-- Noticias Destacadas -->
                 <?php if (!empty($noticiasDestacadas) && !$recientesFilter): ?>
-                <section class="mb-12">
+                <section class="mb-12" data-aos="fade-up">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">
                         <i class="fas fa-star text-yellow-500 mr-2"></i>
                         Noticias Destacadas
                     </h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <?php foreach ($noticiasDestacadas as $noticia): ?>
-                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="100">
                             <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
                                 <?php if ($noticia['imagen_destacada']): ?>
                                 <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-48 object-cover hover:opacity-90 transition-opacity cursor-pointer">
@@ -766,7 +811,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <?php endif; ?>
 
                 <!-- Noticias Recientes -->
-                <section>
+                <section data-aos="fade-up">
                     <?php if ($categoriaSeleccionada): ?>
                     <?php 
                     $categoriaActual = $categoriaModel->getById($categoriaSeleccionada);
@@ -799,7 +844,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <?php else: ?>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <?php foreach ($noticiasRecientes as $noticia): ?>
-                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="50">
                             <?php if ($noticia['imagen_destacada']): ?>
                             <a href="<?php echo url('noticia_detalle.php?slug=' . $noticia['slug']); ?>">
                                 <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-40 object-cover">
@@ -926,7 +971,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             <div class="lg:col-span-1">
                 <div class="sidebar-sticky">
                     <?php if (!empty($accesoLateral)): ?>
-                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6" data-aos="fade-left">
                         <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
                             <i class="fas fa-th-list text-blue-600 mr-2"></i>
                             Accesos Rápidos
@@ -1131,6 +1176,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     setInterval(actualizarReloj, 1000);
     // Actualizar inmediatamente al cargar
     actualizarReloj();
+    
+    // Inicializar AOS (Animate On Scroll)
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
     </script>
 </body>
 </html>

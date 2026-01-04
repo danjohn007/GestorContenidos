@@ -80,17 +80,46 @@ function displayBanners($ubicacion, $limit = null, $cssClass = '', $random = tru
         // Determinar clase según orientación
         $orientacionClass = $banner['orientacion'] === 'vertical' ? 'banner-vertical' : 'banner-horizontal';
         
+        // Determinar clase según tamaño de display
+        $imgClass = 'w-full h-auto';
+        $tamanoClass = 'banner-size-auto'; // default
+        $tamano = $banner['tamano_display'] ?? 'auto';
+        
+        switch ($tamano) {
+            case 'horizontal':
+                $tamanoClass = 'banner-size-horizontal';
+                $imgClass = 'w-full h-auto object-cover';
+                break;
+            case 'cuadrado':
+                $tamanoClass = 'banner-size-cuadrado';
+                $imgClass = 'w-full h-auto object-cover';
+                break;
+            case 'vertical':
+                $tamanoClass = 'banner-size-vertical';
+                $imgClass = 'w-full h-auto object-cover';
+                break;
+            case 'real':
+                $tamanoClass = 'banner-size-real';
+                $imgClass = 'max-w-full h-auto';
+                break;
+            case 'auto':
+            default:
+                $tamanoClass = 'banner-size-auto';
+                $imgClass = 'w-full h-auto';
+                break;
+        }
+        
         // Sanitize CSS class
         $safeCssClass = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
         
-        echo '<div class="' . $orientacionClass . ' ' . $safeCssClass . ' ' . $deviceClass . '" data-banner-id="' . (int)$banner['id'] . '">';
+        echo '<div class="' . $orientacionClass . ' ' . $tamanoClass . ' ' . $safeCssClass . ' ' . $deviceClass . '" data-banner-id="' . (int)$banner['id'] . '">';
         
         if (!empty($banner['url_destino'])) {
             echo '<a href="' . e($banner['url_destino']) . '" target="_blank" onclick="return trackBannerClick(this);">';
         }
         
         if (!empty($banner['imagen_url'])) {
-            echo '<img src="' . e(BASE_URL . $banner['imagen_url']) . '" alt="' . e($banner['nombre']) . '" class="w-full h-auto" loading="lazy">';
+            echo '<img src="' . e(BASE_URL . $banner['imagen_url']) . '" alt="' . e($banner['nombre']) . '" class="' . $imgClass . '" loading="lazy">';
         }
         
         if (!empty($banner['url_destino'])) {

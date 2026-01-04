@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ubicacion = $_POST['ubicacion'] ?? '';
     $orientacion = $_POST['orientacion'] ?? 'horizontal';
     $dispositivo = $_POST['dispositivo'] ?? 'todos';
+    $tamano_display = $_POST['tamano_display'] ?? 'auto';
     $url_destino = trim($_POST['url_destino'] ?? '');
     $orden = (int)($_POST['orden'] ?? 0);
     $activo = isset($_POST['activo']) ? 1 : 0;
@@ -130,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'ubicacion' => $ubicacion,
             'orientacion' => $orientacion,
             'dispositivo' => $dispositivo,
+            'tamano_display' => $tamano_display,
             'orden' => $orden,
             'activo' => $activo,
             'rotativo' => $rotativo,
@@ -248,6 +250,21 @@ ob_start();
                         </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Tamaño de Visualización
+                    </label>
+                    <select name="tamano_display" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <?php foreach (Banner::getTamanosDisplay() as $key => $label): ?>
+                        <option value="<?php echo $key; ?>" <?php echo (isset($_POST['tamano_display']) && $_POST['tamano_display'] === $key) ? 'selected' : ''; ?>>
+                            <?php echo e($label); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Define el tamaño real de visualización del banner</p>
                 </div>
 
                 <div>

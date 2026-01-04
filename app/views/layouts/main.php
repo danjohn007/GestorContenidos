@@ -4,8 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($title ?? 'Dashboard'); ?> - <?php echo SITE_NAME; ?></title>
+    <?php
+    // Cargar favicon si está configurado
+    if (isAuthenticated()) {
+        $configuracionModel = new Configuracion();
+        $configGeneral = $configuracionModel->getByGrupo('general');
+        $faviconSitio = $configGeneral['favicon_sitio']['valor'] ?? null;
+        if ($faviconSitio):
+            // Determinar tipo MIME según extensión
+            $faviconExt = strtolower(pathinfo($faviconSitio, PATHINFO_EXTENSION));
+            $faviconType = 'image/x-icon'; // default
+            if ($faviconExt === 'png') {
+                $faviconType = 'image/png';
+            } elseif ($faviconExt === 'jpg' || $faviconExt === 'jpeg') {
+                $faviconType = 'image/jpeg';
+            } elseif ($faviconExt === 'svg') {
+                $faviconType = 'image/svg+xml';
+            }
+    ?>
+    <link rel="icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <link rel="shortcut icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <?php 
+        endif;
+    }
+    ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS - Animate On Scroll -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <?php
     // Cargar configuración de diseño si está autenticado
     if (isAuthenticated()) {
@@ -220,6 +247,14 @@
                 sidebar.classList.toggle('-translate-x-full');
             });
         }
+        
+        // Inicializar AOS (Animate On Scroll)
+        AOS.init({
+            duration: 600,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 50
+        });
     </script>
 </body>
 </html>
