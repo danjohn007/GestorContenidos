@@ -19,8 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'email_sistema' => trim($_POST['email_sistema'] ?? ''),
         'telefono_contacto' => trim($_POST['telefono_contacto'] ?? ''),
         'direccion' => trim($_POST['direccion'] ?? ''),
-        'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City')
+        'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City'),
+        'modo_logo' => trim($_POST['modo_logo'] ?? 'imagen')
     ];
+    
+    // Agregar configuraciones del slider si están presentes
+    if (isset($_POST['slider_tipo'])) {
+        $valores['slider_tipo'] = trim($_POST['slider_tipo']);
+    }
+    if (isset($_POST['slider_cantidad'])) {
+        $valores['slider_cantidad'] = (int)$_POST['slider_cantidad'];
+    }
+    if (isset($_POST['slider_autoplay'])) {
+        $valores['slider_autoplay'] = '1';
+    } else if (isset($_POST['slider_tipo'])) {
+        // Solo setear a 0 si venimos del formulario de slider
+        $valores['slider_autoplay'] = '0';
+    }
+    if (isset($_POST['slider_intervalo'])) {
+        $valores['slider_intervalo'] = (int)$_POST['slider_intervalo'];
+    }
     
     // Validaciones
     if (empty($valores['nombre_sitio'])) {
@@ -98,6 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $success = true;
         setFlash('success', 'Configuración actualizada exitosamente');
+        
+        // Si viene del formulario de slider, redirigir a página de inicio
+        if (isset($_POST['slider_tipo'])) {
+            redirect('pagina_inicio.php');
+        }
     }
 }
 
@@ -184,18 +207,65 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Logo del Sitio
-                </label>
-                <?php if (!empty($config['logo_sitio']['valor'])): ?>
-                <div class="mb-3">
-                    <img src="<?php echo e(BASE_URL . $config['logo_sitio']['valor'] . '?v=' . time()); ?>" alt="Logo actual" class="h-16" loading="eager">
-                    <p class="text-xs text-gray-500 mt-1">Logo actual</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Logo del Sitio</h3>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Modo de Logo
+                    </label>
+                    <div class="space-y-2">
+                        <label class="inline-flex items-center mr-6">
+                            <input type="radio" name="modo_logo" value="imagen" 
+                                   <?php echo (empty($config['modo_logo']['valor']) || $config['modo_logo']['valor'] === 'imagen') ? 'checked' : ''; ?>
+                                   class="form-radio text-blue-600">
+                            <span class="ml-2">Mostrar imagen</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="modo_logo" value="texto" 
+                                   <?php echo (!empty($config['modo_logo']['valor']) && $config['modo_logo']['valor'] === 'texto') ? 'checked' : ''; ?>
+                                   class="form-radio text-blue-600">
+                            <span class="ml-2">Mostrar título como texto</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Elige cómo mostrar el logo: como imagen o como el título del sitio en texto
+                    </p>
                 </div>
-                <?php endif; ?>
-                <input type="file" name="logo" accept="image/*"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF, SVG, WEBP</p>
+                
+                <div id="logo-image-section">
+                    <?php if (!empty($config['logo_sitio']['valor'])): ?>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Logo Actual</label>
+                        <img src="<?php echo e(BASE_URL . $config['logo_sitio']['valor'] . '?v=' . time()); ?>" alt="Logo actual" class="h-16" loading="eager">
+                    </div>
+                    <?php endif; ?>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Imagen del Logo
+                    </label>
+                    <input type="file" name="logo" accept="image/*"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF, SVG, WEBP</p>
+                </div>
+                
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const modoLogoRadios = document.querySelectorAll('input[name="modo_logo"]');
+                    const logoImageSection = document.getElementById('logo-image-section');
+                    
+                    function toggleLogoFields() {
+                        const modoLogo = document.querySelector('input[name="modo_logo"]:checked').value;
+                        if (logoImageSection) {
+                            logoImageSection.style.display = (modoLogo === 'texto') ? 'none' : 'block';
+                        }
+                    }
+                    
+                    modoLogoRadios.forEach(radio => {
+                        radio.addEventListener('change', toggleLogoFields);
+                    });
+                    
+                    toggleLogoFields();
+                });
+                </script>
             </div>
 
             <div class="border-t border-gray-200 pt-6">

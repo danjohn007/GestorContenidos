@@ -214,6 +214,68 @@ ob_start();
             <h2 class="text-xl font-bold text-gray-900 mb-4">Slider Principal</h2>
             <p class="text-gray-600 mb-6">Configura los elementos del slider que aparecen en la página principal. Puedes agregar imágenes estáticas o configurar noticias destacadas.</p>
             
+            <!-- Configuración del Slider -->
+            <form method="POST" action="<?php echo url('configuracion_sitio.php'); ?>" class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-cog mr-2 text-blue-600"></i>
+                    Configuración del Slider
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tipo de Contenido del Slider
+                        </label>
+                        <select name="slider_tipo" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <?php 
+                            $configuracionModel = new Configuracion();
+                            $sliderTipo = $configuracionModel->get('slider_tipo', 'estatico'); 
+                            ?>
+                            <option value="estatico" <?php echo $sliderTipo === 'estatico' ? 'selected' : ''; ?>>Solo imágenes estáticas</option>
+                            <option value="noticias" <?php echo $sliderTipo === 'noticias' ? 'selected' : ''; ?>>Solo noticias destacadas</option>
+                            <option value="mixto" <?php echo $sliderTipo === 'mixto' ? 'selected' : ''; ?>>Combinación de ambos</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Define qué tipo de contenido se mostrará en el slider</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Cantidad de Slides
+                        </label>
+                        <input type="number" name="slider_cantidad" min="1" max="10" 
+                               value="<?php echo (int)$configuracionModel->get('slider_cantidad', 3); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Número máximo de elementos a mostrar</p>
+                    </div>
+                    
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="slider_autoplay" value="1" 
+                                   <?php echo $configuracionModel->get('slider_autoplay', '1') === '1' ? 'checked' : ''; ?>
+                                   class="form-checkbox text-blue-600">
+                            <span class="ml-2 text-sm font-medium text-gray-700">Activar reproducción automática</span>
+                        </label>
+                        <p class="text-xs text-gray-500 mt-1 ml-6">El slider cambiará automáticamente</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Intervalo (milisegundos)
+                        </label>
+                        <input type="number" name="slider_intervalo" min="1000" max="30000" step="1000"
+                               value="<?php echo (int)$configuracionModel->get('slider_intervalo', 5000); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Tiempo entre cambios automáticos (5000 = 5 segundos)</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        Guardar Configuración
+                    </button>
+                </div>
+            </form>
+            
             <!-- Botón para agregar nuevo slider -->
             <div class="mb-6">
                 <button type="button" onclick="mostrarFormularioNuevoSlider()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">

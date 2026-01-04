@@ -7,19 +7,23 @@
 class MenuItem {
     private $db;
     private $table = 'menu_items';
+    
+    // Constantes para estados
+    const CATEGORIA_VISIBLE = 1;
+    const ITEM_ACTIVO = 1;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
 
     /**
-     * Obtiene todos los ítems del menú con información de categoría
+     * Obtiene todos los ítems del menú con información de categoría y subcategorías
      */
     public function getAll($activo = null) {
         $query = "SELECT mi.*, c.nombre as categoria_nombre, c.slug as categoria_slug, c.descripcion as categoria_descripcion
                   FROM {$this->table} mi
                   INNER JOIN categorias c ON mi.categoria_id = c.id
-                  WHERE 1=1";
+                  WHERE c.visible = " . self::CATEGORIA_VISIBLE;
         
         if ($activo !== null) {
             $query .= " AND mi.activo = :activo";
@@ -36,6 +40,21 @@ class MenuItem {
         }
         
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Obtiene ítems del menú con estructura jerárquica (incluye subcategorías)
+     */
+    public function getAllWithSubcategories($activo = null) {
+        $menuItems = $this->getAll($activo);
+        $categoriaModel = new Categoria();
+        
+        // Para cada ítem del menú, obtener sus subcategorías si existen
+        foreach ($menuItems as &$item) {
+            $item['subcategorias'] = $categoriaModel->getChildren($item['categoria_id'], 1);
+        }
+        
+        return $menuItems;
     }
 
     /**
