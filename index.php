@@ -120,9 +120,19 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     // Cargar favicon si está configurado
     $faviconSitio = $configGeneral['favicon_sitio']['valor'] ?? null;
     if ($faviconSitio): 
+        // Determinar tipo MIME según extensión
+        $faviconExt = strtolower(pathinfo($faviconSitio, PATHINFO_EXTENSION));
+        $faviconType = 'image/x-icon'; // default
+        if ($faviconExt === 'png') {
+            $faviconType = 'image/png';
+        } elseif ($faviconExt === 'jpg' || $faviconExt === 'jpeg') {
+            $faviconType = 'image/jpeg';
+        } elseif ($faviconExt === 'svg') {
+            $faviconType = 'image/svg+xml';
+        }
     ?>
-    <link rel="icon" type="image/x-icon" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <link rel="icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
+    <link rel="shortcut icon" type="<?php echo $faviconType; ?>" href="<?php echo e(BASE_URL . $faviconSitio); ?>">
     <?php endif; ?>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -372,6 +382,30 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             width: 100%;
             height: auto;
             display: block;
+        }
+        
+        /* Banner size classes */
+        .banner-size-horizontal {
+            max-width: 1200px;
+            max-height: 400px;
+        }
+        
+        .banner-size-cuadrado {
+            max-width: 600px;
+            max-height: 600px;
+        }
+        
+        .banner-size-vertical {
+            max-width: 300px;
+            max-height: 600px;
+        }
+        
+        .banner-size-real {
+            /* No constraints - natural size */
+        }
+        
+        .banner-size-auto {
+            /* Responsive - no constraints */
         }
     </style>
 </head>

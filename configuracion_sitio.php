@@ -126,7 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (!empty($config['favicon_sitio']['valor'])) {
                         $oldFaviconPath = __DIR__ . $config['favicon_sitio']['valor'];
                         if (file_exists($oldFaviconPath) && is_file($oldFaviconPath)) {
-                            @unlink($oldFaviconPath);
+                            if (!unlink($oldFaviconPath)) {
+                                error_log("Failed to delete old favicon: " . $oldFaviconPath);
+                            }
                         }
                     }
                     
