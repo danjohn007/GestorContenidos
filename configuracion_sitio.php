@@ -20,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'telefono_contacto' => trim($_POST['telefono_contacto'] ?? ''),
         'direccion' => trim($_POST['direccion'] ?? ''),
         'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City'),
-        'modo_logo' => trim($_POST['modo_logo'] ?? 'imagen')
+        'modo_logo' => trim($_POST['modo_logo'] ?? 'imagen'),
+        'tamano_logo' => trim($_POST['tamano_logo'] ?? 'h-10')
     ];
     
     // Agregar configuraciones del slider si están presentes
@@ -240,12 +241,28 @@ ob_start();
                         <img src="<?php echo e(BASE_URL . $config['logo_sitio']['valor'] . '?v=' . time()); ?>" alt="Logo actual" class="h-16" loading="eager">
                     </div>
                     <?php endif; ?>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Imagen del Logo
-                    </label>
-                    <input type="file" name="logo" accept="image/*"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF, SVG, WEBP</p>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Imagen del Logo
+                        </label>
+                        <input type="file" name="logo" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, GIF, SVG, WEBP</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tamaño del Logo
+                        </label>
+                        <select name="tamano_logo" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="h-8" <?php echo (!empty($config['tamano_logo']['valor']) && $config['tamano_logo']['valor'] === 'h-8') ? 'selected' : ''; ?>>Pequeño (32px)</option>
+                            <option value="h-10" <?php echo (empty($config['tamano_logo']['valor']) || $config['tamano_logo']['valor'] === 'h-10') ? 'selected' : ''; ?>>Mediano (40px) - Por defecto</option>
+                            <option value="h-12" <?php echo (!empty($config['tamano_logo']['valor']) && $config['tamano_logo']['valor'] === 'h-12') ? 'selected' : ''; ?>>Grande (48px)</option>
+                            <option value="h-16" <?php echo (!empty($config['tamano_logo']['valor']) && $config['tamano_logo']['valor'] === 'h-16') ? 'selected' : ''; ?>>Extra Grande (64px)</option>
+                            <option value="h-20" <?php echo (!empty($config['tamano_logo']['valor']) && $config['tamano_logo']['valor'] === 'h-20') ? 'selected' : ''; ?>>XXL (80px)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Ajusta el tamaño de visualización del logo</p>
+                    </div>
                 </div>
                 
                 <script>

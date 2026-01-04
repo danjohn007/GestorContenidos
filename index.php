@@ -4,8 +4,9 @@
  */
 require_once __DIR__ . '/config/bootstrap.php';
 
-// Si está autenticado, redirigir al dashboard
-if (isAuthenticated()) {
+// Si está autenticado, redirigir al dashboard (a menos que se solicite ver el sitio público)
+$verSitioPublico = isset($_GET['preview']) && $_GET['preview'] === '1';
+if (isAuthenticated() && !$verSitioPublico) {
     redirect('dashboard.php');
 }
 
@@ -98,6 +99,7 @@ $configDiseno = $configuracionModel->getByGrupo('diseno');
 $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
 $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
 $modoLogo = $configGeneral['modo_logo']['valor'] ?? 'imagen';
+$tamanoLogo = $configGeneral['tamano_logo']['valor'] ?? 'h-10';
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
 $colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
 $colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
@@ -412,7 +414,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div class="flex items-center space-x-2">
                     <?php if ($modoLogo === 'imagen' && $logoSitio): ?>
                     <a href="<?php echo url('index.php'); ?>">
-                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="<?php echo e($tamanoLogo); ?>">
                     </a>
                     <?php elseif ($modoLogo === 'texto' || !$logoSitio): ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
@@ -454,9 +456,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
                            class="text-gray-700 hover:text-blue-600 <?php echo $categoriaSeleccionada == $menuItem['categoria_id'] ? 'text-blue-600 font-medium' : ''; ?>">
                             <?php echo e($menuItem['categoria_nombre']); ?>
-                            <?php if (!empty($menuItem['subcategorias'])): ?>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
-                            <?php endif; ?>
                         </a>
                         <?php if (!empty($menuItem['subcategorias'])): ?>
                         <!-- Submenu -->
@@ -540,7 +539,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <?php if ($imagen): ?>
                         <!-- Slide con imagen -->
                         <div class="relative w-full h-full">
-                            <img src="<?php echo e($esNoticia ? BASE_URL . $imagen : $imagen); ?>" 
+                            <img src="<?php echo e($esNoticia ? BASE_URL . $imagen : (strpos($imagen, 'http') === 0 ? $imagen : BASE_URL . $imagen)); ?>" 
                                  alt="<?php echo e($titulo); ?>" 
                                  class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
