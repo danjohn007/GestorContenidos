@@ -33,7 +33,6 @@ class Banner {
      */
     public static function getUbicaciones() {
         return [
-            self::UBICACION_INICIO => 'Inicio (Entre secciones)',
             self::UBICACION_SIDEBAR => 'Sidebar lateral derecho',
             self::UBICACION_FOOTER => 'Sección inferior (Footer)',
             self::UBICACION_DENTRO_NOTAS => 'Dentro de notas/artículos',

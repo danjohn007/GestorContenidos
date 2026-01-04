@@ -378,13 +378,14 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 </div>
                 <div class="text-gray-600 hidden md:block">
                     <i class="fas fa-calendar-alt mr-2"></i>
+                    <span id="fecha-hora-header">
                     <?php 
                     // Function to format date in Spanish
                     $formatearFechaEspanol = function() {
                         $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
                         $dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
                         $fecha = new DateTime();
-                        return $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y');
+                        return $dias[$fecha->format('w')] . ', ' . $fecha->format('d') . ' de ' . $meses[$fecha->format('n') - 1] . ' de ' . $fecha->format('Y') . ' - ' . $fecha->format('H:i:s');
                     };
                     
                     // Try to use IntlDateFormatter if available
@@ -393,6 +394,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                             $formatter = new IntlDateFormatter('es_ES', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
                             $formatter->setPattern('EEEE, dd \'de\' MMMM \'de\' yyyy');
                             echo $formatter->format(new DateTime());
+                            echo ' - ' . (new DateTime())->format('H:i:s');
                         } catch (Exception $e) {
                             // Fallback if locale is not available
                             echo $formatearFechaEspanol();
@@ -402,6 +404,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         echo $formatearFechaEspanol();
                     }
                     ?>
+                    </span>
                 </div>
             </div>
             
@@ -1101,6 +1104,34 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             }
         }
     });
+    
+    // Update clock in header
+    function actualizarReloj() {
+        const ahora = new Date();
+        const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        
+        const diaSemana = dias[ahora.getDay()];
+        const dia = ahora.getDate();
+        const mes = meses[ahora.getMonth()];
+        const anio = ahora.getFullYear();
+        
+        const horas = String(ahora.getHours()).padStart(2, '0');
+        const minutos = String(ahora.getMinutes()).padStart(2, '0');
+        const segundos = String(ahora.getSeconds()).padStart(2, '0');
+        
+        const textoFecha = `${diaSemana}, ${dia} de ${mes} de ${anio} - ${horas}:${minutos}:${segundos}`;
+        
+        const elementoFecha = document.getElementById('fecha-hora-header');
+        if (elementoFecha) {
+            elementoFecha.textContent = textoFecha;
+        }
+    }
+    
+    // Actualizar el reloj cada segundo
+    setInterval(actualizarReloj, 1000);
+    // Actualizar inmediatamente al cargar
+    actualizarReloj();
     </script>
 </body>
 </html>

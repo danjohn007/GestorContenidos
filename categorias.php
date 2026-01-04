@@ -73,8 +73,17 @@ ob_start();
                             ?> noticia<?php echo $count !== 1 ? 's' : ''; ?>
                         </span>
                         <a href="<?php echo url('categoria_editar.php?id=' . $categoria['id']); ?>" 
-                           class="text-blue-600 hover:text-blue-900 px-2 py-1">
+                           class="text-blue-600 hover:text-blue-900 px-2 py-1" title="Editar">
                             <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="<?php echo url('categoria_accion.php?accion=toggle&id=' . $categoria['id']); ?>" 
+                           class="text-orange-600 hover:text-orange-900 px-2 py-1" title="<?php echo $categoria['visible'] ? 'Ocultar' : 'Mostrar'; ?>">
+                            <i class="fas fa-eye<?php echo $categoria['visible'] ? '-slash' : ''; ?>"></i>
+                        </a>
+                        <a href="<?php echo url('categoria_accion.php?accion=eliminar&id=' . $categoria['id']); ?>" 
+                           class="text-red-600 hover:text-red-900 px-2 py-1" title="Eliminar"
+                           onclick="return confirm('¿Estás seguro de que deseas eliminar esta categoría? Esta acción no se puede deshacer.');">
+                            <i class="fas fa-trash"></i>
                         </a>
                     </div>
                 </div>
@@ -106,8 +115,17 @@ ob_start();
                                 ?> noticia<?php echo $subcount !== 1 ? 's' : ''; ?>
                             </span>
                             <a href="<?php echo url('categoria_editar.php?id=' . $subcategoria['id']); ?>" 
-                               class="text-blue-600 hover:text-blue-900 px-2 py-1">
+                               class="text-blue-600 hover:text-blue-900 px-2 py-1" title="Editar">
                                 <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="<?php echo url('categoria_accion.php?accion=toggle&id=' . $subcategoria['id']); ?>" 
+                               class="text-orange-600 hover:text-orange-900 px-2 py-1" title="<?php echo $subcategoria['visible'] ? 'Ocultar' : 'Mostrar'; ?>">
+                                <i class="fas fa-eye<?php echo $subcategoria['visible'] ? '-slash' : ''; ?>"></i>
+                            </a>
+                            <a href="<?php echo url('categoria_accion.php?accion=eliminar&id=' . $subcategoria['id']); ?>" 
+                               class="text-red-600 hover:text-red-900 px-2 py-1" title="Eliminar"
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar esta subcategoría?');">
+                                <i class="fas fa-trash"></i>
                             </a>
                         </div>
                     </div>

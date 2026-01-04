@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Validaciones
-    if (empty($valores['nombre_sitio'])) {
+    // Solo validar nombre_sitio si NO viene del formulario de slider
+    if (empty($valores['nombre_sitio']) && !isset($_POST['slider_tipo'])) {
         $errors[] = 'El nombre del sitio es requerido';
     }
     

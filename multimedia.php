@@ -99,6 +99,27 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     }
 }
 
+// Editar archivo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id'])) {
+    $id = (int)$_POST['edit_id'];
+    $titulo = trim($_POST['edit_titulo'] ?? '');
+    $descripcion = trim($_POST['edit_descripcion'] ?? '');
+    $alt_text = trim($_POST['edit_alt_text'] ?? '');
+    
+    $data = [
+        'titulo' => $titulo,
+        'descripcion' => $descripcion,
+        'alt_text' => $alt_text
+    ];
+    
+    if ($multimediaModel->update($id, $data)) {
+        setFlash('success', 'Archivo actualizado exitosamente');
+        redirect('multimedia.php');
+    } else {
+        $errors[] = 'Error al actualizar el archivo';
+    }
+}
+
 // Obtener filtros
 $tipo = $_GET['tipo'] ?? null;
 $carpeta = $_GET['carpeta'] ?? null;
@@ -256,6 +277,10 @@ ob_start();
                     
                     <!-- Acciones -->
                     <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                        <button onclick="editFile(<?php echo $archivo['id']; ?>, '<?php echo e($archivo['titulo']); ?>', '<?php echo e($archivo['descripcion']); ?>', '<?php echo e($archivo['alt_text']); ?>')" 
+                                class="text-green-600 hover:text-green-800 text-xs">
+                            <i class="fas fa-edit mr-1"></i>Editar
+                        </button>
                         <button onclick="copyToClipboard('<?php echo e($archivo['ruta']); ?>')" 
                                 class="text-blue-600 hover:text-blue-800 text-xs">
                             <i class="fas fa-copy mr-1"></i>Copiar URL
@@ -390,7 +415,75 @@ ob_start();
     </div>
 </div>
 
+<!-- Modal de Edición -->
+<div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-edit mr-2 text-green-600"></i>
+                Editar Archivo
+            </h3>
+            <button onclick="document.getElementById('editModal').classList.add('hidden')" 
+                    class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form method="POST" action="" class="p-6 space-y-4">
+            <input type="hidden" name="edit_id" id="edit_id">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Título
+                </label>
+                <input type="text" name="edit_titulo" id="edit_titulo"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                       placeholder="Título descriptivo del archivo">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Descripción
+                </label>
+                <textarea name="edit_descripcion" id="edit_descripcion" rows="3"
+                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="Descripción del archivo"></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Texto ALT (para imágenes)
+                </label>
+                <input type="text" name="edit_alt_text" id="edit_alt_text"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                       placeholder="Texto alternativo para accesibilidad">
+            </div>
+            
+            <div class="flex items-center justify-end space-x-4 pt-4 border-t">
+                <button type="button" 
+                        onclick="document.getElementById('editModal').classList.add('hidden')"
+                        class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+function editFile(id, titulo, descripcion, altText) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_titulo').value = titulo || '';
+    document.getElementById('edit_descripcion').value = descripcion || '';
+    document.getElementById('edit_alt_text').value = altText || '';
+    document.getElementById('editModal').classList.remove('hidden');
+}
+
 function copyToClipboard(text) {
     const fullUrl = '<?php echo BASE_URL; ?>' + text;
     if (navigator.clipboard && navigator.clipboard.writeText) {
