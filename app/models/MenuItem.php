@@ -7,6 +7,10 @@
 class MenuItem {
     private $db;
     private $table = 'menu_items';
+    
+    // Constantes para estados
+    const CATEGORIA_VISIBLE = 1;
+    const ITEM_ACTIVO = 1;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
@@ -19,7 +23,7 @@ class MenuItem {
         $query = "SELECT mi.*, c.nombre as categoria_nombre, c.slug as categoria_slug, c.descripcion as categoria_descripcion
                   FROM {$this->table} mi
                   INNER JOIN categorias c ON mi.categoria_id = c.id
-                  WHERE c.visible = 1";
+                  WHERE c.visible = " . self::CATEGORIA_VISIBLE;
         
         if ($activo !== null) {
             $query .= " AND mi.activo = :activo";

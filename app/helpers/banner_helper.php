@@ -37,6 +37,11 @@ function displayBanners($ubicacion, $limit = null, $cssClass = '', $random = tru
     
     // Si no hay banners disponibles (todos ya mostrados), resetear y usar todos
     if (empty($availableBanners)) {
+        // Resetear tracking para esta ubicación
+        $GLOBALS['displayed_banners'] = array_diff(
+            $GLOBALS['displayed_banners'], 
+            array_map(function($b) { return $b['id']; }, $allBanners)
+        );
         $availableBanners = $allBanners;
     }
     

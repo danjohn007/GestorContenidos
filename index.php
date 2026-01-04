@@ -67,7 +67,9 @@ if ($sliderTipo === 'noticias') {
     $sliderItems = $sliderNoticias;
 } elseif ($sliderTipo === 'mixto') {
     // Mezclar slider estático con noticias
-    $sliderItems = array_merge(array_slice($slider, 0, $sliderCantidad), $sliderNoticias);
+    $staticItems = array_slice($slider, 0, max(1, floor($sliderCantidad / 2)));
+    $newsItems = array_slice($sliderNoticias, 0, max(1, ceil($sliderCantidad / 2)));
+    $sliderItems = array_merge($staticItems, $newsItems);
     shuffle($sliderItems);
     $sliderItems = array_slice($sliderItems, 0, $sliderCantidad);
 } else {
@@ -523,7 +525,8 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <?php foreach ($sliderItems as $index => $slide): ?>
                     <?php
                     // Determinar si es una noticia o contenido estático
-                    $esNoticia = isset($slide['slug']);
+                    // Las noticias tienen campos específicos como 'autor_id' y 'categoria_id'
+                    $esNoticia = isset($slide['categoria_id']) && isset($slide['slug']);
                     $titulo = $esNoticia ? $slide['titulo'] : $slide['titulo'];
                     $subtitulo = $esNoticia ? ($slide['subtitulo'] ?? '') : ($slide['subtitulo'] ?? '');
                     $contenido = $esNoticia ? ($slide['resumen'] ?? strip_tags(substr($slide['contenido'], 0, 150))) : ($slide['contenido'] ?? '');
