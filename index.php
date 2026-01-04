@@ -46,8 +46,35 @@ $categorias = $categoriaModel->getParents(1);
 // Obtener ítems del menú principal (solo activos)
 $menuItems = $menuItemModel->getAll(1);
 
+// Obtener configuración del slider
+$sliderTipo = $configuracionModel->get('slider_tipo', 'estatico');
+$sliderCantidad = (int)$configuracionModel->get('slider_cantidad', 3);
+$sliderAutoplay = $configuracionModel->get('slider_autoplay', '1') === '1';
+$sliderIntervalo = (int)$configuracionModel->get('slider_intervalo', 5000);
+
 // Obtener contenido de página de inicio
 $slider = $paginaInicioModel->getBySeccion('slider');
+
+// Si el slider está configurado para mostrar noticias o mixto, obtener noticias destacadas
+$sliderNoticias = [];
+if ($sliderTipo === 'noticias' || $sliderTipo === 'mixto') {
+    $sliderNoticias = $noticiaModel->getDestacadas($sliderCantidad);
+}
+
+// Combinar contenido según el tipo de slider
+$sliderItems = [];
+if ($sliderTipo === 'noticias') {
+    $sliderItems = $sliderNoticias;
+} elseif ($sliderTipo === 'mixto') {
+    // Mezclar slider estático con noticias
+    $sliderItems = array_merge(array_slice($slider, 0, $sliderCantidad), $sliderNoticias);
+    shuffle($sliderItems);
+    $sliderItems = array_slice($sliderItems, 0, $sliderCantidad);
+} else {
+    // Estático: usar solo contenido de pagina_inicio
+    $sliderItems = array_slice($slider, 0, $sliderCantidad);
+}
+
 $accesoDirecto = $paginaInicioModel->getBySeccion('acceso_directo');
 $accesoLateral = $paginaInicioModel->getBySeccion('acceso_lateral');
 $contacto = $paginaInicioModel->getBySeccion('contacto');
@@ -248,6 +275,35 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             .hamburger-btn {
                 display: block;
             }
+            
+            .slider-container {
+                height: 300px !important;
+            }
+            
+            .slider-slide h2 {
+                font-size: 1.5rem !important;
+            }
+            
+            .slider-slide p {
+                font-size: 0.875rem !important;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        
+        /* Slider responsive styles */
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slider-slide {
+            transition: opacity 0.5s ease-in-out;
         }
         
         /* Sidebar sticky - increased height for full ad display without scroll */
@@ -429,26 +485,175 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <!-- Slider Principal -->
-        <?php if (!empty($slider) && $mostrarContenidoPaginaPrincipal): ?>
+        <?php if (!empty($sliderItems) && $mostrarContenidoPaginaPrincipal): ?>
         <section class="mb-12">
-            <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-xl overflow-hidden">
-                <div class="relative z-10 px-8 py-16 md:px-16 md:py-20">
-                    <?php $currentSlide = $slider[0]; ?>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
-                        <?php echo e($currentSlide['titulo']); ?>
-                    </h2>
-                    <p class="text-xl text-blue-100 mb-2">
-                        <?php echo e($currentSlide['subtitulo']); ?>
-                    </p>
-                    <p class="text-lg text-blue-50 mb-6">
-                        <?php echo e($currentSlide['contenido']); ?>
-                    </p>
-                    <a href="<?php echo url('buscar.php'); ?>" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-                        Explorar Noticias <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
+            <div class="relative rounded-lg shadow-xl overflow-hidden" id="mainSlider">
+                <!-- Slides Container -->
+                <div class="slider-container relative" style="height: 400px;">
+                    <?php foreach ($sliderItems as $index => $slide): ?>
+                    <?php
+                    // Determinar si es una noticia o contenido estático
+                    $esNoticia = isset($slide['slug']);
+                    $titulo = $esNoticia ? $slide['titulo'] : $slide['titulo'];
+                    $subtitulo = $esNoticia ? ($slide['subtitulo'] ?? '') : ($slide['subtitulo'] ?? '');
+                    $contenido = $esNoticia ? ($slide['resumen'] ?? strip_tags(substr($slide['contenido'], 0, 150))) : ($slide['contenido'] ?? '');
+                    $imagen = $esNoticia ? ($slide['imagen_destacada'] ?? null) : ($slide['imagen'] ?? $slide['imagen_slider'] ?? null);
+                    $enlace = $esNoticia ? url('noticia_detalle.php?slug=' . $slide['slug']) : ($slide['url'] ?? 'javascript:void(0)');
+                    ?>
+                    <div class="slider-slide absolute inset-0 transition-opacity duration-500 <?php echo $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'; ?>" data-slide="<?php echo $index; ?>">
+                        <?php if ($imagen): ?>
+                        <!-- Slide con imagen -->
+                        <div class="relative w-full h-full">
+                            <img src="<?php echo e($esNoticia ? BASE_URL . $imagen : $imagen); ?>" 
+                                 alt="<?php echo e($titulo); ?>" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="container mx-auto px-8 md:px-16">
+                                    <div class="max-w-2xl">
+                                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-3">
+                                            <?php echo e($titulo); ?>
+                                        </h2>
+                                        <?php if ($subtitulo): ?>
+                                        <p class="text-xl text-white/90 mb-2">
+                                            <?php echo e($subtitulo); ?>
+                                        </p>
+                                        <?php endif; ?>
+                                        <?php if ($contenido): ?>
+                                        <p class="text-lg text-white/80 mb-6 line-clamp-2">
+                                            <?php echo e($contenido); ?>
+                                        </p>
+                                        <?php endif; ?>
+                                        <a href="<?php echo e($enlace); ?>" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                                            <?php echo $esNoticia ? 'Leer Noticia' : 'Explorar'; ?> <i class="fas fa-arrow-right ml-2"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php else: ?>
+                        <!-- Slide sin imagen (con gradiente) -->
+                        <div class="relative w-full h-full bg-gradient-to-r from-blue-600 to-blue-800">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="container mx-auto px-8 md:px-16">
+                                    <div class="max-w-2xl">
+                                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-3">
+                                            <?php echo e($titulo); ?>
+                                        </h2>
+                                        <?php if ($subtitulo): ?>
+                                        <p class="text-xl text-blue-100 mb-2">
+                                            <?php echo e($subtitulo); ?>
+                                        </p>
+                                        <?php endif; ?>
+                                        <?php if ($contenido): ?>
+                                        <p class="text-lg text-blue-50 mb-6">
+                                            <?php echo e($contenido); ?>
+                                        </p>
+                                        <?php endif; ?>
+                                        <a href="<?php echo e($enlace); ?>" class="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                                            <?php echo $esNoticia ? 'Leer Noticia' : 'Explorar'; ?> <i class="fas fa-arrow-right ml-2"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute top-0 right-0 bottom-0 w-1/3 bg-gradient-to-l from-blue-900/50 to-transparent"></div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <div class="absolute top-0 right-0 bottom-0 w-1/3 bg-gradient-to-l from-blue-900/50 to-transparent"></div>
+                
+                <!-- Navigation Arrows -->
+                <?php if (count($sliderItems) > 1): ?>
+                <button onclick="changeSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-gray-800 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button onclick="changeSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-gray-800 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Slide Indicators -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
+                    <?php foreach ($sliderItems as $index => $slide): ?>
+                    <button onclick="goToSlide(<?php echo $index; ?>)" 
+                            class="slider-indicator w-3 h-3 rounded-full transition-all <?php echo $index === 0 ? 'bg-white' : 'bg-white/50'; ?>" 
+                            data-indicator="<?php echo $index; ?>">
+                    </button>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
+            
+            <script>
+            let currentSlide = 0;
+            const totalSlides = <?php echo count($sliderItems); ?>;
+            const autoplay = <?php echo $sliderAutoplay ? 'true' : 'false'; ?>;
+            const interval = <?php echo $sliderIntervalo; ?>;
+            let autoplayTimer = null;
+            
+            function showSlide(index) {
+                const slides = document.querySelectorAll('.slider-slide');
+                const indicators = document.querySelectorAll('.slider-indicator');
+                
+                slides.forEach((slide, i) => {
+                    if (i === index) {
+                        slide.classList.remove('opacity-0', 'z-0');
+                        slide.classList.add('opacity-100', 'z-10');
+                    } else {
+                        slide.classList.remove('opacity-100', 'z-10');
+                        slide.classList.add('opacity-0', 'z-0');
+                    }
+                });
+                
+                indicators.forEach((indicator, i) => {
+                    if (i === index) {
+                        indicator.classList.remove('bg-white/50');
+                        indicator.classList.add('bg-white');
+                    } else {
+                        indicator.classList.remove('bg-white');
+                        indicator.classList.add('bg-white/50');
+                    }
+                });
+            }
+            
+            function changeSlide(direction) {
+                currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+                resetAutoplay();
+            }
+            
+            function goToSlide(index) {
+                currentSlide = index;
+                showSlide(currentSlide);
+                resetAutoplay();
+            }
+            
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+            
+            function resetAutoplay() {
+                if (autoplay) {
+                    clearInterval(autoplayTimer);
+                    autoplayTimer = setInterval(nextSlide, interval);
+                }
+            }
+            
+            // Start autoplay if enabled
+            if (autoplay && totalSlides > 1) {
+                autoplayTimer = setInterval(nextSlide, interval);
+            }
+            
+            // Pause autoplay on hover
+            document.getElementById('mainSlider')?.addEventListener('mouseenter', function() {
+                if (autoplay) clearInterval(autoplayTimer);
+            });
+            
+            document.getElementById('mainSlider')?.addEventListener('mouseleave', function() {
+                if (autoplay) autoplayTimer = setInterval(nextSlide, interval);
+            });
+            </script>
         </section>
         <?php endif; ?>
 

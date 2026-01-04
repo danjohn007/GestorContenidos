@@ -23,6 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'modo_logo' => trim($_POST['modo_logo'] ?? 'imagen')
     ];
     
+    // Agregar configuraciones del slider si están presentes
+    if (isset($_POST['slider_tipo'])) {
+        $valores['slider_tipo'] = trim($_POST['slider_tipo']);
+    }
+    if (isset($_POST['slider_cantidad'])) {
+        $valores['slider_cantidad'] = (int)$_POST['slider_cantidad'];
+    }
+    if (isset($_POST['slider_autoplay'])) {
+        $valores['slider_autoplay'] = '1';
+    } else if (isset($_POST['slider_tipo'])) {
+        // Solo setear a 0 si venimos del formulario de slider
+        $valores['slider_autoplay'] = '0';
+    }
+    if (isset($_POST['slider_intervalo'])) {
+        $valores['slider_intervalo'] = (int)$_POST['slider_intervalo'];
+    }
+    
     // Validaciones
     if (empty($valores['nombre_sitio'])) {
         $errors[] = 'El nombre del sitio es requerido';
@@ -99,6 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $success = true;
         setFlash('success', 'Configuración actualizada exitosamente');
+        
+        // Si viene del formulario de slider, redirigir a página de inicio
+        if (isset($_POST['slider_tipo'])) {
+            redirect('pagina_inicio.php');
+        }
     }
 }
 

@@ -219,6 +219,27 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
             word-wrap: break-word;
         }
         
+        .prose iframe, .prose video {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Responsive container */
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
         /* Quill alignment styles for content display */
         .prose .ql-align-center, .ql-align-center {
             text-align: center;
