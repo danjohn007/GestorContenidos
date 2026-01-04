@@ -35,7 +35,7 @@ ob_start();
     <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
         <div class="text-sm text-gray-600 flex items-center space-x-4">
-            <a href="<?php echo url('index.php'); ?>" target="_blank" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
+            <a href="<?php echo url('index.php?preview=1'); ?>" target="_blank" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
                 <i class="fas fa-globe mr-2"></i>
                 Ver Sitio Público
             </a>

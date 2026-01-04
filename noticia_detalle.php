@@ -51,6 +51,7 @@ $configDiseno = $configuracionModel->getByGrupo('diseno');
 $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
 $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
 $modoLogo = $configGeneral['modo_logo']['valor'] ?? 'imagen';
+$tamanoLogo = $configGeneral['tamano_logo']['valor'] ?? 'h-10';
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
 $colorSecundario = $configDiseno['color_secundario']['valor'] ?? '#3b82f6';
 $colorAcento = $configDiseno['color_acento']['valor'] ?? '#10b981';
@@ -117,6 +118,15 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
         /* Footer background */
         .footer-bg {
             background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+        }
+        
+        /* Sticky header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         /* Mobile menu styles */
@@ -254,7 +264,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
 </head>
 <body class="bg-gray-100">
     <!-- Header -->
-    <header class="bg-white shadow-md">
+    <header class="bg-white shadow-md sticky-header">
         <div class="container mx-auto px-4">
             <!-- Date and Time Bar -->
             <div class="flex justify-end items-center py-2 text-sm border-b border-gray-200">
@@ -294,7 +304,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div class="flex items-center space-x-2">
                     <?php if ($modoLogo === 'imagen' && $logoSitio): ?>
                     <a href="<?php echo url('index.php'); ?>">
-                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10">
+                        <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="<?php echo e($tamanoLogo); ?>">
                     </a>
                     <?php elseif ($modoLogo === 'texto' || !$logoSitio): ?>
                     <i class="fas fa-newspaper text-3xl text-blue-600"></i>
@@ -335,9 +345,6 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                         <a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" 
                            class="text-gray-700 hover:text-blue-600 whitespace-nowrap">
                             <?php echo e($menuItem['categoria_nombre']); ?>
-                            <?php if (!empty($menuItem['subcategorias'])): ?>
-                            <i class="fas fa-chevron-down text-xs ml-1"></i>
-                            <?php endif; ?>
                         </a>
                         <?php if (!empty($menuItem['subcategorias'])): ?>
                         <!-- Submenu -->
@@ -567,7 +574,35 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <!-- Footer -->
     <footer class="footer-bg text-white mt-12 py-8">
         <div class="container mx-auto px-4">
-            <div class="text-center opacity-80">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-newspaper mr-2"></i>
+                        Portal de Noticias
+                    </h3>
+                    <p class="opacity-80">Tu fuente de noticias de Querétaro</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categorías</h4>
+                    <ul class="space-y-2 opacity-80">
+                        <?php foreach (array_slice($menuItems, 0, 5) as $menuItem): ?>
+                        <li><a href="<?php echo url('index.php?categoria=' . $menuItem['categoria_id']); ?>" class="hover:opacity-100"><?php echo e($menuItem['categoria_nombre']); ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contacto</h4>
+                    <p class="opacity-80">
+                        <i class="fas fa-phone mr-2"></i>
+                        442-123-4567
+                    </p>
+                    <p class="opacity-80 mt-2">
+                        <i class="fas fa-envelope mr-2"></i>
+                        contacto@portalqueretaro.mx
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-white/20 mt-8 pt-8 text-center opacity-80">
                 <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
             </div>
         </div>
