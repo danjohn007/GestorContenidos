@@ -191,25 +191,10 @@ ob_start();
                     <i class="fas fa-th-large mr-2"></i>
                     Accesos Directos
                 </button>
-                <button onclick="showTab('laterales')" id="tab-laterales"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-sidebar mr-2"></i>
-                    Accesos Laterales
-                </button>
                 <button onclick="showTab('bannersvert')" id="tab-bannersvert"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-ad mr-2"></i>
-                    Banners Verticales
-                </button>
-                <button onclick="showTab('bannersinter')" id="tab-bannersinter"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-image mr-2"></i>
-                    Banners Intermedios
-                </button>
-                <button onclick="showTab('anunciosfoot')" id="tab-anunciosfoot"
-                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    <i class="fas fa-th mr-2"></i>
-                    Anuncios Footer
+                    Sidebar lateral - Banners
                 </button>
                 <button onclick="showTab('menu')" id="tab-menu"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
@@ -227,8 +212,79 @@ ob_start();
         <!-- Slider Section -->
         <div id="content-slider" class="tab-content p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Slider Principal</h2>
-            <p class="text-gray-600 mb-6">Configura los elementos del slider que aparecen en la página principal</p>
+            <p class="text-gray-600 mb-6">Configura los elementos del slider que aparecen en la página principal. Puedes agregar imágenes estáticas o configurar noticias destacadas.</p>
             
+            <!-- Botón para agregar nuevo slider -->
+            <div class="mb-6">
+                <button type="button" onclick="mostrarFormularioNuevoSlider()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    Agregar Nuevo Elemento
+                </button>
+            </div>
+            
+            <!-- Formulario para nuevo slider (oculto por defecto) -->
+            <div id="formulario_nuevo_slider" class="border border-green-200 rounded-lg p-4 mb-6 bg-green-50" style="display: none;">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Nuevo Elemento del Slider</h3>
+                <form method="POST" action="<?php echo url('pagina_inicio_accion.php'); ?>" enctype="multipart/form-data" class="space-y-4">
+                    <input type="hidden" name="accion" value="crear_slider">
+                    <input type="hidden" name="seccion" value="slider">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                            <input type="text" name="titulo" required
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Subtítulo</label>
+                            <input type="text" name="subtitulo"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contenido</label>
+                        <textarea name="contenido" rows="2"
+                                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Imagen del Slider</label>
+                        <input type="file" name="imagen" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <p class="text-xs text-gray-500 mt-1">Tamaño recomendado: 1920x600px. Formatos: JPG, PNG, WebP. Máximo 5MB.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Orden</label>
+                            <input type="number" name="orden" value="0"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        
+                        <div class="flex items-center pt-6">
+                            <input type="checkbox" name="activo" id="activo_nuevo" value="1" checked
+                                   class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <label for="activo_nuevo" class="ml-2 block text-sm text-gray-900">
+                                Activo
+                            </label>
+                        </div>
+                        
+                        <div class="flex justify-end items-end space-x-2">
+                            <button type="button" onclick="ocultarFormularioNuevoSlider()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>
+                                Crear
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Lista de sliders existentes -->
             <div class="space-y-4">
                 <?php foreach ($sliders as $slider): ?>
                 <div class="border border-gray-200 rounded-lg p-4">
@@ -253,6 +309,18 @@ ob_start();
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contenido</label>
                             <textarea name="contenido" rows="2"
                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"><?php echo e($slider['contenido']); ?></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagen del Slider</label>
+                            <?php if (!empty($slider['imagen'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo e($slider['imagen']); ?>" alt="<?php echo e($slider['titulo']); ?>" class="max-w-md h-32 object-cover rounded">
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="imagen" accept="image/*"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Tamaño recomendado: 1920x600px. Formatos: JPG, PNG, WebP. Máximo 5MB.</p>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -364,8 +432,8 @@ ob_start();
             </div>
         </div>
 
-        <!-- Accesos Laterales Section -->
-        <div id="content-laterales" class="tab-content p-6 hidden">
+        <!-- Accesos Laterales Section - HIDDEN FROM UI -->
+        <div id="content-laterales" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Accesos Laterales</h2>
             <p class="text-gray-600 mb-6">Configura los 3 accesos directos que aparecen en el módulo lateral de la página principal</p>
             
@@ -602,7 +670,7 @@ ob_start();
         
         <!-- Banners Verticales Section -->
         <div id="content-bannersvert" class="tab-content p-6 hidden">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Banners Publicitarios Verticales</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Sidebar lateral - Banners</h2>
             <p class="text-gray-600 mb-6">Configura los banners publicitarios que aparecen en el módulo lateral de la página principal</p>
             
             <div class="space-y-4">
@@ -665,8 +733,8 @@ ob_start();
             </div>
         </div>
         
-        <!-- Banners Intermedios Section -->
-        <div id="content-bannersinter" class="tab-content p-6 hidden">
+        <!-- Banners Intermedios Section - HIDDEN FROM UI -->
+        <div id="content-bannersinter" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Banners Entre Secciones</h2>
             <p class="text-gray-600 mb-6">Configura los banners publicitarios que aparecen entre las secciones de la página principal</p>
             
@@ -730,8 +798,8 @@ ob_start();
             </div>
         </div>
         
-        <!-- Anuncios Footer Section -->
-        <div id="content-anunciosfoot" class="tab-content p-6 hidden">
+        <!-- Anuncios Footer Section - HIDDEN FROM UI -->
+        <div id="content-anunciosfoot" class="tab-content p-6" style="display: none;">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Anuncios del Footer</h2>
             <p class="text-gray-600 mb-6">Configura los anuncios que aparecen en un grid de 3-4 espacios antes del footer</p>
             
@@ -817,6 +885,14 @@ function showTab(tabName) {
     const activeTab = document.getElementById('tab-' + tabName);
     activeTab.classList.remove('border-transparent', 'text-gray-500');
     activeTab.classList.add('border-blue-500', 'text-blue-600');
+}
+
+function mostrarFormularioNuevoSlider() {
+    document.getElementById('formulario_nuevo_slider').style.display = 'block';
+}
+
+function ocultarFormularioNuevoSlider() {
+    document.getElementById('formulario_nuevo_slider').style.display = 'none';
 }
 </script>
 
