@@ -107,6 +107,11 @@ $colorTexto = $configDiseno['color_texto']['valor'] ?? '#1f2937';
 $colorFondo = $configDiseno['color_fondo']['valor'] ?? '#f3f4f6';
 $fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
 $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
+$sloganSitio = !empty($configGeneral['slogan_sitio']['valor']) ? $configGeneral['slogan_sitio']['valor'] : 'Tu fuente de noticias de Querétaro';
+$descripcionSitio = $configGeneral['descripcion_sitio']['valor'] ?? '';
+$emailSistema = !empty($configGeneral['email_sistema']['valor']) ? $configGeneral['email_sistema']['valor'] : 'contacto@portalqueretaro.mx';
+$telefonoContacto = !empty($configGeneral['telefono_contacto']['valor']) ? $configGeneral['telefono_contacto']['valor'] : '442-123-4567';
+$direccion = $configGeneral['direccion']['valor'] ?? '';
 
 ?>
 <!DOCTYPE html>
@@ -1088,9 +1093,9 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                 <div>
                     <h3 class="text-xl font-bold mb-4">
                         <i class="fas fa-newspaper mr-2"></i>
-                        Portal de Noticias
+                        <?php echo e($nombreSitio); ?>
                     </h3>
-                    <p class="opacity-80">Tu fuente de noticias de Querétaro</p>
+                    <p class="opacity-80"><?php echo e($sloganSitio); ?></p>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold mb-4">Categorías</h4>
@@ -1104,16 +1109,16 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
                     <h4 class="text-lg font-semibold mb-4">Contacto</h4>
                     <p class="opacity-80">
                         <i class="fas fa-phone mr-2"></i>
-                        442-123-4567
+                        <?php echo e($telefonoContacto); ?>
                     </p>
                     <p class="opacity-80 mt-2">
                         <i class="fas fa-envelope mr-2"></i>
-                        contacto@portalqueretaro.mx
+                        <?php echo e($emailSistema); ?>
                     </p>
                 </div>
             </div>
             <div class="border-t border-white/20 mt-8 pt-8 text-center opacity-80">
-                <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
+                <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

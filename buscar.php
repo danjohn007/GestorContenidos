@@ -257,7 +257,7 @@ $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
     <footer class="footer-bg text-white mt-12 py-8">
         <div class="container mx-auto px-4">
             <div class="text-center opacity-80">
-                <p>&copy; <?php echo date('Y'); ?> Portal de Noticias Querétaro. Todos los derechos reservados.</p>
+                <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
