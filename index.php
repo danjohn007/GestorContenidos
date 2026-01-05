@@ -112,6 +112,9 @@ $descripcionSitio = $configGeneral['descripcion_sitio']['valor'] ?? '';
 $emailSistema = !empty($configGeneral['email_sistema']['valor']) ? $configGeneral['email_sistema']['valor'] : 'contacto@portalqueretaro.mx';
 $telefonoContacto = !empty($configGeneral['telefono_contacto']['valor']) ? $configGeneral['telefono_contacto']['valor'] : '442-123-4567';
 $direccion = $configGeneral['direccion']['valor'] ?? '';
+$textoFooter = $configGeneral['texto_footer']['valor'] ?? '&copy; ' . date('Y') . ' ' . $nombreSitio . '. Todos los derechos reservados.';
+$avisoLegal = $configGeneral['aviso_legal']['valor'] ?? '';
+$mostrarAvisoLegal = ($configGeneral['mostrar_aviso_legal']['valor'] ?? '1') === '1';
 
 ?>
 <!DOCTYPE html>
@@ -489,11 +492,6 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
                             <i class="fas fa-search"></i>
                         </button>
                     </form>
-                    
-                    <a href="<?php echo url('login.php'); ?>" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Acceder
-                    </a>
                 </div>
             </div>
             
@@ -559,9 +557,6 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
             <div class="border-t border-gray-200 my-2"></div>
             <a href="<?php echo url('buscar.php'); ?>" class="mobile-menu-item">
                 <i class="fas fa-search mr-2"></i> Buscar
-            </a>
-            <a href="<?php echo url('login.php'); ?>" class="mobile-menu-item">
-                <i class="fas fa-sign-in-alt mr-2"></i> Acceder
             </a>
         </div>
     </div>
@@ -1117,8 +1112,17 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
                     </p>
                 </div>
             </div>
-            <div class="border-t border-white/20 mt-8 pt-8 text-center opacity-80">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
+            <div class="border-t border-white/20 mt-8 pt-8 text-center">
+                <div class="opacity-80 mb-4">
+                    <?php echo nl2br(e($textoFooter)); ?>
+                </div>
+                <?php if ($mostrarAvisoLegal && !empty($avisoLegal)): ?>
+                <div class="mt-2">
+                    <a href="<?php echo url('aviso-legal.php'); ?>" class="text-white hover:text-blue-200 underline text-sm">
+                        Aviso Legal
+                    </a>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </footer>
