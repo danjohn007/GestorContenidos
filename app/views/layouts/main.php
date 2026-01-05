@@ -70,6 +70,17 @@
         .sidebar-link:hover {
             background-color: rgba(0, 0, 0, 0.2);
         }
+        /* Overlay para menú móvil */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 25;
+        }
+        .menu-overlay.active {
+            display: block;
+        }
         <?php else: ?>
         :root {
             --color-primary: #1e40af;
@@ -107,8 +118,11 @@
 <body class="bg-gray-50">
     
     <?php if (isAuthenticated()): ?>
+        <!-- Overlay para menú móvil -->
+        <div class="menu-overlay" id="menuOverlay"></div>
+        
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 w-64 sidebar-bg text-white transform transition-transform duration-300 ease-in-out z-30" id="sidebar">
+        <div class="fixed inset-y-0 left-0 w-64 sidebar-bg text-white transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30" id="sidebar">
             <div class="flex items-center justify-center h-16 sidebar-header-bg">
                 <?php if (!empty($logoSitio)): ?>
                 <img src="<?php echo e(BASE_URL . $logoSitio); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-10" loading="eager">
@@ -176,9 +190,9 @@
         </div>
 
         <!-- Main Content -->
-        <div class="ml-64">
+        <div class="lg:ml-64">
             <!-- Top Navigation -->
-            <header class="bg-white shadow-sm h-16 fixed top-0 right-0 left-64 z-20">
+            <header class="bg-white shadow-sm h-16 fixed top-0 right-0 left-0 lg:left-64 z-20">
                 <div class="flex items-center justify-between h-full px-6">
                     <div class="flex items-center">
                         <button id="menuToggle" class="text-gray-500 focus:outline-none lg:hidden">
@@ -241,10 +255,31 @@
         // Toggle mobile menu
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
         
         if (menuToggle) {
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('-translate-x-full');
+                menuOverlay.classList.toggle('active');
+            });
+            
+            // Cerrar menú al hacer clic en el overlay
+            if (menuOverlay) {
+                menuOverlay.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                    menuOverlay.classList.remove('active');
+                });
+            }
+            
+            // Cerrar menú al hacer clic en un enlace del sidebar en móvil
+            const sidebarLinks = sidebar.querySelectorAll('a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) { // lg breakpoint
+                        sidebar.classList.add('-translate-x-full');
+                        menuOverlay.classList.remove('active');
+                    }
+                });
             });
         }
         
