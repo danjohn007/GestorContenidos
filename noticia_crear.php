@@ -67,14 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['video_local']) && $_FILES['video_local']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/public/uploads/videos/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            mkdir($uploadDir, 0750, true);
         }
         
         $extension = strtolower(pathinfo($_FILES['video_local']['name'], PATHINFO_EXTENSION));
         $allowedExtensions = ['mp4', 'webm', 'ogg'];
         
         if (in_array($extension, $allowedExtensions)) {
-            $filename = uniqid('video_') . '.' . $extension;
+            $filename = 'video_' . bin2hex(random_bytes(16)) . '.' . $extension;
             $uploadPath = $uploadDir . $filename;
             
             if (move_uploaded_file($_FILES['video_local']['tmp_name'], $uploadPath)) {
@@ -92,14 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['video_thumbnail']) && $_FILES['video_thumbnail']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/public/uploads/noticias/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            mkdir($uploadDir, 0750, true);
         }
         
         $extension = strtolower(pathinfo($_FILES['video_thumbnail']['name'], PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
         
         if (in_array($extension, $allowedExtensions)) {
-            $filename = uniqid('thumb_') . '.' . $extension;
+            $filename = 'thumb_' . bin2hex(random_bytes(16)) . '.' . $extension;
             $uploadPath = $uploadDir . $filename;
             
             if (move_uploaded_file($_FILES['video_thumbnail']['tmp_name'], $uploadPath)) {

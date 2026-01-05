@@ -111,7 +111,7 @@ if (empty($avisoLegal)) {
             </h1>
             
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                <?php echo nl2br(sanitizeSimpleHtml($avisoLegal)); ?>
+                <?php echo nl2br(sanitizeHtml($avisoLegal)); ?>
             </div>
             
             <div class="mt-8 pt-6 border-t border-gray-200">

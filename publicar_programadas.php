@@ -31,7 +31,7 @@ try {
     $db = Database::getInstance()->getConnection();
     
     // Buscar noticias programadas para publicar
-    $query = "SELECT * FROM noticias 
+    $query = "SELECT id, titulo, autor_id, fecha_programada FROM noticias 
               WHERE estado = 'publicado'
               AND fecha_programada IS NOT NULL 
               AND fecha_programada <= :ahora
@@ -70,10 +70,10 @@ try {
                 // Registrar en el log
                 if (!$isCLI) {
                     $currentUser = getCurrentUser();
-                    $userId = $currentUser['id'] ?? null;
+                    $userId = $currentUser['id'] ?? 1;
                 } else {
-                    // Si se ejecuta desde CLI, usar ID 1 (sistema) o crear usuario sistema
-                    $userId = 1;
+                    // Si se ejecuta desde CLI, usar autor de la noticia o ID 1
+                    $userId = $noticia['autor_id'] ?? 1;
                 }
                 
                 $logModel->registrarAuditoria(
