@@ -100,6 +100,7 @@ ob_start();
             <?php endif; ?>
         </div>
         <?php else: ?>
+        <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -207,6 +208,7 @@ ob_start();
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
 
         <!-- Paginación -->
         <?php if ($totalPages > 1): ?>

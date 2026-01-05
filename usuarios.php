@@ -38,6 +38,7 @@ ob_start();
             <p class="text-gray-500 text-lg">No hay usuarios registrados</p>
         </div>
         <?php else: ?>
+        <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -125,6 +126,7 @@ ob_start();
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </div>
         <?php endif; ?>
     </div>
 
