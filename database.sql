@@ -327,6 +327,8 @@ INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) V
 ('nombre_sitio', 'Portal de Noticias Querétaro', 'texto', 'general', 'Nombre del sitio web'),
 ('email_sistema', 'noreply@gestorcontenidos.mx', 'email', 'general', 'Email principal del sistema'),
 ('zona_horaria', 'America/Mexico_City', 'texto', 'general', 'Zona horaria del sistema'),
+('telefono_contacto', '442-123-4567', 'texto', 'general', 'Teléfono de contacto'),
+('direccion', '', 'texto', 'general', 'Dirección de contacto'),
 ('noticias_por_pagina', '20', 'numero', 'contenido', 'Noticias por página'),
 ('permitir_registro', '0', 'booleano', 'usuarios', 'Permitir registro público'),
 ('moderacion_comentarios', '1', 'booleano', 'comentarios', 'Moderación automática de comentarios'),
@@ -334,7 +336,6 @@ INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`) V
 ('facebook_url', '', 'texto', 'redes_sociales', 'URL de Facebook'),
 ('twitter_url', '', 'texto', 'redes_sociales', 'URL de Twitter'),
 ('instagram_url', '', 'texto', 'redes_sociales', 'URL de Instagram'),
-('telefono_contacto', '442-123-4567', 'texto', 'contacto', 'Teléfono de contacto'),
 ('horario_atencion', 'Lunes a Viernes 9:00 - 18:00', 'texto', 'contacto', 'Horario de atención'),
 ('color_primario', '#1e40af', 'color', 'diseno', 'Color primario del sistema'),
 ('color_secundario', '#3b82f6', 'color', 'diseno', 'Color secundario del sistema');
