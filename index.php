@@ -107,10 +107,10 @@ $colorTexto = $configDiseno['color_texto']['valor'] ?? '#1f2937';
 $colorFondo = $configDiseno['color_fondo']['valor'] ?? '#f3f4f6';
 $fuentePrincipal = $configDiseno['fuente_principal']['valor'] ?? 'system-ui';
 $fuenteTitulos = $configDiseno['fuente_titulos']['valor'] ?? 'system-ui';
-$sloganSitio = $configGeneral['slogan_sitio']['valor'] ?? 'Tu fuente de noticias de Querétaro';
+$sloganSitio = !empty($configGeneral['slogan_sitio']['valor']) ? $configGeneral['slogan_sitio']['valor'] : 'Tu fuente de noticias de Querétaro';
 $descripcionSitio = $configGeneral['descripcion_sitio']['valor'] ?? '';
-$emailSistema = $configGeneral['email_sistema']['valor'] ?? 'contacto@portalqueretaro.mx';
-$telefonoContacto = $configGeneral['telefono_contacto']['valor'] ?? '442-123-4567';
+$emailSistema = !empty($configGeneral['email_sistema']['valor']) ? $configGeneral['email_sistema']['valor'] : 'contacto@portalqueretaro.mx';
+$telefonoContacto = !empty($configGeneral['telefono_contacto']['valor']) ? $configGeneral['telefono_contacto']['valor'] : '442-123-4567';
 $direccion = $configGeneral['direccion']['valor'] ?? '';
 
 ?>
