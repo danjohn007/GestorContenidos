@@ -140,10 +140,11 @@ public function get($clave, $default = null) {
 }
 ```
 
-Pero la tabla tiene UNIQUE KEY en `clave`, así que:
-- Si existe `telefono_contacto` con grupo='contacto', intenta actualizar
-- PERO como están en diferentes grupos, puede crear confusión
-- La mejor solución es mantener TODOS los campos de configuración del sitio en el mismo grupo
+Dado que la tabla tiene UNIQUE KEY en `clave`, solo puede existir un registro por clave. Sin embargo:
+- Si existe `telefono_contacto` con grupo='contacto', `get()` lo encuentra y `setOrCreate()` lo actualiza
+- Pero `getByGrupo('general')` usado en index.php NO lo encuentra porque busca específicamente por grupo='general'
+- Resultado: El valor se guarda pero no se muestra en el sitio público
+- La solución correcta es mantener TODOS los campos de configuración del sitio en el mismo grupo para consistencia
 
 ## Solución Implementada
 

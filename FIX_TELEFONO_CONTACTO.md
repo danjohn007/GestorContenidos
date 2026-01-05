@@ -117,7 +117,7 @@ WHERE clave IN ('telefono_contacto', 'direccion', 'email_sistema');
 **Resultado esperado:**
 ```
 | clave              | valor                  | grupo   |
-|--------------------|------------------------|---------|
+|:-------------------|:-----------------------|:--------|
 | telefono_contacto  | 442-123-4567          | general |
 | direccion          | Av. Principal 123...  | general |
 | email_sistema      | contacto@sitio.mx     | general |

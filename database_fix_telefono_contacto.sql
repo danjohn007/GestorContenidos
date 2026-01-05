@@ -11,7 +11,7 @@ WHERE `clave` = 'telefono_contacto';
 
 -- If the entry doesn't exist, create it with the correct group
 INSERT INTO `configuracion` (`clave`, `valor`, `tipo`, `grupo`, `descripcion`)
-SELECT 'telefono_contacto', '442-123-4567', 'texto', 'general', 'Teléfono de contacto'
+SELECT 'telefono_contacto', '', 'texto', 'general', 'Teléfono de contacto'
 WHERE NOT EXISTS (
     SELECT 1 FROM `configuracion` WHERE `clave` = 'telefono_contacto'
 );
