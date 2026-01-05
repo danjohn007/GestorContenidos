@@ -607,6 +607,7 @@ ob_start();
             <?php else: ?>
             <div class="space-y-4">
                 <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -673,6 +674,7 @@ ob_start();
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             <?php endif; ?>
