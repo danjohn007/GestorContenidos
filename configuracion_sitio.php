@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tamano_logo' => trim($_POST['tamano_logo'] ?? 'h-10'),
         'texto_footer' => trim($_POST['texto_footer'] ?? ''),
         'aviso_legal' => trim($_POST['aviso_legal'] ?? ''),
-        'mostrar_aviso_legal' => isset($_POST['mostrar_aviso_legal']) ? '1' : '0'
+        'mostrar_aviso_legal' => isset($_POST['mostrar_aviso_legal']) ? '1' : '0',
+        'mostrar_accesos_rapidos' => isset($_POST['mostrar_accesos_rapidos']) ? '1' : '0'
     ];
     
     // Agregar configuraciones del slider si están presentes
@@ -94,6 +95,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $valores['logo_sitio'] = '/public/uploads/config/' . $filename;
                     } else {
                         $errors[] = 'Error al subir el logo';
+                    }
+                }
+            }
+        }
+    }
+    
+    // Manejar logo del footer si se sube
+    if (isset($_FILES['logo_footer']) && $_FILES['logo_footer']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/public/uploads/config/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $extension = strtolower(pathinfo($_FILES['logo_footer']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+        
+        if (!in_array($extension, $allowedExtensions)) {
+            $errors[] = 'Formato de logo del footer no permitido';
+        } else {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo';
+            } else {
+                $mimeType = finfo_file($finfo, $_FILES['logo_footer']['tmp_name']);
+                finfo_close($finfo);
+                
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo no válido';
+                } else {
+                    // Delete old logo_footer if exists
+                    if (!empty($config['logo_footer']['valor'])) {
+                        $oldLogoPath = __DIR__ . $config['logo_footer']['valor'];
+                        if (file_exists($oldLogoPath) && is_file($oldLogoPath)) {
+                            @unlink($oldLogoPath);
+                        }
+                    }
+                    
+                    $filename = 'logo_footer_' . time() . '.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['logo_footer']['tmp_name'], $uploadPath)) {
+                        $valores['logo_footer'] = '/public/uploads/config/' . $filename;
+                    } else {
+                        $errors[] = 'Error al subir el logo del footer';
                     }
                 }
             }
@@ -395,6 +442,22 @@ ob_start();
             <div class="border-t border-gray-200 pt-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Pie de Página (Footer)</h3>
                 
+                <?php if (!empty($config['logo_footer']['valor'])): ?>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Logo Actual del Footer</label>
+                    <img src="<?php echo e(BASE_URL . $config['logo_footer']['valor'] . '?v=' . time()); ?>" alt="Logo footer actual" class="h-12" loading="eager">
+                </div>
+                <?php endif; ?>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Logo del Footer
+                    </label>
+                    <input type="file" name="logo_footer" accept="image/*"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Logo que se mostrará en el pie de página. Formatos permitidos: JPG, PNG, GIF, SVG, WEBP</p>
+                </div>
+                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Texto del Footer
@@ -403,6 +466,22 @@ ob_start();
                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="©️ 2026 La Cruda Verdad. Todos los derechos reservados."><?php echo e($config['texto_footer']['valor'] ?? ''); ?></textarea>
                     <p class="text-xs text-gray-500 mt-1">Texto que aparecerá al final de la página pública</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Preferencias de Interfaz</h3>
+                
+                <div class="mb-4">
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" name="mostrar_accesos_rapidos" id="mostrar_accesos_rapidos" value="1" 
+                               <?php echo (!empty($config['mostrar_accesos_rapidos']['valor']) && $config['mostrar_accesos_rapidos']['valor'] === '1') ? 'checked' : ''; ?>
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="mostrar_accesos_rapidos" class="ml-2 block text-sm font-medium text-gray-700">
+                            Mostrar bloque de Accesos Rápidos en el sidebar del sitio público
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-6">Desmarcar para ocultar la sección lateral de accesos rápidos</p>
                 </div>
             </div>
 
