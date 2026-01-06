@@ -93,6 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Si no hay errores, actualizar noticia
     if (empty($errors)) {
+        $fecha_programada = !empty($_POST['fecha_programada']) ? $_POST['fecha_programada'] : null;
+        $video_url = trim($_POST['video_url'] ?? '');
+        $video_youtube = trim($_POST['video_youtube'] ?? '');
+        $video_thumbnail = trim($_POST['video_thumbnail'] ?? '');
+        
         $data = [
             'titulo' => $titulo,
             'subtitulo' => $subtitulo,
@@ -101,9 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'tags' => $tags,
             'categoria_id' => $categoria_id,
             'imagen_destacada' => $imagen_destacada,
+            'video_url' => !empty($video_url) ? $video_url : null,
+            'video_youtube' => !empty($video_youtube) ? $video_youtube : null,
+            'video_thumbnail' => !empty($video_thumbnail) ? $video_thumbnail : null,
             'estado' => $estado,
             'destacado' => $destacado,
             'permitir_comentarios' => $permitir_comentarios,
+            'fecha_programada' => $fecha_programada,
             'modificado_por' => $currentUser['id']
         ];
         
@@ -254,20 +263,90 @@ ob_start();
                 <p class="text-xs text-gray-500 mt-1">Deja vacío para mantener la imagen actual</p>
             </div>
 
+            <!-- Videos (YouTube o Local) -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <i class="fas fa-video mr-2 text-blue-600"></i>
+                    Contenido de Video
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Puedes agregar un video de YouTube o subir un video local. El video se mostrará en la noticia.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Video YouTube -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fab fa-youtube text-red-600 mr-1"></i>
+                            Video de YouTube
+                        </label>
+                        <input type="text" name="video_youtube" value="<?php echo e($_POST['video_youtube'] ?? $noticia['video_youtube'] ?? ''); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="ID o URL de YouTube (ej: dQw4w9WgXcQ)">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Ingresa el ID del video o la URL completa
+                        </p>
+                    </div>
+                    
+                    <!-- Video Local URL -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-file-video mr-1"></i>
+                            Video Local (URL)
+                        </label>
+                        <input type="text" name="video_url" value="<?php echo e($_POST['video_url'] ?? $noticia['video_url'] ?? ''); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="/public/uploads/videos/mi-video.mp4">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Ruta del archivo de video subido
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Video Thumbnail -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-image mr-1"></i>
+                        Imagen de Portada del Video (Thumbnail)
+                    </label>
+                    <input type="text" name="video_thumbnail" value="<?php echo e($_POST['video_thumbnail'] ?? $noticia['video_thumbnail'] ?? ''); ?>"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="/public/uploads/thumbnails/mi-portada.jpg">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Opcional: Imagen que se mostrará como portada del video
+                    </p>
+                </div>
+            </div>
+
             <!-- Estado -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Estado
                 </label>
-                <select name="estado" 
+                <select name="estado" id="estado-select"
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="borrador" <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'borrador' : $noticia['estado'] == 'borrador') ? 'selected' : ''; ?>>Borrador</option>
                     <option value="revision" <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'revision' : $noticia['estado'] == 'revision') ? 'selected' : ''; ?>>En Revisión</option>
                     <?php if (hasPermission('all') || hasPermission('noticias')): ?>
                     <option value="aprobado" <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'aprobado' : $noticia['estado'] == 'aprobado') ? 'selected' : ''; ?>>Aprobado</option>
                     <option value="publicado" <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'publicado' : $noticia['estado'] == 'publicado') ? 'selected' : ''; ?>>Publicado</option>
+                    <option value="programado" <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'programado' : $noticia['estado'] == 'programado') ? 'selected' : ''; ?>>Programado</option>
                     <?php endif; ?>
                 </select>
+            </div>
+
+            <!-- Fecha Programada (solo visible cuando estado es 'programado') -->
+            <div id="fecha-programada-container" style="display: <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'programado' : $noticia['estado'] == 'programado') ? 'block' : 'none'; ?>;">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-calendar-alt mr-1"></i>
+                    Fecha y Hora de Publicación
+                </label>
+                <input type="datetime-local" name="fecha_programada" id="fecha-programada"
+                       value="<?php echo e(isset($_POST['fecha_programada']) ? $_POST['fecha_programada'] : ($noticia['fecha_programada'] ? date('Y-m-d\TH:i', strtotime($noticia['fecha_programada'])) : '')); ?>"
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">
+                    La noticia se publicará automáticamente en la fecha y hora indicada
+                </p>
             </div>
 
             <!-- Opciones -->
@@ -376,6 +455,16 @@ form.addEventListener('submit', function(e) {
         e.preventDefault();
         alert('Por favor ingresa el contenido de la noticia');
         return false;
+    }
+});
+
+// Toggle fecha programada field based on estado
+document.getElementById('estado-select').addEventListener('change', function() {
+    var fechaProgramadaContainer = document.getElementById('fecha-programada-container');
+    if (this.value === 'programado') {
+        fechaProgramadaContainer.style.display = 'block';
+    } else {
+        fechaProgramadaContainer.style.display = 'none';
     }
 });
 </script>

@@ -189,7 +189,7 @@ class Banner {
                           'fecha_inicio', 'fecha_fin', 'rotativo'];
         
         foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
+            if (array_key_exists($field, $data)) { // Cambio: usar array_key_exists en lugar de isset para permitir NULL
                 $fields[] = "$field = :$field";
                 $params[$field] = $data[$field];
             }

@@ -227,6 +227,9 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
         .prose img {
             max-width: 100%;
             height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .prose {
@@ -237,6 +240,36 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
         .prose iframe, .prose video {
             max-width: 100%;
             height: auto;
+            aspect-ratio: 16 / 9;
+        }
+        
+        /* Ensure all images within content are responsive */
+        .prose figure {
+            margin: 1.5rem 0;
+        }
+        
+        .prose figure img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+        
+        /* Video container responsive */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
         
         /* Responsive container */
@@ -252,6 +285,16 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
             
             h2 {
                 font-size: 1.5rem;
+            }
+            
+            .prose img {
+                margin: 1rem 0;
+            }
+            
+            .prose table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
             }
         }
         
