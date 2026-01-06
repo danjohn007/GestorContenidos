@@ -191,10 +191,18 @@ ob_start();
                     <i class="fas fa-th-large mr-2"></i>
                     Accesos Directos
                 </button>
+                <!-- Commented out as per requirements: Sidebar lateral - Banners is now managed via Banners module -->
+                <!--
                 <button onclick="showTab('bannersvert')" id="tab-bannersvert"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-ad mr-2"></i>
                     Sidebar lateral - Banners
+                </button>
+                -->
+                <button onclick="showTab('logofooter')" id="tab-logofooter"
+                        class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-image mr-2"></i>
+                    Logo del Footer
                 </button>
                 <button onclick="showTab('menu')" id="tab-menu"
                         class="tab-button px-6 py-3 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
@@ -572,6 +580,55 @@ ob_start();
                     </form>
                 </div>
                 <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Logo del Footer Section -->
+        <div id="content-logofooter" class="tab-content p-6 hidden">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Logo del Footer</h2>
+            <p class="text-gray-600 mb-6">Configura un logo específico que se mostrará en el pie de página del sitio público. Si no se configura, se mostrará el nombre del sitio.</p>
+            
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <form method="POST" action="<?php echo url('configuracion_sitio.php'); ?>" enctype="multipart/form-data" class="space-y-6">
+                    <input type="hidden" name="setting_type" value="logo_footer">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <i class="fas fa-image mr-2 text-blue-600"></i>
+                            Logo del Footer
+                        </label>
+                        <?php 
+                        $logoFooterActual = $configuracionModel->get('logo_footer', '');
+                        if (!empty($logoFooterActual)): 
+                        ?>
+                        <div class="mb-3 p-4 bg-gray-50 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-2">Logo actual:</p>
+                            <img src="<?php echo e(BASE_URL . $logoFooterActual); ?>" alt="Logo Footer" class="h-16 w-auto">
+                        </div>
+                        <?php endif; ?>
+                        
+                        <input type="file" name="logo_footer" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Formatos: JPG, PNG, GIF, WEBP, SVG. Tamaño recomendado: 200x60px. Máximo 2MB.
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle"></i>
+                            Deja vacío si quieres mantener el logo actual o elimínalo desde Configuración del Sitio.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t">
+                        <div class="text-sm text-gray-600">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                            El logo se mostrará automáticamente en el footer del sitio público
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Logo
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
