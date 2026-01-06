@@ -114,22 +114,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
         
         if (in_array($extension, $allowedExtensions)) {
-            $filename = 'thumb_' . bin2hex(random_bytes(16)) . '.' . $extension;
-            $uploadPath = $uploadDir . $filename;
-            
-            if (move_uploaded_file($_FILES['video_thumbnail']['tmp_name'], $uploadPath)) {
-                // Delete old thumbnail if exists
-                if (!empty($noticia['video_thumbnail'])) {
-                    $oldThumbPath = __DIR__ . $noticia['video_thumbnail'];
-                    if (file_exists($oldThumbPath) && is_file($oldThumbPath)) {
-                        @unlink($oldThumbPath);
+            // Validate MIME type
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo del thumbnail';
+            } else {
+                $mimeType = finfo_file($finfo, $_FILES['video_thumbnail']['tmp_name']);
+                finfo_close($finfo);
+                
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo de thumbnail no válido';
+                } else {
+                    // Delete old thumbnail if exists
+                    if (!empty($noticia['video_thumbnail'])) {
+                        $oldThumbPath = __DIR__ . $noticia['video_thumbnail'];
+                        if (file_exists($oldThumbPath) && is_file($oldThumbPath)) {
+                            @unlink($oldThumbPath);
+                        }
+                    }
+                    $filename = 'thumb_' . bin2hex(random_bytes(16)) . '.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['video_thumbnail']['tmp_name'], $uploadPath)) {
+                        $video_thumbnail = '/public/uploads/noticias/' . $filename;
+                        // Limpiar URL si se subió archivo
+                        $video_thumbnail_url = null;
+                    } else {
+                        $errors[] = 'Error al subir el thumbnail del video';
                     }
                 }
-                $video_thumbnail = '/public/uploads/noticias/' . $filename;
-                // Limpiar URL si se subió archivo
-                $video_thumbnail_url = null;
-            } else {
-                $errors[] = 'Error al subir el thumbnail del video';
             }
         } else {
             $errors[] = 'Formato de thumbnail no permitido';

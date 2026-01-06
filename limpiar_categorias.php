@@ -38,8 +38,8 @@ if (empty($huerfanas)) {
     }
     echo "</ul>";
     
-    // Opción de reparación
-    if (isset($_GET['fix']) && $_GET['fix'] == 'orphans') {
+    // Opción de reparación con POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fix']) && $_POST['fix'] == 'orphans') {
         echo "<h3>Reparando categorías huérfanas...</h3>";
         foreach ($huerfanas as $cat) {
             $query = "UPDATE categorias SET padre_id = NULL WHERE id = :id";
@@ -49,7 +49,10 @@ if (empty($huerfanas)) {
             $fixed[] = "Categoría '{$cat['nombre']}' reparada";
         }
     } else {
-        echo "<p><a href='?fix=orphans' class='button' style='background:#10b981;color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;display:inline-block;'>🔧 Reparar Huérfanas</a></p>";
+        echo "<form method='POST' style='display:inline;'>";
+        echo "<input type='hidden' name='fix' value='orphans'>";
+        echo "<button type='submit' style='background:#10b981;color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;display:inline-block;border:none;cursor:pointer;'>🔧 Reparar Huérfanas</button>";
+        echo "</form>";
     }
 }
 
@@ -73,7 +76,7 @@ if (empty($padresOcultos)) {
     }
     echo "</ul>";
     
-    if (isset($_GET['fix']) && $_GET['fix'] == 'visibility') {
+    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fix']) && $_POST['fix'] == 'visibility') {
         echo "<h3>Corrigiendo visibilidad...</h3>";
         foreach ($padresOcultos as $padre) {
             // Opción 1: Ocultar subcategorías
@@ -84,7 +87,10 @@ if (empty($padresOcultos)) {
             $fixed[] = "Subcategorías de '{$padre['nombre']}' ocultadas";
         }
     } else {
-        echo "<p><a href='?fix=visibility' class='button' style='background:#10b981;color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;display:inline-block;'>🔧 Ocultar Subcategorías</a></p>";
+        echo "<form method='POST' style='display:inline;'>";
+        echo "<input type='hidden' name='fix' value='visibility'>";
+        echo "<button type='submit' style='background:#10b981;color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;display:inline-block;border:none;cursor:pointer;'>🔧 Ocultar Subcategorías</button>";
+        echo "</form>";
     }
 }
 

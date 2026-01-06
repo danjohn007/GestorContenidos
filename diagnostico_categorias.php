@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/config/bootstrap.php';
 requireAuth();
+requirePermission('configuracion');
 
 $categoriaModel = new Categoria();
 $menuItemModel = new MenuItem();
