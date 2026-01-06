@@ -514,7 +514,7 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
                         
                         <!-- Banners dentro de noticias -->
                         <div class="my-8">
-                            <?php displayBanners('dentro_notas', 1); ?>
+                            <?php displayCarouselBanners('dentro_notas', 5000); ?>
                         </div>
                         
                         <!-- Estadísticas -->
