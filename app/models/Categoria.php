@@ -202,6 +202,64 @@ class Categoria {
     }
 
     /**
+     * Desasocia una subcategoría de su categoría padre (la convierte en categoría principal)
+     */
+    public function desasociarSubcategoria($id) {
+        $query = "UPDATE {$this->table} SET padre_id = NULL WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    /**
+     * Mueve una subcategoría a otra categoría padre
+     */
+    public function moverSubcategoria($subcategoriaId, $nuevoPadreId) {
+        // Verificar que el nuevo padre no sea la misma subcategoría
+        if ($subcategoriaId == $nuevoPadreId) {
+            return false;
+        }
+        
+        // Verificar que el nuevo padre no sea descendiente de la subcategoría
+        // (evitar ciclos)
+        $categoria = $this->getById($nuevoPadreId);
+        if ($categoria && $categoria['padre_id'] == $subcategoriaId) {
+            return false;
+        }
+        
+        $query = "UPDATE {$this->table} SET padre_id = :padre_id WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([
+            'padre_id' => $nuevoPadreId,
+            'id' => $subcategoriaId
+        ]);
+    }
+
+    /**
+     * Elimina una subcategoría forzadamente (incluso si tiene noticias)
+     * Las noticias se reasignarán a la categoría padre
+     */
+    public function deleteSubcategoriaWithReassign($id) {
+        $subcategoria = $this->getById($id);
+        
+        if (!$subcategoria || !$subcategoria['padre_id']) {
+            return false; // No es una subcategoría
+        }
+        
+        // Reasignar noticias a la categoría padre
+        $query = "UPDATE noticias SET categoria_id = :padre_id WHERE categoria_id = :subcategoria_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([
+            'padre_id' => $subcategoria['padre_id'],
+            'subcategoria_id' => $id
+        ]);
+        
+        // Ahora eliminar la subcategoría
+        $query = "DELETE FROM {$this->table} WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    /**
      * Obtiene el árbol jerárquico de categorías
      */
     public function getTree($visible = null) {

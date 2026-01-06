@@ -98,6 +98,7 @@ $configDiseno = $configuracionModel->getByGrupo('diseno');
 // Valores de configuración
 $nombreSitio = $configGeneral['nombre_sitio']['valor'] ?? 'Portal de Noticias Querétaro';
 $logoSitio = $configGeneral['logo_sitio']['valor'] ?? null;
+$logoFooter = $configGeneral['logo_footer']['valor'] ?? null;
 $modoLogo = $configGeneral['modo_logo']['valor'] ?? 'imagen';
 $tamanoLogo = $configGeneral['tamano_logo']['valor'] ?? 'h-10';
 $colorPrimario = $configDiseno['color_primario']['valor'] ?? '#1e40af';
@@ -115,6 +116,7 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
 $textoFooter = $configGeneral['texto_footer']['valor'] ?? '&copy; ' . date('Y') . ' ' . $nombreSitio . '. Todos los derechos reservados.';
 $avisoLegal = $configGeneral['aviso_legal']['valor'] ?? '';
 $mostrarAvisoLegal = ($configGeneral['mostrar_aviso_legal']['valor'] ?? '1') === '1';
+$mostrarAccesosRapidos = ($configGeneral['mostrar_accesos_rapidos']['valor'] ?? '1') === '1';
 
 ?>
 <!DOCTYPE html>
@@ -970,7 +972,7 @@ $mostrarAvisoLegal = ($configGeneral['mostrar_aviso_legal']['valor'] ?? '1') ===
             <!-- Columna Lateral - Accesos Laterales y Banners Verticales -->
             <div class="lg:col-span-1">
                 <div class="sidebar-sticky">
-                    <?php if (!empty($accesoLateral)): ?>
+                    <?php if ($mostrarAccesosRapidos && !empty($accesoLateral)): ?>
                     <div class="bg-white rounded-lg shadow-lg p-6 mb-6" data-aos="fade-left">
                         <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
                             <i class="fas fa-th-list text-blue-600 mr-2"></i>
@@ -1086,10 +1088,16 @@ $mostrarAvisoLegal = ($configGeneral['mostrar_aviso_legal']['valor'] ?? '1') ===
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
+                    <?php if (!empty($logoFooter)): ?>
+                    <div class="mb-4">
+                        <img src="<?php echo e(BASE_URL . $logoFooter); ?>" alt="<?php echo e($nombreSitio); ?>" class="h-12 w-auto">
+                    </div>
+                    <?php else: ?>
                     <h3 class="text-xl font-bold mb-4">
                         <i class="fas fa-newspaper mr-2"></i>
                         <?php echo e($nombreSitio); ?>
                     </h3>
+                    <?php endif; ?>
                     <p class="opacity-80"><?php echo e($sloganSitio); ?></p>
                 </div>
                 <div>
