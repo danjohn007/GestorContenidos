@@ -458,8 +458,43 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
             <!-- Contenido Principal -->
             <div class="lg:col-span-2">
                 <article class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <!-- Video o Imagen destacada -->
+                    <?php if (!empty($noticia['video_youtube']) || !empty($noticia['video_url'])): ?>
+                    <!-- Video Section -->
+                    <div class="video-container bg-black">
+                        <?php if (!empty($noticia['video_youtube'])): ?>
+                            <?php
+                            // Extract YouTube video ID from various formats
+                            $youtube_id = $noticia['video_youtube'];
+                            if (preg_match('/youtube\.com\/watch\?v=([^&]+)/', $youtube_id, $matches)) {
+                                $youtube_id = $matches[1];
+                            } elseif (preg_match('/youtu\.be\/([^?]+)/', $youtube_id, $matches)) {
+                                $youtube_id = $matches[1];
+                            } elseif (preg_match('/youtube\.com\/embed\/([^?]+)/', $youtube_id, $matches)) {
+                                $youtube_id = $matches[1];
+                            }
+                            ?>
+                            <iframe 
+                                src="https://www.youtube.com/embed/<?php echo e($youtube_id); ?>" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                title="<?php echo e($noticia['titulo']); ?>">
+                            </iframe>
+                        <?php elseif (!empty($noticia['video_url'])): ?>
+                            <video controls class="w-full" 
+                                   <?php if (!empty($noticia['video_thumbnail'])): ?>
+                                   poster="<?php echo e(BASE_URL . $noticia['video_thumbnail']); ?>"
+                                   <?php elseif (!empty($noticia['video_thumbnail_url'])): ?>
+                                   poster="<?php echo e($noticia['video_thumbnail_url']); ?>"
+                                   <?php endif; ?>>
+                                <source src="<?php echo e(BASE_URL . $noticia['video_url']); ?>" type="video/mp4">
+                                Tu navegador no soporta la reproducción de videos.
+                            </video>
+                        <?php endif; ?>
+                    </div>
+                    <?php elseif ($noticia['imagen_destacada']): ?>
                     <!-- Imagen destacada -->
-                    <?php if ($noticia['imagen_destacada']): ?>
                     <img src="<?php echo e(BASE_URL . $noticia['imagen_destacada']); ?>" alt="<?php echo e($noticia['titulo']); ?>" class="w-full h-96 object-cover">
                     <?php endif; ?>
                     
