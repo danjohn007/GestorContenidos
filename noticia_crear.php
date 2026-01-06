@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $estado = $_POST['estado'] ?? 'borrador';
     $destacado = isset($_POST['destacado']) ? 1 : 0;
     $permitir_comentarios = isset($_POST['permitir_comentarios']) ? 1 : 0;
+    $video_youtube = trim($_POST['video_youtube'] ?? '');
+    $fecha_programada = !empty($_POST['fecha_programada']) ? $_POST['fecha_programada'] : null;
     
     // Validaciones
     if (empty($titulo)) {
@@ -60,6 +62,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    // Manejar video local
+    $video_url = null;
+    if (isset($_FILES['video_local']) && $_FILES['video_local']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/public/uploads/videos/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0750, true);
+        }
+        
+        $extension = strtolower(pathinfo($_FILES['video_local']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['mp4', 'webm', 'ogg'];
+        
+        if (in_array($extension, $allowedExtensions)) {
+            $filename = 'video_' . bin2hex(random_bytes(16)) . '.' . $extension;
+            $uploadPath = $uploadDir . $filename;
+            
+            if (move_uploaded_file($_FILES['video_local']['tmp_name'], $uploadPath)) {
+                $video_url = '/public/uploads/videos/' . $filename;
+            } else {
+                $errors[] = 'Error al subir el video';
+            }
+        } else {
+            $errors[] = 'Formato de video no permitido (solo MP4, WebM, OGG)';
+        }
+    }
+    
+    // Manejar thumbnail de video
+    $video_thumbnail = null;
+    if (isset($_FILES['video_thumbnail']) && $_FILES['video_thumbnail']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/public/uploads/noticias/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0750, true);
+        }
+        
+        $extension = strtolower(pathinfo($_FILES['video_thumbnail']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        
+        if (in_array($extension, $allowedExtensions)) {
+            $filename = 'thumb_' . bin2hex(random_bytes(16)) . '.' . $extension;
+            $uploadPath = $uploadDir . $filename;
+            
+            if (move_uploaded_file($_FILES['video_thumbnail']['tmp_name'], $uploadPath)) {
+                $video_thumbnail = '/public/uploads/noticias/' . $filename;
+            } else {
+                $errors[] = 'Error al subir el thumbnail del video';
+            }
+        } else {
+            $errors[] = 'Formato de thumbnail no permitido';
+        }
+    }
+    
     // Si no hay errores, crear noticia
     if (empty($errors)) {
         $currentUser = getCurrentUser();
@@ -74,7 +126,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'imagen_destacada' => $imagen_destacada,
             'estado' => $estado,
             'destacado' => $destacado,
-            'permitir_comentarios' => $permitir_comentarios
+            'permitir_comentarios' => $permitir_comentarios,
+            'video_url' => $video_url,
+            'video_youtube' => $video_youtube,
+            'video_thumbnail' => $video_thumbnail,
+            'fecha_programada' => $fecha_programada
         ];
         
         $result = $noticiaModel->create($data);
@@ -214,6 +270,74 @@ ob_start();
                 </label>
                 <input type="file" name="imagen_destacada" accept="image/*"
                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Sección de Videos -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-video mr-2 text-purple-600"></i>
+                    Contenido de Video (Opcional)
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- Video de YouTube -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            URL de YouTube
+                        </label>
+                        <input type="text" name="video_youtube" value="<?php echo e($_POST['video_youtube'] ?? ''); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="https://www.youtube.com/watch?v=... o ID del video">
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle"></i>
+                            Pegue la URL completa o solo el ID del video de YouTube
+                        </p>
+                    </div>
+
+                    <!-- Video Local -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Subir Video Local
+                        </label>
+                        <input type="file" name="video_local" accept="video/mp4,video/webm,video/ogg"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Formatos permitidos: MP4, WebM, OGG
+                        </p>
+                    </div>
+
+                    <!-- Thumbnail de Video -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Imagen de Portada para Video (Thumbnail)
+                        </label>
+                        <input type="file" name="video_thumbnail" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Imagen que se mostrará antes de reproducir el video
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programación de Publicación -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-clock mr-2 text-blue-600"></i>
+                    Programación de Publicación
+                </h3>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha y Hora Programada
+                    </label>
+                    <input type="datetime-local" name="fecha_programada" value="<?php echo e($_POST['fecha_programada'] ?? ''); ?>"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fas fa-info-circle"></i>
+                        Si especifica una fecha, la noticia se publicará automáticamente en ese momento (debe estar en estado "Publicar")
+                    </p>
+                </div>
             </div>
 
             <!-- Estado -->

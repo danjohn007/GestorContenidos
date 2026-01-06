@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'direccion' => trim($_POST['direccion'] ?? ''),
         'zona_horaria' => trim($_POST['zona_horaria'] ?? 'America/Mexico_City'),
         'modo_logo' => trim($_POST['modo_logo'] ?? 'imagen'),
-        'tamano_logo' => trim($_POST['tamano_logo'] ?? 'h-10')
+        'tamano_logo' => trim($_POST['tamano_logo'] ?? 'h-10'),
+        'texto_footer' => trim($_POST['texto_footer'] ?? ''),
+        'aviso_legal' => trim($_POST['aviso_legal'] ?? ''),
+        'mostrar_aviso_legal' => isset($_POST['mostrar_aviso_legal']) ? '1' : '0'
     ];
     
     // Agregar configuraciones del slider si están presentes
@@ -386,6 +389,45 @@ ob_start();
                     <input type="text" name="direccion" 
                            value="<?php echo e($config['direccion']['valor'] ?? ''); ?>" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Pie de Página (Footer)</h3>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Texto del Footer
+                    </label>
+                    <textarea name="texto_footer" rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="©️ 2026 La Cruda Verdad. Todos los derechos reservados."><?php echo e($config['texto_footer']['valor'] ?? ''); ?></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Texto que aparecerá al final de la página pública</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Aviso Legal</h3>
+                
+                <div class="mb-4">
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" name="mostrar_aviso_legal" id="mostrar_aviso_legal" value="1" 
+                               <?php echo (!empty($config['mostrar_aviso_legal']['valor']) && $config['mostrar_aviso_legal']['valor'] === '1') ? 'checked' : ''; ?>
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="mostrar_aviso_legal" class="ml-2 block text-sm font-medium text-gray-700">
+                            Mostrar enlace de Aviso Legal en el footer
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Contenido del Aviso Legal
+                    </label>
+                    <textarea name="aviso_legal" rows="8"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                              placeholder="Ingrese el contenido de la página de Aviso Legal..."><?php echo e($config['aviso_legal']['valor'] ?? ''); ?></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Contenido completo de la página de Aviso Legal. Puede usar HTML básico.</p>
                 </div>
             </div>
 
