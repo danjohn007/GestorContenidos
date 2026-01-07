@@ -122,9 +122,9 @@ ob_start();
                                class="text-orange-600 hover:text-orange-900 px-2 py-1" title="<?php echo $subcategoria['visible'] ? 'Ocultar' : 'Mostrar'; ?>">
                                 <i class="fas fa-eye<?php echo $subcategoria['visible'] ? '-slash' : ''; ?>"></i>
                             </a>
-                            <a href="<?php echo url('categoria_accion.php?accion=eliminar&id=' . $subcategoria['id']); ?>" 
+                            <a href="<?php echo url('categoria_accion.php?accion=eliminar_subcategoria&id=' . $subcategoria['id']); ?>" 
                                class="text-red-600 hover:text-red-900 px-2 py-1" title="Eliminar"
-                               onclick="return confirm('¿Estás seguro de que deseas eliminar esta subcategoría?');">
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar esta subcategoría? Las noticias asociadas se reasignarán a la categoría padre.');">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>

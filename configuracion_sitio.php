@@ -47,7 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validaciones
     // Solo validar nombre_sitio si NO viene del formulario de slider
-    if (empty($valores['nombre_sitio']) && !isset($_POST['slider_tipo'])) {
+    // Y si viene con datos reales (no solo archivos)
+    $soloArchivos = isset($_FILES['logo_footer']) || isset($_FILES['logo']) || isset($_FILES['favicon']);
+    $tieneOtrosCampos = !empty($_POST['nombre_sitio']) || !empty($_POST['email_sistema']) || !empty($_POST['slogan_sitio']);
+    
+    if (empty($valores['nombre_sitio']) && !isset($_POST['slider_tipo']) && $tieneOtrosCampos) {
         $errors[] = 'El nombre del sitio es requerido';
     }
     
