@@ -114,10 +114,10 @@ class Noticia {
     public function create($data) {
         $query = "INSERT INTO {$this->table} 
                   (titulo, subtitulo, slug, contenido, resumen, tags, autor_id, categoria_id, 
-                   imagen_destacada, video_url, video_youtube, video_thumbnail, estado, destacado, 
+                   imagen_destacada, video_url, video_youtube, video_thumbnail, video_thumbnail_url, estado, destacado, 
                    permitir_comentarios, fecha_programada) 
                   VALUES (:titulo, :subtitulo, :slug, :contenido, :resumen, :tags, :autor_id, :categoria_id,
-                          :imagen_destacada, :video_url, :video_youtube, :video_thumbnail, :estado, :destacado, 
+                          :imagen_destacada, :video_url, :video_youtube, :video_thumbnail, :video_thumbnail_url, :estado, :destacado, 
                           :permitir_comentarios, :fecha_programada)";
         
         $stmt = $this->db->prepare($query);
@@ -135,6 +135,7 @@ class Noticia {
             'video_url' => $data['video_url'] ?? null,
             'video_youtube' => $data['video_youtube'] ?? null,
             'video_thumbnail' => $data['video_thumbnail'] ?? null,
+            'video_thumbnail_url' => $data['video_thumbnail_url'] ?? null,
             'estado' => $data['estado'] ?? 'borrador',
             'destacado' => $data['destacado'] ?? 0,
             'permitir_comentarios' => $data['permitir_comentarios'] ?? 1,
@@ -157,7 +158,7 @@ class Noticia {
         
         $allowedFields = ['titulo', 'subtitulo', 'slug', 'contenido', 'resumen', 'tags',
                           'categoria_id', 'imagen_destacada', 'video_url', 'video_youtube', 
-                          'video_thumbnail', 'estado', 'destacado', 'orden_destacado', 
+                          'video_thumbnail', 'video_thumbnail_url', 'estado', 'destacado', 'orden_destacado', 
                           'permitir_comentarios', 'fecha_programada', 'fecha_publicacion', 
                           'modificado_por'];
         

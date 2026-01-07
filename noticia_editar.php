@@ -91,12 +91,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    // Manejar thumbnail de video
+    $video_thumbnail = null;
+    $video_thumbnail_url = trim($_POST['video_thumbnail_url'] ?? '');
+    
+    // Si se proporciona una URL, validarla
+    if (!empty($video_thumbnail_url)) {
+        $video_thumbnail_url = filter_var($video_thumbnail_url, FILTER_VALIDATE_URL) ? $video_thumbnail_url : null;
+        if (!$video_thumbnail_url) {
+            $errors[] = 'La URL del thumbnail de video no es válida';
+        }
+    }
+    
+    // Si se sube un archivo, toma prioridad sobre la URL
+    if (isset($_FILES['video_thumbnail']) && $_FILES['video_thumbnail']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/public/uploads/noticias/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0750, true);
+        }
+        
+        $extension = strtolower(pathinfo($_FILES['video_thumbnail']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        
+        if (in_array($extension, $allowedExtensions)) {
+            // Validate MIME type
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo === false) {
+                $errors[] = 'Error al validar el tipo de archivo del thumbnail';
+            } else {
+                $mimeType = finfo_file($finfo, $_FILES['video_thumbnail']['tmp_name']);
+                finfo_close($finfo);
+                
+                $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+                
+                if (!in_array($mimeType, $allowedMimes)) {
+                    $errors[] = 'Tipo de archivo de thumbnail no válido';
+                } else {
+                    // Delete old thumbnail if exists
+                    if (!empty($noticia['video_thumbnail'])) {
+                        $oldThumbPath = __DIR__ . $noticia['video_thumbnail'];
+                        if (file_exists($oldThumbPath) && is_file($oldThumbPath)) {
+                            @unlink($oldThumbPath);
+                        }
+                    }
+                    $filename = 'thumb_' . bin2hex(random_bytes(16)) . '.' . $extension;
+                    $uploadPath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($_FILES['video_thumbnail']['tmp_name'], $uploadPath)) {
+                        $video_thumbnail = '/public/uploads/noticias/' . $filename;
+                        // Limpiar URL si se subió archivo
+                        $video_thumbnail_url = null;
+                    } else {
+                        $errors[] = 'Error al subir el thumbnail del video';
+                    }
+                }
+            }
+        } else {
+            $errors[] = 'Formato de thumbnail no permitido';
+        }
+    }
+    
     // Si no hay errores, actualizar noticia
     if (empty($errors)) {
         $fecha_programada = !empty($_POST['fecha_programada']) ? $_POST['fecha_programada'] : null;
         $video_url = trim($_POST['video_url'] ?? '');
         $video_youtube = trim($_POST['video_youtube'] ?? '');
-        $video_thumbnail = trim($_POST['video_thumbnail'] ?? '');
         
         $data = [
             'titulo' => $titulo,
@@ -108,7 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'imagen_destacada' => $imagen_destacada,
             'video_url' => !empty($video_url) ? $video_url : null,
             'video_youtube' => !empty($video_youtube) ? $video_youtube : null,
-            'video_thumbnail' => !empty($video_thumbnail) ? $video_thumbnail : null,
+            'video_thumbnail' => $video_thumbnail !== null ? $video_thumbnail : $noticia['video_thumbnail'],
+            'video_thumbnail_url' => $video_thumbnail_url !== null ? $video_thumbnail_url : ($noticia['video_thumbnail_url'] ?? null),
             'estado' => $estado,
             'destacado' => $destacado,
             'permitir_comentarios' => $permitir_comentarios,
@@ -309,11 +369,44 @@ ob_start();
                         <i class="fas fa-image mr-1"></i>
                         Imagen de Portada del Video (Thumbnail)
                     </label>
-                    <input type="text" name="video_thumbnail" value="<?php echo e($_POST['video_thumbnail'] ?? $noticia['video_thumbnail'] ?? ''); ?>"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="/public/uploads/thumbnails/mi-portada.jpg">
-                    <p class="text-xs text-gray-500 mt-1">
-                        Opcional: Imagen que se mostrará como portada del video
+                    
+                    <?php if (!empty($noticia['video_thumbnail'])): ?>
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Thumbnail Actual (Archivo)</label>
+                        <img src="<?php echo e(BASE_URL . $noticia['video_thumbnail']); ?>" alt="Thumbnail actual" class="h-32 border border-gray-300 rounded">
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($noticia['video_thumbnail_url'])): ?>
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Thumbnail Actual (URL)</label>
+                        <img src="<?php echo e($noticia['video_thumbnail_url']); ?>" alt="Thumbnail actual" class="h-32 border border-gray-300 rounded">
+                    </div>
+                    <?php endif; ?>
+                    
+                    <!-- Opción 1: URL -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">
+                            Opción 1: Ingresar URL de la imagen
+                        </label>
+                        <input type="url" name="video_thumbnail_url" 
+                               value="<?php echo e($_POST['video_thumbnail_url'] ?? $noticia['video_thumbnail_url'] ?? ''); ?>"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="https://ejemplo.com/imagen.jpg">
+                    </div>
+                    
+                    <!-- Opción 2: Subir archivo -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">
+                            Opción 2: Subir imagen desde el equipo
+                        </label>
+                        <input type="file" name="video_thumbnail" accept="image/*"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-info-circle"></i>
+                        Imagen que se mostrará antes de reproducir el video. Puedes ingresar una URL o subir un archivo (si subes un archivo, este tendrá prioridad).
                     </p>
                 </div>
             </div>
