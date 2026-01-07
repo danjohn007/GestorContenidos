@@ -179,7 +179,7 @@ class MenuItem {
                 $this->create([
                     'categoria_id' => $categoria['id'],
                     'orden' => $categoria['orden'] ?? 0,
-                    'activo' => $categoria['visible'] ? 1 : 0 // Respetar visibilidad de categoría
+                    'activo' => $categoria['visible'] ? 1 : 0 // Respect category visibility
                 ]);
             }
         }

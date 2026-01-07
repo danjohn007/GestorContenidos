@@ -1,7 +1,15 @@
 <?php
 /**
- * Diagnóstico Completo del Sistema
- * Verifica categorías, menú, noticias programadas, y configuración
+ * Comprehensive System Diagnostic Tool
+ * 
+ * This tool provides a complete health check of the CMS system:
+ * - Categories and subcategories structure validation
+ * - Menu items integrity check (orphaned items, invalid references)
+ * - Scheduled news status and publication queue
+ * - System configuration verification
+ * - Automated problem detection and recommendations
+ * 
+ * Output: HTML report with color-coded status indicators
  */
 require_once __DIR__ . '/config/bootstrap.php';
 requireAuth();
