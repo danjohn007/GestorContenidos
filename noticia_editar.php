@@ -270,12 +270,23 @@ ob_start();
                 <select name="categoria_id" required 
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Selecciona una categoría</option>
-                    <?php foreach ($categorias as $cat): ?>
-                    <option value="<?php echo $cat['id']; ?>" 
-                        <?php echo (isset($_POST['categoria_id']) ? $_POST['categoria_id'] == $cat['id'] : $noticia['categoria_id'] == $cat['id']) ? 'selected' : ''; ?>>
-                        <?php echo e($cat['nombre']); ?>
-                        <?php if ($cat['padre_id']): ?> (Subcategoría)<?php endif; ?>
+                    <?php 
+                    // Obtener categorías de forma jerárquica
+                    $categoriasTree = $categoriaModel->getTree(1);
+                    foreach ($categoriasTree as $catPrincipal): 
+                    ?>
+                    <option value="<?php echo $catPrincipal['id']; ?>" 
+                        <?php echo (isset($_POST['categoria_id']) ? $_POST['categoria_id'] == $catPrincipal['id'] : $noticia['categoria_id'] == $catPrincipal['id']) ? 'selected' : ''; ?>>
+                        <?php echo e($catPrincipal['nombre']); ?>
                     </option>
+                    <?php if (!empty($catPrincipal['children'])): ?>
+                        <?php foreach ($catPrincipal['children'] as $subcategoria): ?>
+                        <option value="<?php echo $subcategoria['id']; ?>" 
+                            <?php echo (isset($_POST['categoria_id']) ? $_POST['categoria_id'] == $subcategoria['id'] : $noticia['categoria_id'] == $subcategoria['id']) ? 'selected' : ''; ?>>
+                            &nbsp;&nbsp;&nbsp;└─ <?php echo e($subcategoria['nombre']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </div>
