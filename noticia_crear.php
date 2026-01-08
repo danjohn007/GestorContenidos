@@ -42,7 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // First check if image was selected from gallery
     if (!empty($_POST['imagen_destacada_url'])) {
-        $imagen_destacada = trim($_POST['imagen_destacada_url']);
+        $selectedUrl = trim($_POST['imagen_destacada_url']);
+        // Validate that it's a multimedia gallery path
+        if (strpos($selectedUrl, '/public/uploads/multimedia/') === 0) {
+            $imagen_destacada = $selectedUrl;
+        } else {
+            $errors[] = 'URL de imagen de galería no válida';
+        }
     }
     // Otherwise check if file was uploaded
     elseif (isset($_FILES['imagen_destacada']) && $_FILES['imagen_destacada']['error'] === UPLOAD_ERR_OK) {
@@ -578,6 +584,8 @@ form.addEventListener('submit', function(e) {
 
 // Media Gallery Modal Functions
 var currentMediaField = null;
+const BASE_URL = '<?php echo addslashes(BASE_URL); ?>';
+const MEDIA_API_URL = '<?php echo addslashes(url('api/multimedia_list.php')); ?>';
 
 function openMediaGallery(fieldName) {
     currentMediaField = fieldName;
@@ -592,26 +600,41 @@ function closeMediaGallery() {
     currentMediaField = null;
 }
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function loadMediaGallery(page = 1) {
     const tipo = 'imagen'; // For now, only images
     const galleryContainer = document.getElementById('mediaGalleryContainer');
     
     galleryContainer.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i></div>';
     
-    fetch(`<?php echo url('api/multimedia_list.php'); ?>?tipo=${tipo}&page=${page}&perPage=12`)
+    fetch(`${MEDIA_API_URL}?tipo=${encodeURIComponent(tipo)}&page=${encodeURIComponent(page)}&perPage=12`)
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data.length > 0) {
                 let html = '<div class="grid grid-cols-3 gap-4">';
                 data.data.forEach(media => {
+                    const escapedRuta = escapeHtml(media.ruta);
+                    const escapedTitulo = escapeHtml(media.titulo || media.nombre_original || '');
+                    const imgSrc = BASE_URL + media.ruta;
+                    
                     html += `
-                        <div class="relative group cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-lg overflow-hidden" onclick="selectMedia('${media.ruta}', '${media.titulo}')">
-                            <img src="<?php echo BASE_URL; ?>${media.ruta}" alt="${media.titulo || ''}" class="w-full h-32 object-cover">
+                        <div class="relative group cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-lg overflow-hidden" 
+                             data-ruta="${escapedRuta}" 
+                             data-titulo="${escapedTitulo}"
+                             onclick="selectMediaFromElement(this)">
+                            <img src="${escapeHtml(imgSrc)}" alt="${escapedTitulo}" class="w-full h-32 object-cover">
                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
                                 <i class="fas fa-check-circle text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             </div>
                             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-white text-xs truncate">${media.titulo || media.nombre_original}</p>
+                                <p class="text-white text-xs truncate">${escapedTitulo}</p>
                             </div>
                         </div>
                     `;
@@ -639,8 +662,20 @@ function loadMediaGallery(page = 1) {
         });
 }
 
+function selectMediaFromElement(element) {
+    const ruta = element.getAttribute('data-ruta');
+    const titulo = element.getAttribute('data-titulo');
+    selectMedia(ruta, titulo);
+}
+
 function selectMedia(ruta, titulo) {
     if (!currentMediaField) return;
+    
+    // Validate ruta starts with expected path
+    if (!ruta.startsWith('/public/uploads/multimedia/')) {
+        console.error('Invalid media path');
+        return;
+    }
     
     // Set hidden field with URL
     document.getElementById(currentMediaField + '_url').value = ruta;
@@ -650,8 +685,8 @@ function selectMedia(ruta, titulo) {
     const previewImg = document.getElementById(currentMediaField + '_preview_img');
     
     preview.classList.remove('hidden');
-    previewImg.src = '<?php echo BASE_URL; ?>' + ruta;
-    previewImg.alt = titulo;
+    previewImg.src = BASE_URL + ruta;
+    previewImg.alt = titulo || '';
     
     // Clear file input if user selected from gallery
     const fileInput = document.getElementById(currentMediaField + '_file');
