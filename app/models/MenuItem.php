@@ -141,23 +141,45 @@ class MenuItem {
 
     /**
      * Sincroniza los ítems del menú con las categorías principales
-     * Crea ítems para categorías que no tienen y los marca como activos por defecto
+     * Crea ítems para categorías que no tienen, actualiza orden, y elimina huérfanos
      */
     public function syncWithCategories() {
-        // Obtener todas las categorías principales
         $categoriaModel = new Categoria();
-        $categorias = $categoriaModel->getParents();
+        $categoriasParent = $categoriaModel->getParents();
         
-        foreach ($categorias as $categoria) {
-            // Verificar si ya existe un ítem de menú para esta categoría
+        // Crear array de IDs de categorías principales
+        $categoriasIds = array_column($categoriasParent, 'id');
+        
+        // 1. Obtener todos los ítems de menú existentes
+        $menuItemsExistentes = $this->getAll();
+        
+        // 2. Eliminar ítems huérfanos (categorías que ya no existen o que ahora son subcategorías)
+        foreach ($menuItemsExistentes as $menuItem) {
+            $categoria = $categoriaModel->getById($menuItem['categoria_id']);
+            
+            // Si la categoría no existe o ahora es una subcategoría, eliminar el ítem
+            if (!$categoria || $categoria['padre_id'] !== null) {
+                $this->delete($menuItem['id']);
+            }
+        }
+        
+        // 3. Crear o actualizar ítems para categorías principales
+        foreach ($categoriasParent as $categoria) {
             $existente = $this->getByCategoriaId($categoria['id']);
             
-            if (!$existente) {
-                // Crear un nuevo ítem de menú
+            if ($existente) {
+                // Actualizar orden si ha cambiado
+                if ($existente['orden'] != ($categoria['orden'] ?? 0)) {
+                    $this->update($existente['id'], [
+                        'orden' => $categoria['orden'] ?? 0
+                    ]);
+                }
+            } else {
+                // Crear nuevo ítem de menú
                 $this->create([
                     'categoria_id' => $categoria['id'],
                     'orden' => $categoria['orden'] ?? 0,
-                    'activo' => 1 // Por defecto activo
+                    'activo' => $categoria['visible'] ? 1 : 0 // Respect category visibility
                 ]);
             }
         }

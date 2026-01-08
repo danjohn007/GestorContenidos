@@ -637,15 +637,26 @@ ob_start();
             <h2 class="text-xl font-bold text-gray-900 mb-4">Gestión de Menú Principal</h2>
             <p class="text-gray-600 mb-4">Administra los ítems del menú principal. Cada ítem representa una categoría y puedes habilitar o deshabilitar los que se muestren en la parte pública.</p>
             
-            <div class="mb-6">
-                <form method="POST" class="inline">
-                    <input type="hidden" name="menu_action" value="sync">
-                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                        <i class="fas fa-sync mr-2"></i>
-                        Sincronizar con Categorías
-                    </button>
-                </form>
-                <p class="text-xs text-gray-500 mt-2">Sincroniza el menú con las categorías principales del sistema</p>
+            <div class="mb-6 space-y-3">
+                <div>
+                    <form method="POST" class="inline">
+                        <input type="hidden" name="menu_action" value="sync">
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-sync mr-2"></i>
+                            Sincronizar con Categorías
+                        </button>
+                    </form>
+                    <a href="<?php echo url('diagnostico_completo.php'); ?>" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-block ml-2">
+                        <i class="fas fa-stethoscope mr-2"></i>
+                        Diagnóstico Completo
+                    </a>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Sincronización Automática:</strong> Crea ítems de menú para categorías principales, elimina categorías huérfanas o subcategorías del menú, y actualiza el orden automáticamente.
+                    </p>
+                </div>
             </div>
             
             <?php if (empty($menuItems)): ?>

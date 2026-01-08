@@ -1045,7 +1045,7 @@ $mostrarAccesosRapidos = ($configGeneral['mostrar_accesos_rapidos']['valor'] ?? 
                         </div>
                     </div>
                     <div class="text-center">
-                        <a href="mailto:contacto@portalqueretaro.mx" class="inline-block bg-white px-8 py-4 rounded-lg font-semibold hover:bg-opacity-90 transition-colors" style="color: var(--color-primario);">
+                        <a href="mailto:<?php echo e($emailSistema); ?>" class="inline-block bg-white px-8 py-4 rounded-lg font-semibold hover:bg-opacity-90 transition-colors" style="color: var(--color-primario);">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Contáctanos
                         </a>
