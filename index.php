@@ -28,6 +28,9 @@ $bannerModel = new Banner();
 // Incluir helper de banners
 require_once __DIR__ . '/app/helpers/banner_helper.php';
 
+// Incluir helper de noticias destacadas
+require_once __DIR__ . '/app/helpers/noticia_destacada_helper.php';
+
 // Obtener categoría seleccionada del parámetro URL
 $categoriaSeleccionada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
 $destacadasFilter = isset($_GET['destacadas']) ? true : false;
@@ -739,6 +742,11 @@ $mostrarAccesosRapidos = ($configGeneral['mostrar_accesos_rapidos']['valor'] ?? 
         </section>
         <?php endif; ?>
 
+        <!-- Noticias Destacadas (Solo Imágenes) - Bajo Slider -->
+        <?php if ($mostrarContenidoPaginaPrincipal): ?>
+            <?php displayNoticiasDestacadasImagenes('bajo_slider'); ?>
+        <?php endif; ?>
+
         <!-- Layout de dos columnas: Contenido principal y Accesos Laterales -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Columna Principal -->
@@ -961,6 +969,9 @@ $mostrarAccesosRapidos = ($configGeneral['mostrar_accesos_rapidos']['valor'] ?? 
                         
                         <!-- Banner entre categorías -->
                         <?php displayBanners('entre_secciones', 1); ?>
+                        
+                        <!-- Noticias Destacadas (Solo Imágenes) - Entre Bloques -->
+                        <?php displayNoticiasDestacadasImagenes('entre_bloques'); ?>
                     </section>
                     <?php 
                         endif;
@@ -1053,6 +1064,11 @@ $mostrarAccesosRapidos = ($configGeneral['mostrar_accesos_rapidos']['valor'] ?? 
                 </div>
             </div>
         </section>
+        <?php endif; ?>
+        
+        <!-- Noticias Destacadas (Solo Imágenes) - Antes Footer -->
+        <?php if ($mostrarContenidoPaginaPrincipal): ?>
+            <?php displayNoticiasDestacadasImagenes('antes_footer'); ?>
         <?php endif; ?>
         
         <!-- Banners Footer desde sistema de gestión -->
