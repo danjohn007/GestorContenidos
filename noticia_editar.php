@@ -468,18 +468,31 @@ ob_start();
                 </select>
             </div>
 
-            <!-- Fecha Programada (solo visible cuando estado es 'programado') -->
-            <div id="fecha-programada-container" style="display: <?php echo (isset($_POST['estado']) ? $_POST['estado'] == 'programado' : $noticia['estado'] == 'programado') ? 'block' : 'none'; ?>;">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    <i class="fas fa-calendar-alt mr-1"></i>
-                    Fecha y Hora de Publicación
-                </label>
-                <input type="datetime-local" name="fecha_programada" id="fecha-programada"
-                       value="<?php echo e(isset($_POST['fecha_programada']) ? $_POST['fecha_programada'] : ($noticia['fecha_programada'] ? date('Y-m-d\TH:i', strtotime($noticia['fecha_programada'])) : '')); ?>"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <p class="text-xs text-gray-500 mt-1">
-                    La noticia se publicará automáticamente en la fecha y hora indicada
-                </p>
+            <!-- Programación de Publicación -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-clock mr-2 text-blue-600"></i>
+                    Programación de Publicación
+                </h3>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha y Hora Programada
+                    </label>
+                    <input type="datetime-local" name="fecha_programada" id="fecha-programada"
+                           value="<?php echo e(isset($_POST['fecha_programada']) ? $_POST['fecha_programada'] : ($noticia['fecha_programada'] ? date('Y-m-d\TH:i', strtotime($noticia['fecha_programada'])) : '')); ?>"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fas fa-info-circle"></i>
+                        Si especifica una fecha futura y el estado es "Publicado", la noticia se publicará automáticamente en ese momento
+                    </p>
+                    <?php if ($noticia['fecha_programada'] && strtotime($noticia['fecha_programada']) > time() && $noticia['estado'] === 'publicado' && !$noticia['fecha_publicacion']): ?>
+                    <div class="mt-2 text-xs text-purple-600 font-medium">
+                        <i class="fas fa-clock mr-1"></i>
+                        Esta noticia está programada para publicarse el <?php echo date('d/m/Y H:i', strtotime($noticia['fecha_programada'])); ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <!-- Opciones -->

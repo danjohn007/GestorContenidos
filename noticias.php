@@ -158,21 +158,35 @@ ob_start();
                         <span class="text-sm text-gray-900"><?php echo e($noticia['autor_nombre'] . ' ' . $noticia['autor_apellidos']); ?></span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            <?php 
-                            echo match($noticia['estado']) {
-                                'publicado' => 'bg-green-100 text-green-800',
-                                'borrador' => 'bg-yellow-100 text-yellow-800',
-                                'revision' => 'bg-orange-100 text-orange-800',
-                                'aprobado' => 'bg-blue-100 text-blue-800',
-                                'rechazado' => 'bg-red-100 text-red-800',
-                                'archivado' => 'bg-gray-100 text-gray-800',
-                                default => 'bg-gray-100 text-gray-800'
-                            };
-                            ?>
-                        ">
-                            <?php echo ucfirst($noticia['estado']); ?>
+                        <?php 
+                        // Determinar si está programada
+                        $esProgramada = $noticia['estado'] === 'publicado' 
+                                       && $noticia['fecha_programada'] 
+                                       && !$noticia['fecha_publicacion']
+                                       && strtotime($noticia['fecha_programada']) > time();
+                        
+                        $estadoTexto = $esProgramada ? 'Programada' : ucfirst($noticia['estado']);
+                        $estadoClase = $esProgramada ? 'bg-purple-100 text-purple-800' : match($noticia['estado']) {
+                            'publicado' => 'bg-green-100 text-green-800',
+                            'borrador' => 'bg-yellow-100 text-yellow-800',
+                            'revision' => 'bg-orange-100 text-orange-800',
+                            'aprobado' => 'bg-blue-100 text-blue-800',
+                            'rechazado' => 'bg-red-100 text-red-800',
+                            'archivado' => 'bg-gray-100 text-gray-800',
+                            default => 'bg-gray-100 text-gray-800'
+                        };
+                        ?>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $estadoClase; ?>">
+                            <?php if ($esProgramada): ?>
+                                <i class="fas fa-clock mr-1"></i>
+                            <?php endif; ?>
+                            <?php echo $estadoTexto; ?>
                         </span>
+                        <?php if ($esProgramada): ?>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <?php echo date('d/m/Y H:i', strtotime($noticia['fecha_programada'])); ?>
+                            </div>
+                        <?php endif; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <?php echo date('d/m/Y', strtotime($noticia['fecha_creacion'])); ?>
