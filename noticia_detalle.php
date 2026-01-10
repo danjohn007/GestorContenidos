@@ -692,8 +692,10 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
                     </p>
                 </div>
             </div>
-            <div class="border-t border-white/20 mt-8 pt-8 text-center opacity-80">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
+            <div class="border-t border-white/20 mt-8 pt-8 text-center">
+                <div class="opacity-80 mb-4">
+                    <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
+                </div>
             </div>
         </div>
     </footer>

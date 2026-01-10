@@ -31,9 +31,10 @@ class Noticia {
             $query .= " AND n.estado = :estado";
             $params['estado'] = $estado;
             
-            // If filtering by 'publicado' status, ensure scheduled news don't show yet
+            // If filtering by 'publicado' status, ensure scheduled news show only when time has come
             if ($estado === 'publicado') {
-                $query .= " AND (n.fecha_publicacion IS NOT NULL OR n.fecha_programada IS NULL)";
+                $query .= " AND (n.fecha_publicacion IS NOT NULL 
+                            AND (n.fecha_programada IS NULL OR n.fecha_programada <= NOW()))";
             }
         }
         
@@ -231,7 +232,8 @@ class Noticia {
                   FROM {$this->table} n
                   INNER JOIN categorias c ON n.categoria_id = c.id
                   WHERE n.destacado = 1 AND n.estado = 'publicado'
-                  AND (n.fecha_publicacion IS NOT NULL OR n.fecha_programada IS NULL)
+                  AND n.fecha_publicacion IS NOT NULL
+                  AND (n.fecha_programada IS NULL OR n.fecha_programada <= NOW())
                   ORDER BY n.orden_destacado ASC, n.fecha_publicacion DESC
                   LIMIT :limit";
         
@@ -250,7 +252,8 @@ class Noticia {
                   FROM {$this->table} n
                   INNER JOIN categorias c ON n.categoria_id = c.id
                   WHERE n.estado = 'publicado'
-                  AND (n.fecha_publicacion IS NOT NULL OR n.fecha_programada IS NULL)
+                  AND n.fecha_publicacion IS NOT NULL
+                  AND (n.fecha_programada IS NULL OR n.fecha_programada <= NOW())
                   ORDER BY n.visitas DESC
                   LIMIT :limit";
         

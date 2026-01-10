@@ -39,7 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Manejar imagen destacada
     $imagen_destacada = null;
-    if (isset($_FILES['imagen_destacada']) && $_FILES['imagen_destacada']['error'] === UPLOAD_ERR_OK) {
+    
+    // First check if image was selected from gallery
+    if (!empty($_POST['imagen_destacada_url'])) {
+        $selectedUrl = trim($_POST['imagen_destacada_url']);
+        // Validate that it's a multimedia gallery path
+        if (strpos($selectedUrl, '/public/uploads/multimedia/') === 0) {
+            $imagen_destacada = $selectedUrl;
+        } else {
+            $errors[] = 'URL de imagen de galería no válida';
+        }
+    }
+    // Otherwise check if file was uploaded
+    elseif (isset($_FILES['imagen_destacada']) && $_FILES['imagen_destacada']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/public/uploads/noticias/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
@@ -250,11 +262,21 @@ ob_start();
                 <select name="categoria_id" required 
                         class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Selecciona una categoría</option>
-                    <?php foreach ($categorias as $cat): ?>
-                    <option value="<?php echo $cat['id']; ?>" <?php echo (isset($_POST['categoria_id']) && $_POST['categoria_id'] == $cat['id']) ? 'selected' : ''; ?>>
-                        <?php echo e($cat['nombre']); ?>
-                        <?php if ($cat['padre_id']): ?> (Subcategoría)<?php endif; ?>
+                    <?php 
+                    // Obtener categorías de forma jerárquica
+                    $categoriasTree = $categoriaModel->getTree(1);
+                    foreach ($categoriasTree as $catPrincipal): 
+                    ?>
+                    <option value="<?php echo $catPrincipal['id']; ?>" <?php echo (isset($_POST['categoria_id']) && $_POST['categoria_id'] == $catPrincipal['id']) ? 'selected' : ''; ?>>
+                        <?php echo e($catPrincipal['nombre']); ?>
                     </option>
+                    <?php if (!empty($catPrincipal['children'])): ?>
+                        <?php foreach ($catPrincipal['children'] as $subcategoria): ?>
+                        <option value="<?php echo $subcategoria['id']; ?>" <?php echo (isset($_POST['categoria_id']) && $_POST['categoria_id'] == $subcategoria['id']) ? 'selected' : ''; ?>>
+                            &nbsp;&nbsp;&nbsp;└─ <?php echo e($subcategoria['nombre']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -297,8 +319,25 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     Imagen Destacada
                 </label>
-                <input type="file" name="imagen_destacada" accept="image/*"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="flex items-center space-x-3">
+                    <input type="file" name="imagen_destacada" accept="image/*" id="imagen_destacada_file"
+                           class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="button" onclick="openMediaGallery('imagen_destacada')"
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors whitespace-nowrap">
+                        <i class="fas fa-images mr-2"></i>
+                        Galería
+                    </button>
+                </div>
+                <input type="hidden" name="imagen_destacada_url" id="imagen_destacada_url">
+                <div id="imagen_destacada_preview" class="mt-3 hidden">
+                    <p class="text-sm text-gray-600 mb-2">Vista previa de la galería:</p>
+                    <img id="imagen_destacada_preview_img" src="" alt="Preview" class="h-32 rounded border border-gray-300">
+                    <button type="button" onclick="clearMediaSelection('imagen_destacada')"
+                            class="mt-2 text-sm text-red-600 hover:text-red-800">
+                        <i class="fas fa-times mr-1"></i>
+                        Remover selección
+                    </button>
+                </div>
             </div>
 
             <!-- Sección de Videos -->
@@ -542,7 +581,162 @@ form.addEventListener('submit', function(e) {
         return false;
     }
 });
+
+// Media Gallery Modal Functions
+var currentMediaField = null;
+const BASE_URL = '<?php echo addslashes(BASE_URL); ?>';
+const MEDIA_API_URL = '<?php echo addslashes(url('api/multimedia_list.php')); ?>';
+
+function openMediaGallery(fieldName) {
+    currentMediaField = fieldName;
+    document.getElementById('mediaGalleryModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    loadMediaGallery();
+}
+
+function closeMediaGallery() {
+    document.getElementById('mediaGalleryModal').classList.add('hidden');
+    document.body.style.overflow = '';
+    currentMediaField = null;
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function loadMediaGallery(page = 1) {
+    const tipo = 'imagen'; // For now, only images
+    const galleryContainer = document.getElementById('mediaGalleryContainer');
+    
+    galleryContainer.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i></div>';
+    
+    fetch(`${MEDIA_API_URL}?tipo=${encodeURIComponent(tipo)}&page=${encodeURIComponent(page)}&perPage=12`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.length > 0) {
+                let html = '<div class="grid grid-cols-3 gap-4">';
+                data.data.forEach(media => {
+                    const escapedRuta = escapeHtml(media.ruta);
+                    const escapedTitulo = escapeHtml(media.titulo || media.nombre_original || '');
+                    const imgSrc = BASE_URL + media.ruta;
+                    
+                    html += `
+                        <div class="relative group cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-lg overflow-hidden" 
+                             data-ruta="${escapedRuta}" 
+                             data-titulo="${escapedTitulo}"
+                             onclick="selectMediaFromElement(this)">
+                            <img src="${escapeHtml(imgSrc)}" alt="${escapedTitulo}" class="w-full h-32 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                                <i class="fas fa-check-circle text-white text-3xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <p class="text-white text-xs truncate">${escapedTitulo}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                // Pagination
+                if (data.totalPages > 1) {
+                    html += '<div class="mt-6 flex justify-center space-x-2">';
+                    for (let i = 1; i <= data.totalPages; i++) {
+                        const active = i === page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+                        html += `<button type="button" onclick="loadMediaGallery(${i})" class="${active} px-3 py-1 rounded">${i}</button>`;
+                    }
+                    html += '</div>';
+                }
+                
+                galleryContainer.innerHTML = html;
+            } else {
+                galleryContainer.innerHTML = '<div class="text-center py-8 text-gray-500">No hay imágenes disponibles en la galería</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading media:', error);
+            galleryContainer.innerHTML = '<div class="text-center py-8 text-red-500">Error al cargar la galería</div>';
+        });
+}
+
+function selectMediaFromElement(element) {
+    const ruta = element.getAttribute('data-ruta');
+    const titulo = element.getAttribute('data-titulo');
+    selectMedia(ruta, titulo);
+}
+
+function selectMedia(ruta, titulo) {
+    if (!currentMediaField) return;
+    
+    // Validate ruta starts with expected path
+    if (!ruta.startsWith('/public/uploads/multimedia/')) {
+        console.error('Invalid media path');
+        return;
+    }
+    
+    // Set hidden field with URL
+    document.getElementById(currentMediaField + '_url').value = ruta;
+    
+    // Show preview
+    const preview = document.getElementById(currentMediaField + '_preview');
+    const previewImg = document.getElementById(currentMediaField + '_preview_img');
+    
+    preview.classList.remove('hidden');
+    previewImg.src = BASE_URL + ruta;
+    previewImg.alt = titulo || '';
+    
+    // Clear file input if user selected from gallery
+    const fileInput = document.getElementById(currentMediaField + '_file');
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    
+    closeMediaGallery();
+}
+
+function clearMediaSelection(fieldName) {
+    document.getElementById(fieldName + '_url').value = '';
+    document.getElementById(fieldName + '_preview').classList.add('hidden');
+    document.getElementById(fieldName + '_file').value = '';
+}
 </script>
+
+<!-- Media Gallery Modal -->
+<div id="mediaGalleryModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="closeMediaGallery()">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        <i class="fas fa-images mr-2 text-purple-600"></i>
+                        Galería de Multimedia
+                    </h3>
+                    <button type="button" onclick="closeMediaGallery()" class="text-gray-400 hover:text-gray-500">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="mediaGalleryContainer" class="max-h-96 overflow-y-auto">
+                    <!-- Gallery will be loaded here -->
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="closeMediaGallery()" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php
 $content = ob_get_clean();
