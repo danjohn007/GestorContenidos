@@ -18,11 +18,44 @@ if ($ubicacion === '' || $ubicacion === 'Todas') {
 // Obtener noticias destacadas
 $noticiasDestacadas = $noticiaDestacadaImagenModel->getAll(null, $ubicacion);
 
+// Verificar si la tabla existe (si getAll retorna array vacío y no hay filtros, podría ser que la tabla no existe)
+$tablaMissing = false;
+try {
+    $db = Database::getInstance()->getConnection();
+    $stmt = $db->query("SHOW TABLES LIKE 'noticias_destacadas_imagenes'");
+    $tablaMissing = ($stmt->rowCount() === 0);
+} catch (Exception $e) {
+    // Ignorar errores de verificación
+}
+
 $title = 'Noticias Destacadas (Imágenes)';
 ob_start();
 ?>
 
 <div class="space-y-6">
+    <?php if ($tablaMissing): ?>
+    <!-- Alerta de tabla faltante -->
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                    Tabla de base de datos no encontrada
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                    <p>La tabla <code>noticias_destacadas_imagenes</code> no existe en la base de datos.</p>
+                    <p class="mt-2">Por favor ejecute el siguiente script SQL para crear la tabla:</p>
+                    <code class="block mt-2 p-2 bg-red-100 rounded">
+                        mysql -u usuario -p base_datos &lt; database_noticias_destacadas_imagenes.sql
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <!-- Header -->
     <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold text-gray-900">

@@ -46,29 +46,39 @@ class NoticiaDestacadaImagen {
      * Obtiene todas las noticias destacadas
      */
     public function getAll($activo = null, $ubicacion = null) {
-        $query = "SELECT * FROM {$this->table} WHERE 1=1";
-        $params = [];
-        
-        if ($activo !== null) {
-            $query .= " AND activo = :activo";
-            $params['activo'] = $activo;
-        }
+        try {
+            $query = "SELECT * FROM {$this->table} WHERE 1=1";
+            $params = [];
+            
+            if ($activo !== null) {
+                $query .= " AND activo = :activo";
+                $params['activo'] = $activo;
+            }
 
-        if ($ubicacion !== null) {
-            $query .= " AND ubicacion = :ubicacion";
-            $params['ubicacion'] = $ubicacion;
-        }
+            if ($ubicacion !== null) {
+                $query .= " AND ubicacion = :ubicacion";
+                $params['ubicacion'] = $ubicacion;
+            }
 
-        // Filtrar por fechas de vigencia
-        $query .= " AND (fecha_inicio IS NULL OR fecha_inicio <= CURDATE())";
-        $query .= " AND (fecha_fin IS NULL OR fecha_fin >= CURDATE())";
-        
-        $query .= " ORDER BY orden ASC";
-        
-        $stmt = $this->db->prepare($query);
-        $stmt->execute($params);
-        
-        return $stmt->fetchAll();
+            // Filtrar por fechas de vigencia
+            $query .= " AND (fecha_inicio IS NULL OR fecha_inicio <= CURDATE())";
+            $query .= " AND (fecha_fin IS NULL OR fecha_fin >= CURDATE())";
+            
+            $query .= " ORDER BY orden ASC";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute($params);
+            
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            // Si la tabla no existe (código de error 42S02), retornar array vacío
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return [];
+            }
+            // Para otros errores, relanzar la excepción
+            throw $e;
+        }
     }
 
     /**
@@ -82,78 +92,111 @@ class NoticiaDestacadaImagen {
      * Obtiene una noticia destacada por ID
      */
     public function getById($id) {
-        $query = "SELECT * FROM {$this->table} WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+        try {
+            $query = "SELECT * FROM {$this->table} WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            // Si la tabla no existe, retornar false
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return false;
+            }
+            throw $e;
+        }
     }
 
     /**
      * Crea una nueva noticia destacada
      */
     public function create($data) {
-        $query = "INSERT INTO {$this->table} 
-                  (titulo, imagen_url, url_destino, noticia_id, ubicacion, vista, orden, activo, 
-                   fecha_inicio, fecha_fin) 
-                  VALUES (:titulo, :imagen_url, :url_destino, :noticia_id, :ubicacion, :vista, 
-                          :orden, :activo, :fecha_inicio, :fecha_fin)";
-        
-        $stmt = $this->db->prepare($query);
-        
-        $result = $stmt->execute([
-            'titulo' => $data['titulo'],
-            'imagen_url' => $data['imagen_url'],
-            'url_destino' => $data['url_destino'] ?? null,
-            'noticia_id' => $data['noticia_id'] ?? null,
-            'ubicacion' => $data['ubicacion'] ?? self::UBICACION_BAJO_SLIDER,
-            'vista' => $data['vista'] ?? self::VISTA_GRID,
-            'orden' => $data['orden'] ?? 0,
-            'activo' => $data['activo'] ?? 1,
-            'fecha_inicio' => $data['fecha_inicio'] ?? null,
-            'fecha_fin' => $data['fecha_fin'] ?? null
-        ]);
-        
-        if ($result) {
-            return $this->db->lastInsertId();
+        try {
+            $query = "INSERT INTO {$this->table} 
+                      (titulo, imagen_url, url_destino, noticia_id, ubicacion, vista, orden, activo, 
+                       fecha_inicio, fecha_fin) 
+                      VALUES (:titulo, :imagen_url, :url_destino, :noticia_id, :ubicacion, :vista, 
+                              :orden, :activo, :fecha_inicio, :fecha_fin)";
+            
+            $stmt = $this->db->prepare($query);
+            
+            $result = $stmt->execute([
+                'titulo' => $data['titulo'],
+                'imagen_url' => $data['imagen_url'],
+                'url_destino' => $data['url_destino'] ?? null,
+                'noticia_id' => $data['noticia_id'] ?? null,
+                'ubicacion' => $data['ubicacion'] ?? self::UBICACION_BAJO_SLIDER,
+                'vista' => $data['vista'] ?? self::VISTA_GRID,
+                'orden' => $data['orden'] ?? 0,
+                'activo' => $data['activo'] ?? 1,
+                'fecha_inicio' => $data['fecha_inicio'] ?? null,
+                'fecha_fin' => $data['fecha_fin'] ?? null
+            ]);
+            
+            if ($result) {
+                return $this->db->lastInsertId();
+            }
+            
+            return false;
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return false;
+            }
+            throw $e;
         }
-        
-        return false;
     }
 
     /**
      * Actualiza una noticia destacada
      */
     public function update($id, $data) {
-        $fields = [];
-        $params = ['id' => $id];
-        
-        $allowedFields = ['titulo', 'imagen_url', 'url_destino', 'noticia_id', 'ubicacion', 
-                          'vista', 'orden', 'activo', 'fecha_inicio', 'fecha_fin'];
-        
-        foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $data[$field];
+        try {
+            $fields = [];
+            $params = ['id' => $id];
+            
+            $allowedFields = ['titulo', 'imagen_url', 'url_destino', 'noticia_id', 'ubicacion', 
+                              'vista', 'orden', 'activo', 'fecha_inicio', 'fecha_fin'];
+            
+            foreach ($allowedFields as $field) {
+                if (isset($data[$field])) {
+                    $fields[] = "$field = :$field";
+                    $params[$field] = $data[$field];
+                }
             }
+            
+            if (empty($fields)) {
+                return false;
+            }
+            
+            $query = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return false;
+            }
+            throw $e;
         }
-        
-        if (empty($fields)) {
-            return false;
-        }
-        
-        $query = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        
-        return $stmt->execute($params);
     }
 
     /**
      * Elimina una noticia destacada
      */
     public function delete($id) {
-        $query = "DELETE FROM {$this->table} WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        return $stmt->execute(['id' => $id]);
+        try {
+            $query = "DELETE FROM {$this->table} WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            return $stmt->execute(['id' => $id]);
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return false;
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -173,14 +216,22 @@ class NoticiaDestacadaImagen {
      * Actualiza el orden de múltiples noticias destacadas
      */
     public function updateOrden($ordenes) {
-        $query = "UPDATE {$this->table} SET orden = :orden WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        
-        foreach ($ordenes as $id => $orden) {
-            $stmt->execute(['id' => $id, 'orden' => $orden]);
+        try {
+            $query = "UPDATE {$this->table} SET orden = :orden WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            
+            foreach ($ordenes as $id => $orden) {
+                $stmt->execute(['id' => $id, 'orden' => $orden]);
+            }
+            
+            return true;
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S02') {
+                error_log("NoticiaDestacadaImagen: Tabla no existe. Por favor ejecute database_noticias_destacadas_imagenes.sql");
+                return false;
+            }
+            throw $e;
         }
-        
-        return true;
     }
 }
 ?>
