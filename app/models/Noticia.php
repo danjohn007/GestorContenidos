@@ -118,13 +118,24 @@ class Noticia {
      * Crea una nueva noticia
      */
     public function create($data) {
+        // Si está programada para publicarse en el futuro, no establecer fecha_publicacion aún
+        $fecha_publicacion = null;
+        if (($data['estado'] ?? 'borrador') === 'publicado') {
+            $fecha_programada = $data['fecha_programada'] ?? null;
+            if (!$fecha_programada || strtotime($fecha_programada) <= time()) {
+                // Publicar inmediatamente si no hay programación o la fecha ya pasó
+                $fecha_publicacion = date('Y-m-d H:i:s');
+            }
+            // Si está programada para el futuro, fecha_publicacion permanece NULL
+        }
+        
         $query = "INSERT INTO {$this->table} 
                   (titulo, subtitulo, slug, contenido, resumen, tags, autor_id, categoria_id, 
                    imagen_destacada, video_url, video_youtube, video_thumbnail, video_thumbnail_url, estado, destacado, 
-                   permitir_comentarios, fecha_programada) 
+                   permitir_comentarios, fecha_programada, fecha_publicacion) 
                   VALUES (:titulo, :subtitulo, :slug, :contenido, :resumen, :tags, :autor_id, :categoria_id,
                           :imagen_destacada, :video_url, :video_youtube, :video_thumbnail, :video_thumbnail_url, :estado, :destacado, 
-                          :permitir_comentarios, :fecha_programada)";
+                          :permitir_comentarios, :fecha_programada, :fecha_publicacion)";
         
         $stmt = $this->db->prepare($query);
         
@@ -145,7 +156,8 @@ class Noticia {
             'estado' => $data['estado'] ?? 'borrador',
             'destacado' => $data['destacado'] ?? 0,
             'permitir_comentarios' => $data['permitir_comentarios'] ?? 1,
-            'fecha_programada' => $data['fecha_programada'] ?? null
+            'fecha_programada' => $data['fecha_programada'] ?? null,
+            'fecha_publicacion' => $fecha_publicacion
         ]);
         
         if ($result) {
@@ -165,8 +177,22 @@ class Noticia {
         $allowedFields = ['titulo', 'subtitulo', 'slug', 'contenido', 'resumen', 'tags',
                           'categoria_id', 'imagen_destacada', 'video_url', 'video_youtube', 
                           'video_thumbnail', 'video_thumbnail_url', 'estado', 'destacado', 'orden_destacado', 
-                          'permitir_comentarios', 'fecha_programada', 'fecha_publicacion', 
+                          'permitir_comentarios', 'fecha_programada', 
                           'modificado_por'];
+        
+        // Manejar fecha_publicacion según el estado y fecha_programada
+        if (isset($data['estado']) && $data['estado'] === 'publicado') {
+            $fecha_programada = $data['fecha_programada'] ?? null;
+            if (!$fecha_programada || strtotime($fecha_programada) <= time()) {
+                // Si no hay programación o la fecha ya pasó, publicar inmediatamente
+                // Solo establecer fecha_publicacion si aún no tiene una
+                $noticia = $this->getById($id);
+                if (!$noticia['fecha_publicacion']) {
+                    $fields[] = "fecha_publicacion = NOW()";
+                }
+            }
+            // Si está programada para el futuro, no modificar fecha_publicacion
+        }
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {

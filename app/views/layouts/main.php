@@ -142,6 +142,10 @@
                     <i class="fas fa-newspaper mr-3"></i>
                     Noticias
                 </a>
+                <a href="<?php echo url('noticias_destacadas.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
+                    <i class="fas fa-images mr-3"></i>
+                    Destacadas (Imágenes)
+                </a>
                 <?php endif; ?>
                 
                 <?php if (hasPermission('categorias') || hasPermission('all')): ?>
@@ -151,12 +155,7 @@
                 </a>
                 <?php endif; ?>
                 
-                <?php if (hasPermission('multimedia') || hasPermission('all')): ?>
-                <a href="<?php echo url('multimedia.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
-                    <i class="fas fa-images mr-3"></i>
-                    Multimedia
-                </a>
-                <?php endif; ?>
+
                 
                 <?php if (hasPermission('usuarios') || hasPermission('all')): ?>
                 <a href="<?php echo url('usuarios.php'); ?>" class="flex items-center px-6 py-3 text-gray-200 hover:text-white sidebar-link">
