@@ -45,6 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Una categoría no puede ser su propia categoría padre';
     }
     
+    // Validar que el nuevo padre no sea una subcategoría de esta categoría
+    // (prevenir ciclos en la jerarquía)
+    if ($padre_id) {
+        $subcategorias = $categoriaModel->getChildren($categoriaId);
+        $subcategoriasIds = array_column($subcategorias, 'id');
+        if (in_array($padre_id, $subcategoriasIds)) {
+            $errors[] = 'No se puede seleccionar una subcategoría propia como categoría padre';
+        }
+    }
+    
     // Si no hay errores, actualizar categoría
     if (empty($errors)) {
         $data = [

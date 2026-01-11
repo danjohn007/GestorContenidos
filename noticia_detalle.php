@@ -694,8 +694,20 @@ $direccion = $configGeneral['direccion']['valor'] ?? '';
             </div>
             <div class="border-t border-white/20 mt-8 pt-8 text-center">
                 <div class="opacity-80 mb-4">
-                    <p>&copy; <?php echo date('Y'); ?> <?php echo e($nombreSitio); ?>. Todos los derechos reservados.</p>
+                    <?php 
+                    $textoFooter = $configGeneral['texto_footer']['valor'] ?? '&copy; ' . date('Y') . ' ' . $nombreSitio . '. Todos los derechos reservados.';
+                    $avisoLegal = $configGeneral['aviso_legal']['valor'] ?? '';
+                    $mostrarAvisoLegal = ($configGeneral['mostrar_aviso_legal']['valor'] ?? '1') === '1';
+                    echo nl2br(e($textoFooter)); 
+                    ?>
                 </div>
+                <?php if ($mostrarAvisoLegal && !empty($avisoLegal)): ?>
+                <div class="mt-2">
+                    <a href="<?php echo url('aviso-legal.php'); ?>" class="text-white hover:text-blue-200 underline text-sm">
+                        Aviso Legal
+                    </a>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </footer>
