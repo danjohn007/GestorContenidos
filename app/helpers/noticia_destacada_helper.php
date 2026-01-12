@@ -10,6 +10,8 @@ if (!isset($noticiaDestacadaImagenModel)) {
 
 /**
  * Muestra noticias destacadas de una ubicación específica
+ * Implementa el requerimiento: 4 columnas horizontales en desktop
+ * Con controles prev/next cuando hay más de 4 imágenes
  * @param string $ubicacion - La ubicación (bajo_slider, entre_bloques, antes_footer)
  * @param string $cssClass - Clase CSS adicional para el contenedor
  */
@@ -45,7 +47,8 @@ function displayNoticiasDestacadasImagenes($ubicacion, $cssClass = '') {
 
 /**
  * Muestra noticias destacadas en formato grid
- * Ahora muestra 4 columnas con controles prev/next cuando hay más de 4 imágenes (igual que carousel)
+ * Cumple con el requerimiento: vista horizontal de 4 columnas en desktop
+ * Si hay más de 4 imágenes, usa carousel con controles prev/next para navegación
  */
 function displayNoticiasDestacadasGrid($noticias, $cssClass = '') {
     if (empty($noticias)) {
@@ -90,7 +93,8 @@ function displayNoticiasDestacadasGrid($noticias, $cssClass = '') {
 
 /**
  * Muestra noticias destacadas en formato carousel
- * Ahora muestra 4 columnas con controles prev/next cuando hay más de 4 imágenes
+ * Muestra 4 columnas con controles prev/next cuando hay más de 4 imágenes
+ * Cumple con el requerimiento: vista horizontal de 4 columnas con navegación
  */
 function displayNoticiasDestacadasCarousel($noticias, $cssClass = '') {
     if (empty($noticias)) {
@@ -100,7 +104,7 @@ function displayNoticiasDestacadasCarousel($noticias, $cssClass = '') {
     $carouselId = 'noticias-destacadas-carousel-' . uniqid();
     $safeCssClass = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
     $totalNoticias = count($noticias);
-    $noticiasPerPage = 4; // Mostrar 4 columnas
+    $noticiasPerPage = 4; // Mostrar 4 columnas horizontalmente
     $totalPages = ceil($totalNoticias / $noticiasPerPage);
     
     echo '<div class="noticias-destacadas-carousel my-8 ' . $safeCssClass . '" id="' . $carouselId . '">';

@@ -81,11 +81,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $imagen_url = '/public/uploads/destacadas/' . $filename;
             } else {
-                $errors[] = 'Error al subir la imagen';
+                $errors[] = 'Error al subir la imagen. Verifique los permisos del directorio.';
             }
         } else {
-            $errors[] = 'Formato de imagen no permitido';
+            $errors[] = 'Formato de imagen no permitido. Use JPG, PNG, GIF o WebP.';
         }
+    } elseif (isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
+        // Hay un error en el archivo subido
+        $uploadErrors = [
+            UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por PHP',
+            UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo permitido por el formulario',
+            UPLOAD_ERR_PARTIAL => 'El archivo se subió parcialmente',
+            UPLOAD_ERR_NO_TMP_DIR => 'Falta la carpeta temporal',
+            UPLOAD_ERR_CANT_WRITE => 'Error al escribir el archivo en disco',
+            UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida'
+        ];
+        $errorCode = $_FILES['imagen']['error'];
+        $errors[] = isset($uploadErrors[$errorCode]) ? $uploadErrors[$errorCode] : 'Error desconocido al subir la imagen';
     }
     
     // Si no hay errores, actualizar
