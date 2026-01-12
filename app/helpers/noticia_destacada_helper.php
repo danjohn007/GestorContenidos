@@ -45,38 +45,47 @@ function displayNoticiasDestacadasImagenes($ubicacion, $cssClass = '') {
 
 /**
  * Muestra noticias destacadas en formato grid
+ * Ahora muestra 4 columnas con controles prev/next cuando hay más de 4 imágenes (igual que carousel)
  */
 function displayNoticiasDestacadasGrid($noticias, $cssClass = '') {
     if (empty($noticias)) {
         return;
     }
     
-    $safeCssClass = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
+    $totalNoticias = count($noticias);
     
-    echo '<div class="noticias-destacadas-grid my-8 ' . $safeCssClass . '">';
-    echo '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">';
-    
-    foreach ($noticias as $noticia) {
-        $url = !empty($noticia['url_destino']) ? $noticia['url_destino'] : '#';
-        $titulo = e($noticia['titulo']);
+    // Si hay 4 o menos, mostrar en grid simple sin controles
+    if ($totalNoticias <= 4) {
+        $safeCssClass = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
         
-        echo '<div class="noticia-destacada-item overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow">';
-        echo '<a href="' . e($url) . '" class="block">';
+        echo '<div class="noticias-destacadas-grid my-8 ' . $safeCssClass . '">';
+        echo '<div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
         
-        if (!empty($noticia['imagen_url'])) {
-            echo '<img src="' . e(BASE_URL . $noticia['imagen_url']) . '" alt="' . $titulo . '" class="w-full h-48 object-cover hover:opacity-90 transition-opacity">';
-        } else {
-            echo '<div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">';
-            echo '<i class="fas fa-image text-white text-4xl"></i>';
+        foreach ($noticias as $noticia) {
+            $url = !empty($noticia['url_destino']) ? $noticia['url_destino'] : '#';
+            $titulo = e($noticia['titulo']);
+            
+            echo '<div class="noticia-destacada-item overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow">';
+            echo '<a href="' . e($url) . '" class="block">';
+            
+            if (!empty($noticia['imagen_url'])) {
+                echo '<img src="' . e(BASE_URL . $noticia['imagen_url']) . '" alt="' . $titulo . '" class="w-full h-48 object-cover hover:opacity-90 transition-opacity">';
+            } else {
+                echo '<div class="w-full h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">';
+                echo '<i class="fas fa-image text-white text-4xl"></i>';
+                echo '</div>';
+            }
+            
+            echo '</a>';
             echo '</div>';
         }
         
-        echo '</a>';
         echo '</div>';
+        echo '</div>';
+    } else {
+        // Si hay más de 4, usar el sistema de carousel para mantener consistencia
+        displayNoticiasDestacadasCarousel($noticias, $cssClass);
     }
-    
-    echo '</div>';
-    echo '</div>';
 }
 
 /**
