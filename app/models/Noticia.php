@@ -190,8 +190,11 @@ class Noticia {
                 if (!$noticia['fecha_publicacion']) {
                     $fields[] = "fecha_publicacion = NOW()";
                 }
+            } else {
+                // Si está programada para el futuro, resetear fecha_publicacion a NULL
+                // para que el script publicar_programadas.php la procese
+                $fields[] = "fecha_publicacion = NULL";
             }
-            // Si está programada para el futuro, no modificar fecha_publicacion
         }
         
         foreach ($allowedFields as $field) {
