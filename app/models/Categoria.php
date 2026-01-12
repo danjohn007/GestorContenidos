@@ -151,7 +151,7 @@ class Categoria {
                           'visible', 'editor_responsable_id'];
         
         foreach ($allowedFields as $field) {
-            if (isset($data[$field])) {
+            if (array_key_exists($field, $data)) {
                 if ($field === 'slug') {
                     $fields[] = "$field = :$field";
                     $params[$field] = $this->generateSlug($data[$field], $id);
